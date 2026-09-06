@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QuantumCircuit",
+  "description": "Shared circuit contract used by frontend builder, code editor, simulation service, and AI tutor.",
+  "type": "object",
+  "required": ["num_qubits", "gates"],
+  "properties": {
+    "num_qubits": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20,
+      "description": "Capped at 20 for educational-scale Aer simulation performance."
+    },
+    "num_clbits": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional. Defaults to num_qubits if omitted and measure gates are present."
+    },
+    "gates": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/gate" }
+    },
+    "shots": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20000,
+      "default": 1024,
+      "description": "Number of measurement shots for counts/probabilities."
+    }
+  },
+  "definitions": {
+    "gate": {
+      "type": "object",
+      "required": ["type", "qubits"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "h", "x", "y", "z", "s", "t", "sdg", "tdg",
+            "rx", "ry", "rz",
+            "cx", "cy", "cz", "swap", "ccx",
+            "measure"
+          ]
+        },
+        "qubits": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "minItems": 1
+        },
+        "clbits": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "description": "Only used with type=measure. Defaults to same indices as qubits."
+        },
+        "params": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Angle(s) in radians, only for rx/ry/rz."
+        }
+      }
+    }
+  },
+  "example": {
+    "num_qubits": 3,
+    "shots": 1024,
+    "gates": [
+      { "type": "h", "qubits": [0] },
+      { "type": "cx", "qubits": [0, 1] },
+      { "type": "measure", "qubits": [0, 1, 2] }
+    ]
+  }
+}
