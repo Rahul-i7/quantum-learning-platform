@@ -79,7 +79,7 @@ function DropCell({ qubitIndex, stepIndex, pendingCX, setPendingCX }: CellProps)
             <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-400 z-0" />
             {gate && (
                 <div className="group relative z-10 flex h-8 w-8 items-center justify-center rounded bg-blue-600 font-mono text-xs font-bold text-white shadow-sm">
-                    {gate.type === 'measure' ? 'M' : gate.type.toUpperCase()}
+                    {gate.type === 'Measure' ? 'M' : gate.type.toUpperCase()}
 
                     <button
                         onClick={handleRemove}

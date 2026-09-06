@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Atom, LayoutGrid, Gauge } from 'lucide-react'
+import { Atom, LayoutGrid, Gauge, BookOpen } from 'lucide-react'
 
 const LINKS = [
+  { href: '/learn', label: 'Learn', icon: BookOpen },
   { href: '/builder', label: 'Builder', icon: LayoutGrid },
   { href: '/dashboard', label: 'Dashboard', icon: Gauge },
 ]
