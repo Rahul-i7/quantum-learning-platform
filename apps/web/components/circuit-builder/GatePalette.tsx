@@ -35,7 +35,7 @@ export default function GatePalette() {
     <div className="flex flex-col gap-2 p-4">
       <h3 className="font-semibold text-gray-700">Gates</h3>
       {GATES.map((gate) => (
-        <DraggableGate key={gate.label} gateType={gate.label} />
+        <DraggableGate key={gate.type} gateType={gate.label} />
       ))}
     </div>
   )

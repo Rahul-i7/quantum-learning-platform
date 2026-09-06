@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,26 +12,8 @@ import {
   Cell,
 } from 'recharts';
 import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed } from 'lucide-react';
-import { COLORS, panelStyle, primaryButtonStyle, textareaStyle, presetButtonStyle } from './theme';
+import { COLORS, panelStyle, presetButtonStyle } from './theme';
 
-// ---------------------------------------------------------------------------
-// Shared mock data shape — sync this with Role 5 (Backend/Data Lead), whose
-// Supabase schema and progress-tracking APIs are the real source of this data:
-//
-//   {
-//     cohortName: "Section A",
-//     modules: ["Qubits & Superposition", "Entanglement", ...],
-//     students: [
-//       {
-//         id, name, completionPct,
-//         moduleProgress: [90, 85, 80, 70],   // % per module, same order as `modules`
-//         quizzes: [{ name, score, max }],
-//         challenges: [{ name, status: "completed" | "in_progress" | "not_started" }],
-//         lastActive: "2 days ago"
-//       }
-//     ]
-//   }
-// ---------------------------------------------------------------------------
 
 const SIMULATED_DELAY_MS = 400;
 
@@ -178,7 +160,7 @@ export default function InstructorDashboard() {
 
         {isEmpty && !isLoading && (
           <div
-            style={{ border: `1px solid ${COLORS.border}`, background: 'rgba(15,26,46,0.4)', padding: '32px 20px', textAlign: 'center' }}
+            style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: '32px 20px', textAlign: 'center' }}
           >
             <p style={{ color: COLORS.textDim, fontSize: '0.85rem' }}>
               Choose a class section to load cohort progress
@@ -204,7 +186,7 @@ export default function InstructorDashboard() {
             </div>
 
             {/* Per-student completion chart */}
-            <div style={{ border: `1px solid ${COLORS.border}`, background: 'rgba(15,26,46,0.4)', padding: 16 }}>
+            <div style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: 16 }}>
               <div style={{ color: COLORS.textBright, fontSize: '0.9rem', fontWeight: 600, marginBottom: 2 }}>
                 Completion by student
               </div>
@@ -261,7 +243,7 @@ export default function InstructorDashboard() {
             </div>
 
             {/* Module completion chart */}
-            <div style={{ border: `1px solid ${COLORS.border}`, background: 'rgba(15,26,46,0.4)', padding: 16 }}>
+            <div style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: 16 }}>
               <div style={{ color: COLORS.textBright, fontSize: '0.9rem', fontWeight: 600, marginBottom: 2 }}>
                 Average completion by module
               </div>

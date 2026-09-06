@@ -1,77 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
-import { RotateCcw, Info, Loader2 } from 'lucide-react';
-import { COLORS, panelStyle, primaryButtonStyle, textareaStyle, presetButtonStyle } from './theme';
+import { RotateCcw, Loader2, Orbit } from 'lucide-react';
 
-// ---------------------------------------------------------------------------
-// Bloch sphere math
-//
-// A single-qubit pure state |psi> = alpha|0> + beta|1> maps to a point on the
-// unit sphere via:
-//   alpha = cos(theta/2)                     (chosen real & non-negative)
-//   beta  = e^(i*phi) * sin(theta/2)
-//   x = sin(theta)*cos(phi)   (|+>/|-> axis)
-//   y = sin(theta)*sin(phi)   (|+i>/|-i> axis)
-//   z = cos(theta)            (|0>/|1> axis)
-//
-// This is exactly the shape you'll eventually receive from the Simulation
-// Service (Section 3/4 of the design doc) as a statevector. Until Role 3
-// (Backend Lead) finalizes the exact field names for that response, this
-// component accepts a small mock schema — swap `parseStatevectorInput`
-// below for the real one once it's agreed.
-// ---------------------------------------------------------------------------
-
-const PRESETS = [
-  { label: '|0⟩', theta: 0, phi: 0 },
-  { label: '|1⟩', theta: Math.PI, phi: 0 },
-  { label: '|+⟩', theta: Math.PI / 2, phi: 0 },
-  { label: '|−⟩', theta: Math.PI / 2, phi: Math.PI },
-  { label: '|+i⟩', theta: Math.PI / 2, phi: Math.PI / 2 },
-  { label: '|−i⟩', theta: Math.PI / 2, phi: (3 * Math.PI) / 2 },
-];
-
-// Simulated latency for the "loading" state — stands in for the real network
-// round-trip to the Simulation Service once it exists.
-const SIMULATED_DELAY_MS = 350;
-
-function amplitudesFromAngles(theta, phi) {
-  const alpha = Math.cos(theta / 2);
-  const beta = {
-    re: Math.sin(theta / 2) * Math.cos(phi),
-    im: Math.sin(theta / 2) * Math.sin(phi),
-  };
-  return { alpha: { re: alpha, im: 0 }, beta };
-}
-
-function anglesFromAmplitudes(alpha, beta) {
-  const alphaMag = Math.hypot(alpha.re, alpha.im);
-  const betaMag = Math.hypot(beta.re, beta.im);
-  const norm = Math.hypot(alphaMag, betaMag) || 1;
-  const theta = 2 * Math.atan2(betaMag / norm, alphaMag / norm);
-  let phi = Math.atan2(beta.im, beta.re) - Math.atan2(alpha.im, alpha.re);
-  phi = ((phi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-  return { theta, phi };
-}
-
-function fmt(n) {
-  const v = Math.abs(n) < 1e-4 ? 0 : n;
-  return v.toFixed(3);
-}
-
-function formatComplex(c) {
-  if (Math.abs(c.im) < 1e-4) return fmt(c.re);
-  const sign = c.im >= 0 ? '+' : '−';
-  return `${fmt(c.re)} ${sign} ${fmt(Math.abs(c.im))}i`;
-}
-
-function makeTextSprite(text, color) {
+function makeTextSprite(text, color = '#334155') {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 128;
   const ctx = canvas.getContext('2d');
-  ctx.font = '52px system-ui, sans-serif';
+  ctx.font = 'bold 44px ui-monospace, monospace';
   ctx.fillStyle = color;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -84,31 +22,91 @@ function makeTextSprite(text, color) {
   return sprite;
 }
 
-export default function BlochSphereVisualizer() {
+function computeBlochVector(data, qubitIndex) {
+  if (!data) {
+    return { x: 0, y: 0, z: 1, mag: 1, prob0: 1, prob1: 0, isDefault: true };
+  }
+
+  const numQubits = data.num_qubits || 1;
+
+  if (data.statevector && Array.isArray(data.statevector) && data.statevector.length > 0) {
+    const dim = data.statevector.length;
+    const bitPos = qubitIndex;
+    let rho00 = 0, rho11 = 0, rho01re = 0, rho01im = 0;
+
+    for (let i = 0; i < dim; i++) {
+      const bit = (i >> bitPos) & 1;
+      const amp = data.statevector[i];
+      const re = Array.isArray(amp) ? amp[0] : (amp?.re ?? 0);
+      const im = Array.isArray(amp) ? amp[1] : (amp?.im ?? 0);
+      const p = re * re + im * im;
+
+      if (bit === 0) {
+        rho00 += p;
+        const j = i | (1 << bitPos);
+        if (j < dim) {
+          const ampJ = data.statevector[j];
+          const jRe = Array.isArray(ampJ) ? ampJ[0] : (ampJ?.re ?? 0);
+          const jIm = Array.isArray(ampJ) ? ampJ[1] : (ampJ?.im ?? 0);
+          rho01re += re * jRe + im * jIm;
+          rho01im += im * jRe - re * jIm;
+        }
+      } else {
+        rho11 += p;
+      }
+    }
+
+    const x = 2 * rho01re;
+    const y = -2 * rho01im;
+    const z = rho00 - rho11;
+    const mag = Math.sqrt(x * x + y * y + z * z);
+    return { x, y, z, mag, prob0: rho00, prob1: rho11, isDefault: false };
+  }
+
+  if (data.probabilities) {
+    let p0 = 0, p1 = 0;
+    Object.entries(data.probabilities).forEach(([bitstring, prob]) => {
+      const charIndex = bitstring.length - 1 - qubitIndex;
+      if (charIndex >= 0 && charIndex < bitstring.length) {
+        if (bitstring[charIndex] === '0') p0 += prob;
+        else if (bitstring[charIndex] === '1') p1 += prob;
+      }
+    });
+    const z = p0 - p1;
+    return { x: 0, y: 0, z, mag: Math.abs(z), prob0: p0, prob1: p1, isDefault: false };
+  }
+
+  return { x: 0, y: 0, z: 1, mag: 1, prob0: 1, prob1: 0, isDefault: true };
+}
+
+export default function BlochSphereVisualizer({ data, qubitIndex = 0, numQubits = 3, loading = false }) {
   const mountRef = useRef(null);
   const threeRef = useRef({});
   const dragRef = useRef({ dragging: false, lastX: 0, lastY: 0 });
-  const delayRef = useRef(null);
 
-  const [theta, setTheta] = useState(0);
-  const [phi, setPhi] = useState(0);
-  const [activePreset, setActivePreset] = useState('');
-  const [pasteText, setPasteText] = useState('');
-  const [pasteError, setPasteError] = useState('');
-  // 'empty'   -> no circuit/state has been loaded yet
-  // 'loading' -> simulating the round-trip to the (future) Simulation Service
-  // 'ready'   -> a state is loaded and the sphere/readout reflect it
-  const [status, setStatus] = useState('empty');
+  const [selectedQubit, setSelectedQubit] = useState(qubitIndex);
 
-  // --- Three.js scene setup (once) ---------------------------------------
+  useEffect(() => {
+    setSelectedQubit(qubitIndex);
+  }, [qubitIndex]);
+
+  const effectiveNumQubits = data?.num_qubits || numQubits || 3;
+  const qubitsList = Array.from({ length: effectiveNumQubits }, (_, i) => i);
+
+  const blochState = useMemo(() => {
+    return computeBlochVector(data, selectedQubit);
+  }, [data, selectedQubit]);
+
   useEffect(() => {
     const mount = mountRef.current;
-    const width = mount.clientWidth;
-    const height = mount.clientHeight;
+    if (!mount) return;
+
+    const width = mount.clientWidth || 320;
+    const height = mount.clientHeight || 260;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
-    camera.position.set(2.4, 1.7, 2.6);
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(2.4, 1.8, 2.6);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -119,35 +117,32 @@ export default function BlochSphereVisualizer() {
     const group = new THREE.Group();
     scene.add(group);
 
-    // Sphere: faint solid fill + wireframe
     const sphereGeo = new THREE.SphereGeometry(1, 32, 24);
     const solidMat = new THREE.MeshBasicMaterial({
-      color: COLORS.axis,
+      color: 0xf1f5f9,
       transparent: true,
-      opacity: 0.05,
+      opacity: 0.1,
     });
     group.add(new THREE.Mesh(sphereGeo, solidMat));
 
     const wireMat = new THREE.MeshBasicMaterial({
-      color: COLORS.axis,
+      color: 0xcbd5e1,
       wireframe: true,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.45,
     });
     group.add(new THREE.Mesh(sphereGeo, wireMat));
 
-    // Equator ring, highlighted
     const equatorPts = [];
     for (let i = 0; i <= 64; i++) {
       const a = (i / 64) * Math.PI * 2;
       equatorPts.push(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)));
     }
     const equatorGeo = new THREE.BufferGeometry().setFromPoints(equatorPts);
-    const equatorMat = new THREE.LineBasicMaterial({ color: COLORS.axis, transparent: true, opacity: 0.6 });
+    const equatorMat = new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.7 });
     group.add(new THREE.LineLoop(equatorGeo, equatorMat));
 
-    // Axes through the sphere
-    const axisMat = new THREE.LineBasicMaterial({ color: COLORS.axis, transparent: true, opacity: 0.5 });
+    const axisMat = new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.5 });
     [
       [new THREE.Vector3(-1.3, 0, 0), new THREE.Vector3(1.3, 0, 0)],
       [new THREE.Vector3(0, -1.3, 0), new THREE.Vector3(0, 1.3, 0)],
@@ -157,35 +152,38 @@ export default function BlochSphereVisualizer() {
       group.add(new THREE.Line(geo, axisMat));
     });
 
-    // Axis labels
     const labelDefs = [
-      ['|0⟩', 0, 1.55, 0],
-      ['|1⟩', 0, -1.55, 0],
-      ['|+⟩', 1.55, 0, 0],
-      ['|−⟩', -1.55, 0, 0],
-      ['|+i⟩', 0, 0, 1.55],
-      ['|−i⟩', 0, 0, -1.55],
+      ['|0⟩', 0, 1.5, 0],
+      ['|1⟩', 0, -1.5, 0],
+      ['|+⟩', 1.5, 0, 0],
+      ['|−⟩', -1.5, 0, 0],
+      ['|+i⟩', 0, 0, 1.5],
+      ['|−i⟩', 0, 0, -1.5],
     ];
     labelDefs.forEach(([text, x, y, z]) => {
-      const sprite = makeTextSprite(text, COLORS.textBright);
+      const sprite = makeTextSprite(text, '#334155');
       sprite.position.set(x, y, z);
       group.add(sprite);
     });
 
-    // State vector arrow — starts hidden until a state is actually loaded
     const arrow = new THREE.ArrowHelper(
       new THREE.Vector3(0, 1, 0),
       new THREE.Vector3(0, 0, 0),
       1,
-      new THREE.Color(COLORS.accent).getHex(),
-      0.16,
-      0.09
+      0x2563eb,
+      0.18,
+      0.1
     );
-    arrow.line.material.linewidth = 2;
-    arrow.visible = false;
     group.add(arrow);
 
-    threeRef.current = { scene, camera, renderer, group, arrow, mount };
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x059669 })
+    );
+    dot.visible = false;
+    group.add(dot);
+
+    threeRef.current = { scene, camera, renderer, group, arrow, dot, mount };
 
     let raf;
     const animate = () => {
@@ -198,6 +196,7 @@ export default function BlochSphereVisualizer() {
     animate();
 
     const handleResize = () => {
+      if (!mount) return;
       const w = mount.clientWidth;
       const h = mount.clientHeight;
       camera.aspect = w / h;
@@ -209,315 +208,167 @@ export default function BlochSphereVisualizer() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', handleResize);
-      mount.removeChild(renderer.domElement);
+      if (mount && renderer.domElement) {
+        mount.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, []);
 
-  // --- Update arrow whenever theta/phi/status change ----------------------
   useEffect(() => {
-    const { arrow } = threeRef.current;
-    if (!arrow) return;
-    arrow.visible = status === 'ready';
-    const bx = Math.sin(theta) * Math.cos(phi);
-    const by = Math.sin(theta) * Math.sin(phi);
-    const bz = Math.cos(theta);
-    const dir = new THREE.Vector3(bx, bz, by).normalize();
-    arrow.setDirection(dir);
-  }, [theta, phi, status]);
+    const { arrow, dot } = threeRef.current;
+    if (!arrow || !dot) return;
 
-  // Clear any pending simulated-delay timer on unmount
-  useEffect(() => {
-    return () => {
-      if (delayRef.current) clearTimeout(delayRef.current);
-    };
-  }, []);
+    const { x, y, z, mag } = blochState;
 
-  // --- Pointer drag to rotate ---------------------------------------------
+    if (mag < 0.08) {
+      arrow.visible = false;
+      dot.visible = true;
+    } else {
+      dot.visible = false;
+      arrow.visible = true;
+      const dir = new THREE.Vector3(x, z, y).normalize();
+      arrow.setDirection(dir);
+      arrow.setLength(Math.max(0.2, mag), 0.16 * mag + 0.04, 0.08 * mag + 0.02);
+    }
+  }, [blochState]);
+
   const onPointerDown = (e) => {
     dragRef.current = { dragging: true, lastX: e.clientX, lastY: e.clientY };
   };
+
   const onPointerMove = (e) => {
     if (!dragRef.current.dragging) return;
     const { group } = threeRef.current;
+    if (!group) return;
     const dx = e.clientX - dragRef.current.lastX;
     const dy = e.clientY - dragRef.current.lastY;
-    group.rotation.y += dx * 0.006;
-    group.rotation.x = Math.max(-1.2, Math.min(1.2, group.rotation.x + dy * 0.006));
+    group.rotation.y += dx * 0.008;
+    group.rotation.x = Math.max(-1.2, Math.min(1.2, group.rotation.x + dy * 0.008));
     dragRef.current.lastX = e.clientX;
     dragRef.current.lastY = e.clientY;
   };
+
   const endDrag = () => {
     dragRef.current.dragging = false;
   };
 
-  const applyPreset = (preset) => {
-    setActivePreset(preset.label);
-    setPasteError('');
-    setStatus('loading');
-    if (delayRef.current) clearTimeout(delayRef.current);
-    delayRef.current = setTimeout(() => {
-      setTheta(preset.theta);
-      setPhi(preset.phi);
-      setStatus('ready');
-    }, SIMULATED_DELAY_MS);
-  };
-
-  const handleThetaChange = (v) => {
-    setActivePreset('');
-    setTheta(v);
-    setStatus('ready');
-  };
-  const handlePhiChange = (v) => {
-    setActivePreset('');
-    setPhi(v);
-    setStatus('ready');
-  };
-
-  const handleParse = useCallback(() => {
-    try {
-      const data = JSON.parse(pasteText);
-      if (!data.alpha || !data.beta) throw new Error('missing alpha/beta');
-      const a = { re: Number(data.alpha.re) || 0, im: Number(data.alpha.im) || 0 };
-      const b = { re: Number(data.beta.re) || 0, im: Number(data.beta.im) || 0 };
-      const { theta: t, phi: p } = anglesFromAmplitudes(a, b);
-      setPasteError('');
-      setActivePreset('');
-      setStatus('loading');
-      if (delayRef.current) clearTimeout(delayRef.current);
-      delayRef.current = setTimeout(() => {
-        setTheta(t);
-        setPhi(p);
-        setStatus('ready');
-      }, SIMULATED_DELAY_MS);
-    } catch (err) {
-      setPasteError('Could not parse — expected {"alpha":{"re":..,"im":..},"beta":{"re":..,"im":..}}');
-    }
-  }, [pasteText]);
-
   const resetView = () => {
     const { group } = threeRef.current;
-    if (group) {
-      group.rotation.set(0, 0, 0);
-    }
+    if (group) group.rotation.set(0, 0, 0);
   };
 
-  const isEmpty = status === 'empty';
-  const isLoading = status === 'loading';
-  const { alpha, beta } = amplitudesFromAngles(theta, phi);
-  const probZero = Math.pow(Math.cos(theta / 2), 2);
-  const probOne = 1 - probZero;
-
   return (
-    <div
-      className="w-full h-full min-h-screen flex flex-col md:flex-row"
-      style={{ background: COLORS.bg, fontFamily: 'system-ui, sans-serif' }}
-    >
-      {/* 3D viewport */}
-      <div className="relative flex-1" style={{ minHeight: 320 }}>
+    <div className="flex flex-col h-full rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold text-gray-800">
+            Bloch Sphere Visualizer
+          </h3>
+          <p className="text-xs text-gray-500">
+            {blochState.isDefault
+              ? 'Showing ground state |0⟩'
+              : `State representation for Qubit ${selectedQubit}`}
+          </p>
+        </div>
+
+        {qubitsList.length > 1 && (
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
+            {qubitsList.map((q) => (
+              <button
+                key={q}
+                onClick={() => setSelectedQubit(q)}
+                className={`px-2.5 py-1 text-xs font-mono font-medium rounded transition-colors ${
+                  selectedQubit === q
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                q[{q}]
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="relative flex-1 min-h-[260px] rounded-lg border border-gray-100 bg-slate-50/50 overflow-hidden">
+        {loading && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xs">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600 mb-2" />
+            <span className="text-xs font-medium text-gray-600">Simulating state...</span>
+          </div>
+        )}
+
         <div
           ref={mountRef}
-          className="w-full h-full cursor-grab active:cursor-grabbing"
-          style={{ minHeight: 320, touchAction: 'none' }}
+          className="w-full h-full min-h-[260px] cursor-grab active:cursor-grabbing"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
         />
 
-        {isEmpty && (
-          <div
-            className="absolute inset-0 flex items-center justify-center px-6 pointer-events-none"
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          <button
+            onClick={resetView}
+            className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-gray-600 bg-white/90 hover:bg-white border border-gray-200 rounded-md shadow-xs transition-colors"
           >
-            <div
-              className="text-center px-5 py-4"
-              style={{ background: 'rgba(15,26,46,0.85)', border: `1px solid ${COLORS.border}`, maxWidth: 320 }}
-            >
-              <p style={{ color: COLORS.textBright, fontSize: '0.9rem', marginBottom: 4 }}>
-                No state loaded yet
-              </p>
-              <p style={{ color: COLORS.textDim, fontSize: '0.78rem' }}>
-                Choose a preset or paste a statevector to visualize a qubit
-              </p>
-            </div>
-          </div>
-        )}
-
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div
-              className="flex items-center gap-2 px-4 py-2"
-              style={{ background: 'rgba(15,26,46,0.85)', border: `1px solid ${COLORS.border}` }}
-            >
-              <Loader2 size={15} className="animate-spin" style={{ color: COLORS.accent }} />
-              <span style={{ color: COLORS.textBright, fontSize: '0.8rem' }}>Simulating…</span>
-            </div>
-          </div>
-        )}
-
-        <button
-          onClick={resetView}
-          className="absolute top-4 right-4 flex items-center gap-2 px-3 py-3 sm:py-2 text-sm"
-          style={{
-            background: COLORS.panel,
-            border: `1px solid ${COLORS.border}`,
-            color: COLORS.textDim,
-          }}
-        >
-          <RotateCcw size={14} />
-          Reset view
-        </button>
-        <div
-          className="absolute bottom-4 left-4 text-xs flex items-center gap-1.5"
-          style={{ color: COLORS.textDim }}
-        >
-          <Info size={13} />
-          Drag to orbit — rotates automatically otherwise
-        </div>
-      </div>
-
-      {/* Control / readout panel */}
-      <div
-        className="w-full md:w-96 flex flex-col gap-6 p-4 sm:p-6 md:overflow-y-auto"
-        style={panelStyle}
-      >
-        <div>
-          <h2 style={{ color: COLORS.textBright, fontSize: '1.05rem', fontWeight: 600 }}>
-            Single-qubit state
-          </h2>
-          <p style={{ color: COLORS.textDim, fontSize: '0.8rem', marginTop: 4 }}>
-            Position on the Bloch sphere for α|0⟩ + β|1⟩
-          </p>
-        </div>
-
-        {/* Presets */}
-        <div>
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 8 }}>
-            Preset states
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {PRESETS.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => applyPreset(p)}
-                className="py-3 sm:py-2 text-sm"
-                style={{ fontFamily: 'ui-monospace, monospace', ...presetButtonStyle(activePreset === p.label) }}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sliders */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <div className="flex justify-between" style={{ fontSize: '0.8rem' }}>
-              <span style={{ color: COLORS.textDim }}>θ (polar)</span>
-              <span style={{ color: COLORS.textBright, fontFamily: 'ui-monospace, monospace' }}>
-                {((theta * 180) / Math.PI).toFixed(1)}°
-              </span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={Math.PI}
-              step={0.01}
-              value={theta}
-              onChange={(e) => handleThetaChange(parseFloat(e.target.value))}
-              className="w-full mt-1"
-              style={{ accentColor: COLORS.accent }}
-            />
-          </div>
-          <div>
-            <div className="flex justify-between" style={{ fontSize: '0.8rem' }}>
-              <span style={{ color: COLORS.textDim }}>φ (azimuth)</span>
-              <span style={{ color: COLORS.textBright, fontFamily: 'ui-monospace, monospace' }}>
-                {((phi * 180) / Math.PI).toFixed(1)}°
-              </span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={2 * Math.PI}
-              step={0.01}
-              value={phi}
-              onChange={(e) => handlePhiChange(parseFloat(e.target.value))}
-              className="w-full mt-1"
-              style={{ accentColor: COLORS.accent }}
-            />
-          </div>
-        </div>
-
-        {/* Readout */}
-        <div style={{ border: `1px solid ${COLORS.border}`, padding: 14 }}>
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 10 }}>
-            State
-          </div>
-          <div
-            style={{
-              fontFamily: 'ui-monospace, monospace',
-              fontSize: '0.85rem',
-              color: isEmpty ? COLORS.textDim : COLORS.textBright,
-              lineHeight: 1.8,
-              opacity: isLoading ? 0.5 : 1,
-            }}
-          >
-            <div>α = {isEmpty ? '—' : formatComplex(alpha)}</div>
-            <div>β = {isEmpty ? '—' : formatComplex(beta)}</div>
-          </div>
-
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', margin: '14px 0 8px' }}>
-            Measurement probability
-          </div>
-          <div className="flex flex-col gap-2" style={{ opacity: isLoading ? 0.5 : 1 }}>
-            <ProbBar label="|0⟩" value={isEmpty ? 0 : probZero} />
-            <ProbBar label="|1⟩" value={isEmpty ? 0 : probOne} />
-          </div>
-        </div>
-
-        {/* Statevector paste-in, for future integration */}
-        <div>
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 8 }}>
-            Preview a Simulation Service response
-          </div>
-          <textarea
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            placeholder='{"alpha":{"re":0.707,"im":0},"beta":{"re":0,"im":0.707}}'
-            rows={3}
-            className="w-full p-2 text-base sm:text-xs"
-            style={textareaStyle}
-          />
-          <button onClick={handleParse} className="mt-2 w-full py-3 sm:py-2 text-sm" style={primaryButtonStyle}>
-            Load state
+            <RotateCcw size={12} />
+            Reset
           </button>
-          {pasteError && (
-            <div style={{ color: COLORS.danger, fontSize: '0.7rem', marginTop: 6 }}>{pasteError}</div>
-          )}
+        </div>
+
+        <div className="absolute bottom-2 left-3 flex items-center gap-1 text-[11px] text-gray-400 pointer-events-none">
+          <Orbit size={12} />
+          <span>Click & drag to rotate</span>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ProbBar({ label, value }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div style={{ width: 32, color: COLORS.textBright, fontFamily: 'ui-monospace, monospace', fontSize: '0.8rem' }}>
-        {label}
-      </div>
-      <div className="flex-1 h-2" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}>
-        <div
-          style={{
-            width: `${(value * 100).toFixed(1)}%`,
-            height: '100%',
-            background: COLORS.accent,
-          }}
-        />
-      </div>
-      <div style={{ width: 44, textAlign: 'right', color: COLORS.textDim, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem' }}>
-        {(value * 100).toFixed(1)}%
+      <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-mono text-gray-500">Bloch vector (x, y, z):</span>
+          <span className="font-mono font-semibold text-gray-800 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+            ({blochState.x.toFixed(2)}, {blochState.y.toFixed(2)}, {blochState.z.toFixed(2)})
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between text-xs">
+              <span className="font-mono text-gray-600">P(|0⟩)</span>
+              <span className="font-mono font-medium text-gray-800">
+                {(blochState.prob0 * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-600 rounded-full transition-all duration-300"
+                style={{ width: `${Math.max(0, Math.min(100, blochState.prob0 * 100))}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between text-xs">
+              <span className="font-mono text-gray-600">P(|1⟩)</span>
+              <span className="font-mono font-medium text-gray-800">
+                {(blochState.prob1 * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-600 rounded-full transition-all duration-300"
+                style={{ width: `${Math.max(0, Math.min(100, blochState.prob1 * 100))}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {blochState.mag < 0.85 && !blochState.isDefault && (
+          <p className="text-[11px] text-amber-600 mt-0.5">
+            Qubit vector length is {blochState.mag.toFixed(2)} &lt; 1 (entangled / mixed with other qubits).
+          </p>
+        )}
       </div>
     </div>
   );

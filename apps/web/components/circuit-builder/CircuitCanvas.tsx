@@ -5,7 +5,6 @@ import { useDrop } from 'react-dnd'
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import { X } from 'lucide-react'
 
-const NUM_QUBITS = 3
 const NUM_STEPS = 8
 
 interface CellProps {
@@ -80,7 +79,7 @@ function DropCell({ qubitIndex, stepIndex, pendingCX, setPendingCX }: CellProps)
             <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-400 z-0" />
             {gate && (
                 <div className="group relative z-10 flex h-8 w-8 items-center justify-center rounded bg-blue-600 font-mono text-xs font-bold text-white shadow-sm">
-                    {gate.type === 'Measure' ? 'M' : gate.type}
+                    {gate.type === 'measure' ? 'M' : gate.type.toUpperCase()}
 
                     <button
                         onClick={handleRemove}
@@ -103,7 +102,8 @@ function DropCell({ qubitIndex, stepIndex, pendingCX, setPendingCX }: CellProps)
 }
 
 export default function CircuitCanvas() {
-    const qubits = Array.from({ length: NUM_QUBITS }, (_, i) => i)
+    const numQubits = useCircuitStore((state) => state.numQubits)
+    const qubits = Array.from({ length: numQubits }, (_, i) => i)
     const steps = Array.from({ length: NUM_STEPS }, (_, i) => i)
 
     const [pendingCX, setPendingCX] = useState<{ qubitIndex: number; stepIndex: number } | null>(null)

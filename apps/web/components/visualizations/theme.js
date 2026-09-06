@@ -4,16 +4,17 @@
 // without copy-pasting the same object into every file.
 
 export const COLORS = {
-  bg: '#0B1220',
-  panel: '#0F1A2E',
-  border: '#1E2A44',
-  textDim: '#7C8AA5',
-  textBright: '#E7ECF5',
-  accent: '#5EEAD4',
-  accent2: '#A78BFA',
-  axis: '#3A4A6B',
-  grid: '#1E2A44',
-  danger: '#F87171',
+  bg: '#f8fafc',
+  panel: '#ffffff',
+  border: '#e2e8f0',
+  borderDark: '#cbd5e1',
+  textDim: '#64748b',
+  textBright: '#1e293b',
+  accent: '#2563eb',
+  accent2: '#059669',
+  axis: '#94a3b8',
+  grid: '#f1f5f9',
+  danger: '#ef4444',
 };
 
 export const panelStyle = {
@@ -23,8 +24,9 @@ export const panelStyle = {
 
 export const primaryButtonStyle = {
   background: COLORS.accent,
-  color: '#0B1220',
+  color: '#ffffff',
   fontWeight: 500,
+  borderRadius: '0.375rem',
 };
 
 export const textareaStyle = {
@@ -33,12 +35,15 @@ export const textareaStyle = {
   border: `1px solid ${COLORS.border}`,
   color: COLORS.textBright,
   resize: 'none',
+  borderRadius: '0.375rem',
 };
 
 export function presetButtonStyle(active) {
   return {
-    background: active ? COLORS.accent2 : 'transparent',
-    color: active ? '#0B1220' : COLORS.textBright,
-    border: `1px solid ${active ? COLORS.accent2 : COLORS.border}`,
+    background: active ? COLORS.accent : '#f1f5f9',
+    color: active ? '#ffffff' : COLORS.textBright,
+    border: `1px solid ${active ? COLORS.accent : COLORS.border}`,
+    borderRadius: '0.375rem',
   };
 }
+
