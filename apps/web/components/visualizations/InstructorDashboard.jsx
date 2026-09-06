@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { Loader2, Info, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed } from 'lucide-react';
 import { COLORS, panelStyle, primaryButtonStyle, textareaStyle, presetButtonStyle } from './theme';
 
 // ---------------------------------------------------------------------------
@@ -75,13 +75,7 @@ const PRESETS = [
   { label: 'Section B — Week 6', data: buildCohort('Section B', 1) },
 ];
 
-function parseCohortInput(text) {
-  const data = JSON.parse(text);
-  if (!data.students || !Array.isArray(data.students) || !data.modules) {
-    throw new Error('missing students/modules');
-  }
-  return data;
-}
+
 
 function statusMeta(status) {
   if (status === 'completed') return { icon: CheckCircle2, color: COLORS.accent, label: 'Completed' };
@@ -94,14 +88,17 @@ export default function InstructorDashboard() {
   const [cohort, setCohort] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [status, setStatus] = useState('empty');
-  const [pasteText, setPasteText] = useState('');
-  const [pasteError, setPasteError] = useState('');
   const delayRef = useRef(null);
 
   useEffect(() => {
+    // Auto-load first preset for now since backend is not connected
+    if (status === 'empty' && PRESETS.length > 0) {
+      applyPreset(PRESETS[0]);
+    }
     return () => {
       if (delayRef.current) clearTimeout(delayRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const runWithDelay = (fn) => {
@@ -115,23 +112,12 @@ export default function InstructorDashboard() {
 
   const applyPreset = (preset) => {
     setActivePreset(preset.label);
-    setPasteError('');
+    //setPasteError('');
     setSelectedId(null);
     runWithDelay(() => setCohort(preset.data));
   };
 
-  const handleParse = useCallback(() => {
-    try {
-      const parsed = parseCohortInput(pasteText);
-      setPasteError('');
-      setActivePreset('');
-      setSelectedId(null);
-      runWithDelay(() => setCohort(parsed));
-    } catch (err) {
-      setPasteError('Could not parse — expected {"modules":[...],"students":[...]}');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pasteText]);
+
 
   const studentChartData = useMemo(() => {
     if (!cohort) return [];
@@ -430,33 +416,7 @@ export default function InstructorDashboard() {
           </div>
         )}
 
-        <div>
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 8 }}>
-            Preview a Progress Service response
-          </div>
-          <textarea
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            placeholder='{"cohortName":"Section C","modules":[...],"students":[...]}'
-            rows={4}
-            className="w-full p-2 text-base sm:text-xs"
-            style={textareaStyle}
-          />
-          <button onClick={handleParse} className="mt-2 w-full py-3 sm:py-2 text-sm" style={primaryButtonStyle}>
-            Load cohort
-          </button>
-          {pasteError && (
-            <div style={{ color: COLORS.danger, fontSize: '0.7rem', marginTop: 6 }}>{pasteError}</div>
-          )}
-        </div>
 
-        <div className="text-xs flex items-start gap-1.5" style={{ color: COLORS.textDim }}>
-          <Info size={13} style={{ marginTop: 2, flexShrink: 0 }} />
-          <span>
-            This assumes Role 5's Progress Service exposes per-student module/quiz/challenge data
-            in roughly this shape — confirm the exact fields before wiring up real data.
-          </span>
-        </div>
       </div>
     </div>
   );
