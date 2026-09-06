@@ -2,7 +2,12 @@ import { useDrag } from 'react-dnd'
 
 
 
-const GATES = ['H', 'X', 'CX', 'Measure'] as const
+const GATES = [
+  { label: "H", type: "h" },
+  { label: "X", type: "x" },
+  { label: "CX", type: "cx" },
+  { label: "Measure", type: "measure" },
+];
 
 function DraggableGate({ gateType }: { gateType: string }) {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -30,7 +35,7 @@ export default function GatePalette() {
     <div className="flex flex-col gap-2 p-4">
       <h3 className="font-semibold text-gray-700">Gates</h3>
       {GATES.map((gate) => (
-        <DraggableGate key={gate} gateType={gate} />
+        <DraggableGate key={gate.label} gateType={gate.label} />
       ))}
     </div>
   )
