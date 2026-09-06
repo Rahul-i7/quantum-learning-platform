@@ -1,0 +1,19 @@
+{
+  "num_qubits": 3,
+  "num_classical_bits": 2,
+  "metadata": {
+    "title": "Quantum Teleportation",
+    "description": "Teleports an unknown state on qubit 0 to qubit 2 using shared Bell pair on qubits 1 & 2",
+    "tags": ["teleportation", "protocol", "advanced"]
+  },
+  "gates": [
+    { "type": "h", "qubits": [1] },
+    { "type": "cx", "qubits": [1, 2] },
+    { "type": "barrier", "qubits": [0, 1, 2] },
+    { "type": "cx", "qubits": [0, 1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "barrier", "qubits": [0, 1, 2] },
+    { "type": "measure", "qubits": [0], "classical_bits": [0] },
+    { "type": "measure", "qubits": [1], "classical_bits": [1] }
+  ]
+}
