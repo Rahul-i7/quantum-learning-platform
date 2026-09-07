@@ -11,9 +11,13 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed, Wifi, WifiOff } from 'lucide-react';
 import { COLORS, panelStyle, presetButtonStyle } from './theme';
+import { contentApi } from '@/lib/api-client/content';
 
+// Matches supabase/seed.sql's demo cohort (see db/memory_store.py::DEMO_COHORT_ID
+// on the content-progress service when Supabase isn't configured yet).
+const LIVE_COHORT_ID = '00000000-0000-0000-0000-0000000000c1';
 
 const SIMULATED_DELAY_MS = 400;
 
@@ -70,6 +74,7 @@ export default function InstructorDashboard() {
   const [cohort, setCohort] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [status, setStatus] = useState('empty');
+  const [liveError, setLiveError] = useState('');
   const delayRef = useRef(null);
 
   useEffect(() => {
@@ -94,9 +99,27 @@ export default function InstructorDashboard() {
 
   const applyPreset = (preset) => {
     setActivePreset(preset.label);
-    //setPasteError('');
+    setLiveError('');
     setSelectedId(null);
     runWithDelay(() => setCohort(preset.data));
+  };
+
+  const loadLiveCohort = async () => {
+    setActivePreset('Live — Content Service');
+    setLiveError('');
+    setSelectedId(null);
+    setStatus('loading');
+    try {
+      const data = await contentApi.getCohortSummary(LIVE_COHORT_ID);
+      setCohort(data);
+      setStatus('ready');
+    } catch (err) {
+      // content-progress service isn't running / not configured yet — fall
+      // back to the first demo preset rather than leaving the dashboard blank.
+      console.error('Live cohort fetch failed, falling back to demo data:', err);
+      setLiveError('Could not reach the content service — showing demo data instead.');
+      applyPreset(PRESETS[0]);
+    }
   };
 
 
@@ -303,6 +326,18 @@ export default function InstructorDashboard() {
             Class sections
           </div>
           <div className="flex flex-col gap-2">
+            <button
+              onClick={loadLiveCohort}
+              className="flex items-center gap-2 py-3 sm:py-2 px-3 text-sm text-left"
+              style={presetButtonStyle(activePreset === 'Live — Content Service')}
+            >
+              {activePreset === 'Live — Content Service' && !liveError ? (
+                <Wifi size={13} style={{ color: COLORS.accent }} />
+              ) : (
+                <WifiOff size={13} style={{ color: COLORS.textDim }} />
+              )}
+              Live — Content Service
+            </button>
             {PRESETS.map((p) => (
               <button
                 key={p.label}
@@ -314,6 +349,9 @@ export default function InstructorDashboard() {
               </button>
             ))}
           </div>
+          {liveError && (
+            <p style={{ color: COLORS.textDim, fontSize: '0.7rem', marginTop: 8 }}>{liveError}</p>
+          )}
         </div>
 
         {status === 'ready' && selectedStudent && (
