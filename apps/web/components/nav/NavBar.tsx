@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Atom, LayoutGrid, Gauge, BookOpen } from 'lucide-react'
+import { Atom, LayoutGrid, Gauge, BookOpen, LogOut, LogIn } from 'lucide-react'
+import { useAuth } from '@/lib/supabase/AuthProvider'
 
 const LINKS = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
@@ -12,6 +13,7 @@ const LINKS = [
 
 export default function NavBar() {
   const pathname = usePathname()
+  const { user, signOut, configured } = useAuth()
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
@@ -40,6 +42,31 @@ export default function NavBar() {
               </Link>
             )
           })}
+
+          <div className="ml-2 border-l border-gray-200 pl-3">
+            {!configured ? (
+              <span className="text-xs text-gray-400" title="Supabase not configured">
+                Guest
+              </span>
+            ) : user ? (
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                title={user.email ?? undefined}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign out</span>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign in</span>
+              </Link>
+            )}
+          </div>
         </nav>
       </div>
     </header>
