@@ -129,7 +129,11 @@ def get_learner_profile(user_id: str = "beginner_alex") -> Dict[str, Any]:
         - quizzes: list of past quiz results
     """
     supabase_url = os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    supabase_key = (
+        os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        or os.getenv("SUPABASE_PUBLISHABLE_KEY")
+        or os.getenv("SUPABASE_ANON_KEY")
+    )
 
     if supabase_url and supabase_key:
         try:

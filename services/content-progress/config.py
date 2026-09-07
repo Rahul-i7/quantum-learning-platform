@@ -11,6 +11,7 @@ load_dotenv()
 class Settings(BaseModel):
     supabase_url: str = os.getenv("SUPABASE_URL", "")
     supabase_service_role_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    supabase_publishable_key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
     supabase_anon_key: str = os.getenv("SUPABASE_ANON_KEY", "")
     supabase_jwt_secret: str = os.getenv("SUPABASE_JWT_SECRET", "")
 
@@ -31,7 +32,14 @@ class Settings(BaseModel):
     # against this service before Supabase credentials exist.
     @property
     def supabase_configured(self) -> bool:
-        return bool(self.supabase_url and self.supabase_service_role_key)
+        return bool(
+            self.supabase_url
+            and (
+                self.supabase_service_role_key
+                or self.supabase_publishable_key
+                or self.supabase_anon_key
+            )
+        )
 
 
 settings = Settings()

@@ -63,10 +63,10 @@ curl localhost:8002/api/instructor/cohort/00000000-0000-0000-0000-0000000000c1
 4. Set `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` in
    `services/content-progress/.env` and run
    `python scripts/seed_demo_users.py` to create the three demo learners.
-5. Copy the project's URL/anon key into the root `.env` as
-   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and (for
-   `services/content-progress` and `services/ai-tutor`) the service-role key
-   as `SUPABASE_SERVICE_ROLE_KEY`.
+5. Copy the project's URL/publishable key into the root `.env` as
+  `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and (for
+  `services/content-progress` and `services/ai-tutor`) the service-role key
+  as `SUPABASE_SERVICE_ROLE_KEY`.
 6. Optional but recommended before a real deploy: set
    `SUPABASE_JWT_SECRET` (Settings → API in the Supabase dashboard) so the
    service verifies learner tokens instead of trusting the request body.

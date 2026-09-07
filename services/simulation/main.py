@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from adapters.qiskit_adapter import simulate_circuit, CircuitValidationError
 from sandbox.executor import run_user_code, SandboxViolation
 
-app = FastAPI(title="Quantum Learning Platform — Simulation Service")
+app = FastAPI(title="QMentor — Simulation Service")
 
 # Tighten allow_origins to the real frontend URL before demo/deploy.
 app.add_middleware(

@@ -50,18 +50,19 @@ tutor_instance: QuantumAITutor = None
 async def lifespan(app: FastAPI):
     global tutor_instance
     logger.info("Initializing Quantum AI Tutor service...")
+    logger.info("Initializing QMentor AI Tutor service...")
     tutor_instance = QuantumAITutor()
     if tutor_instance.is_gemini_connected():
         logger.info(f"Connected to Google AI Studio with model: {tutor_instance.model}")
     else:
         logger.info("Running in autonomous simulation-guided mode (set GEMINI_API_KEY to connect to live Gemini)")
     yield
-    logger.info("Shutting down Quantum AI Tutor service...")
+    logger.info("Shutting down QMentor AI Tutor service...")
 
 
 app = FastAPI(
-    title="Quantum AI Tutor Service",
-    description="Intelligent AI Tutor for Quantum Algorithm Learning, powered by Google AI Studio (Gemini) and Qiskit simulation tool calling.",
+    title="QMentor — AI Tutor Service",
+    description="Intelligent AI Tutor for quantum learning, powered by Google AI Studio (Gemini) and Qiskit simulation tool calling.",
     version="1.0.0",
     lifespan=lifespan
 )

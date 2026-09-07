@@ -1,5 +1,5 @@
 -- ============================================================================
--- Quantum Learning Platform — Content, Auth & Progress schema (Role 5)
+-- QMentor — Content, Auth & Progress schema (Role 5)
 -- ============================================================================
 -- Run this in the Supabase SQL editor (or `supabase db push`) on a fresh
 -- project. Supabase Auth (auth.users) already exists — everything here hangs

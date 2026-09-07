@@ -20,8 +20,8 @@ export default function NavBar() {
       <div className="mx-auto flex h-16 w-full items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-gray-800">
           <Atom className="h-5 w-5 text-blue-600" />
-          <span className="hidden sm:inline">Quantum Learning Platform</span>
-          <span className="sm:hidden">QLP</span>
+          <span className="hidden sm:inline">QMentor</span>
+          <span className="sm:hidden">QM</span>
         </Link>
 
         <nav className="flex items-center gap-1">

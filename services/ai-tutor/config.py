@@ -15,7 +15,11 @@ class Settings(BaseModel):
     fallback_models: list[str] = ["gemini-3.5-flash-lite", "gemini-flash-latest"]
     simulation_service_url: str = os.getenv("SIMULATION_SERVICE_URL", "http://localhost:8000")
     supabase_url: str = os.getenv("SUPABASE_URL", "")
-    supabase_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "") or os.getenv("SUPABASE_ANON_KEY", "")
+    supabase_key: str = (
+        os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+        or os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+        or os.getenv("SUPABASE_ANON_KEY", "")
+    )
     host: str = os.getenv("HOST", "0.0.0.0")
     port: int = int(os.getenv("PORT", "8001"))
     cors_origins: list[str] = [

@@ -41,7 +41,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 logger = logging.getLogger("content-progress-service")
 
 app = FastAPI(
-    title="Quantum Learning Platform — Content, Auth & Progress Service",
+    title="QMentor — Content, Auth & Progress Service",
     description="Supabase-backed course content, quiz/challenge grading, and progress tracking (Role 5).",
     version="1.0.0",
 )

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/supabase/AuthProvider'
+import { LogIn, UserPlus, Mail, Lock, User, AlertCircle, Sparkles } from 'lucide-react'
 
 export default function LoginPage() {
   const { signInWithPassword, signUp, configured } = useAuth()
@@ -19,9 +20,14 @@ export default function LoginPage() {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
+    
     const result =
-      mode === 'signin' ? await signInWithPassword(email, password) : await signUp(email, password, name)
+      mode === 'signin'
+        ? await signInWithPassword(email, password)
+        : await signUp(email, password, name)
+        
     setSubmitting(false)
+    
     if (result.error) {
       setError(result.error)
       return
@@ -29,67 +35,142 @@ export default function LoginPage() {
     router.push('/learn')
   }
 
+  const toggleMode = (newMode: 'signin' | 'signup') => {
+    setMode(newMode)
+    setError(null)
+  }
+
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-16">
-      <h1 className="mb-1 text-xl font-semibold text-gray-800">
-        {mode === 'signin' ? 'Sign in' : 'Create your account'}
-      </h1>
-      <p className="mb-6 text-sm text-gray-500">
-        Track your lessons, quiz scores, and coding-challenge progress across sessions.
-      </p>
-
-      {!configured && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Supabase isn&apos;t configured yet (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are
-          unset), so sign-in is disabled in this environment.
+    <div className="flex h-screen w-screen items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
+        {/* Brand Header */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 shadow-inner">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {mode === 'signin' ? 'Welcome back' : 'Create an account'}
+          </h1>
+          <p className="mt-1 text-xs text-gray-500">
+            Track your quantum lessons, quiz scores, and coding progress.
+          </p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        {mode === 'signup' && (
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          />
+
+        {/* Supabase Unconfigured Warning */}
+        {!configured && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+            <span>
+              Supabase environment variables are missing. Authentication actions are disabled.
+            </span>
+          </div>
         )}
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
-        <input
-          type="password"
-          required
-          minLength={6}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {/* Auth Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {mode === 'signup' && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-700">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Alex Turing"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
 
-        <button
-          type="submit"
-          disabled={submitting || !configured}
-          className="mt-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Sign up'}
-        </button>
-      </form>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-700">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <input
+                type="email"
+                required
+                placeholder="alex@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
 
-      <button
-        onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-        className="mt-4 text-sm text-blue-600 hover:underline"
-      >
-        {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-      </button>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-700">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <input
+                type="password"
+                required
+                minLength={6}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 text-xs font-medium text-red-600">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting || !configured}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          >
+            {submitting ? (
+              <span>Please wait…</span>
+            ) : mode === 'signin' ? (
+              <>
+                <LogIn className="h-4 w-4" />
+                <span>Sign in</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-4 w-4" />
+                <span>Create account</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Footer Toggle Text */}
+        <div className="mt-6 text-center text-xs text-gray-500">
+          {mode === 'signin' ? (
+            <p>
+              Don&apos;t have an account?{' '}
+              <button
+                type="button"
+                onClick={() => toggleMode('signup')}
+                className="font-semibold text-blue-600 hover:underline cursor-pointer"
+              >
+                Sign up
+              </button>
+            </p>
+          ) : (
+            <p>
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => toggleMode('signin')}
+                className="font-semibold text-blue-600 hover:underline cursor-pointer"
+              >
+                Sign in
+              </button>
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

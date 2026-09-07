@@ -1,2 +1,2 @@
-# quantum-learning-platform
+# QMentor
 
