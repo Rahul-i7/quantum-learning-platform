@@ -1,0 +1,14 @@
+{
+  "num_qubits": 2,
+  "num_classical_bits": 2,
+  "metadata": {
+    "title": "Bell State (|Phi+>)",
+    "description": "Creates maximally entangled Bell state: (|00> + |11>) / sqrt(2)",
+    "tags": ["entanglement", "bell-state", "beginner"]
+  },
+  "gates": [
+    { "type": "h", "qubits": [0] },
+    { "type": "cx", "qubits": [0, 1] },
+    { "type": "measure", "qubits": [0, 1], "classical_bits": [0, 1] }
+  ]
+}

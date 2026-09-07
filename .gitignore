@@ -1,45 +1,8 @@
-# --- Environment / secrets ---
-.env
-.env.local
-.env.*.local
-*.pem
-*.key
+﻿.env
+.env.*
+!.env.example
 
-# --- Node / Next.js (apps/web has its own too, but catch stragglers elsewhere) ---
-node_modules/
-.next/
-out/
-dist/
-build/
-.turbo/
-*.tsbuildinfo
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# --- Python (services/simulation, services/ai-tutor) ---
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
-.venv/
-venv/
-env/
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# --- Supabase ---
-supabase/.temp/
-supabase/.branches/
-
-# --- Editors / OS ---
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# --- Logs ---
-*.log
-logs/
+*.pyd

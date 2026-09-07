@@ -1,0 +1,14 @@
+{
+  "num_qubits": 1,
+  "num_classical_bits": 1,
+  "metadata": {
+    "title": "Quantum Interference (H-H Cancellation)",
+    "description": "Demonstrates destructive and constructive interference returning |0> via H followed by H",
+    "tags": ["interference", "hadamard", "beginner"]
+  },
+  "gates": [
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [0] },
+    { "type": "measure", "qubits": [0], "classical_bits": [0] }
+  ]
+}
