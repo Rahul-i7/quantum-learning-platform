@@ -16,8 +16,8 @@ export default function NavBar() {
   const { user, signOut, configured } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+    <header className="sticky w-[100vw] top-0 z-40 border-b border-gray-200 backdrop-blur-2xl">
+      <div className="mx-auto flex h-16 w-full items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-gray-800">
           <Atom className="h-5 w-5 text-blue-600" />
           <span className="hidden sm:inline">Quantum Learning Platform</span>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavBar from "@/components/nav/NavBar";
 import { AuthProvider } from "@/lib/supabase/AuthProvider";
 
 const geistSans = Geist({
@@ -27,7 +26,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-gray-50">
         <AuthProvider>
-          <NavBar />
           <div className="flex flex-1 flex-col">{children}</div>
         </AuthProvider>
       </body>

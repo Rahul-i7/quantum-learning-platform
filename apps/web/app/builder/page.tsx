@@ -10,150 +10,155 @@ import QiskitPreview from '@/components/circuit-builder/QiskitPreview'
 import MeasurementHistogram from '@/components/visualizations/MeasurementHistogram'
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
 import { useCircuitStore } from '@/lib/store/circuit-store'
+import NavBar from '@/components/nav/NavBar'
 
 export default function BuilderPage() {
-  const store = useCircuitStore()
-  
-  const [simulationResult, setSimulationResult] = useState<{
-    counts?: Record<string, number> | null
-    statevector?: number[][] | null
-    probabilities?: Record<string, number> | null
-    num_qubits?: number
-  } | null>(null)
-  
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    const store = useCircuitStore()
 
-  const MIN_QUBITS = 1
-  const MAX_QUBITS = 6
+    const [simulationResult, setSimulationResult] = useState<{
+        counts?: Record<string, number> | null
+        statevector?: number[][] | null
+        probabilities?: Record<string, number> | null
+        num_qubits?: number
+    } | null>(null)
 
-  const handleQubitChange = (next: number) => {
-    const clamped = Math.max(MIN_QUBITS, Math.min(MAX_QUBITS, next))
-    if (clamped === store.numQubits) return
-    // Changing qubit count can orphan gates on qubits that no longer exist,
-    // so reset the circuit rather than leaving dangling references.
-    store.reset()
-    store.setNumQubits(clamped)
-    setSimulationResult(null)
-    setError(null)
-  }
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
-  const handleRunSimulation = async () => {
-    if (store.gates.length === 0) {
-      setError('Please place at least one gate on the circuit canvas before running.')
-      return
+    const MIN_QUBITS = 1
+    const MAX_QUBITS = 6
+
+    const handleQubitChange = (next: number) => {
+        const clamped = Math.max(MIN_QUBITS, Math.min(MAX_QUBITS, next))
+        if (clamped === store.numQubits) return
+        // Changing qubit count can orphan gates on qubits that no longer exist,
+        // so reset the circuit rather than leaving dangling references.
+        store.reset()
+        store.setNumQubits(clamped)
+        setSimulationResult(null)
+        setError(null)
     }
 
-    setLoading(true)
-    setError(null)
-    try {
-      const formattedGates = [...store.gates]
-        .sort((a, b) => a.step - b.step)
-        .map((g) => ({
-          type: g.type.toLowerCase(),
-          qubits: g.qubits,
-        }))
+    const handleRunSimulation = async () => {
+        if (store.gates.length === 0) {
+            setError('Please place at least one gate on the circuit canvas before running.')
+            return
+        }
 
-      const res = await fetch('/api/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          num_qubits: store.numQubits,
-          gates: formattedGates,
-        }),
-      })
+        setLoading(true)
+        setError(null)
+        try {
+            const formattedGates = [...store.gates]
+                .sort((a, b) => a.step - b.step)
+                .map((g) => ({
+                    type: g.type.toLowerCase(),
+                    qubits: g.qubits,
+                }))
 
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.detail || data.error || `Simulation failed with status ${res.status}`)
-      }
+            const res = await fetch('/api/simulate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    num_qubits: store.numQubits,
+                    gates: formattedGates,
+                }),
+            })
 
-      setSimulationResult(data)
-    } catch (err: any) {
-      setError(err?.message || 'Unable to reach the simulation backend service.')
-    } finally {
-      setLoading(false)
+            const data = await res.json()
+            if (!res.ok) {
+                throw new Error(data.detail || data.error || `Simulation failed with status ${res.status}`)
+            }
+
+            setSimulationResult(data)
+        } catch (err: any) {
+            setError(err?.message || 'Unable to reach the simulation backend service.')
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <main className="min-h-screen bg-gray-100 p-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Quantum Circuit Builder</h1>
-            <p className="text-sm text-gray-500">
-              Interactive quantum algorithm design and simulation
-            </p>
-          </div>
+    return (
+        <DndProvider backend={HTML5Backend}>
+            <div className="bg-gray-50 h-screen w-screen">
+                <NavBar />
+                <main className="min-h-screen bg-gray-100 p-8">
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
-              <span className="text-sm font-medium text-gray-600">Qubits</span>
-              <button
-                onClick={() => handleQubitChange(store.numQubits - 1)}
-                disabled={store.numQubits <= MIN_QUBITS}
-                className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
-                aria-label="Decrease qubit count"
-              >
-                <Minus className="h-3.5 w-3.5" />
-              </button>
-              <span className="w-4 text-center font-mono text-sm font-semibold text-gray-800">
-                {store.numQubits}
-              </span>
-              <button
-                onClick={() => handleQubitChange(store.numQubits + 1)}
-                disabled={store.numQubits >= MAX_QUBITS}
-                className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
-                aria-label="Increase qubit count"
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </button>
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-800">Quantum Circuit Builder</h1>
+                            <p className="text-sm text-gray-500">
+                                Interactive quantum algorithm design and simulation
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+                                <span className="text-sm font-medium text-gray-600">Qubits</span>
+                                <button
+                                    onClick={() => handleQubitChange(store.numQubits - 1)}
+                                    disabled={store.numQubits <= MIN_QUBITS}
+                                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
+                                    aria-label="Decrease qubit count"
+                                >
+                                    <Minus className="h-3.5 w-3.5" />
+                                </button>
+                                <span className="w-4 text-center font-mono text-sm font-semibold text-gray-800">
+                                    {store.numQubits}
+                                </span>
+                                <button
+                                    onClick={() => handleQubitChange(store.numQubits + 1)}
+                                    disabled={store.numQubits >= MAX_QUBITS}
+                                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
+                                    aria-label="Increase qubit count"
+                                >
+                                    <Plus className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={handleRunSimulation}
+                                disabled={loading}
+                                className="rounded-lg bg-emerald-600 px-5 py-2 font-semibold text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
+                            >
+                                {loading ? 'Simulating...' : '▶ Run Simulation'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {error && (
+                        <div className="mb-6 rounded-md bg-red-50 p-3 text-sm font-medium text-red-700 border border-red-200">
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-6 lg:flex-row items-start">
+                        <div className="w-full lg:w-48 shrink-0 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <GatePalette />
+                        </div>
+
+                        <div className="flex-1 flex flex-col gap-6 w-full">
+                            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <CircuitCanvas />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <MeasurementHistogram
+                                    data={simulationResult}
+                                    loading={loading}
+                                />
+
+                                <BlochSphereVisualizer
+                                    data={simulationResult}
+                                    numQubits={store.numQubits}
+                                    loading={loading}
+                                />
+                            </div>
+
+                            <QiskitPreview />
+                        </div>
+                    </div>
+                </main>
             </div>
-
-            <button
-              onClick={handleRunSimulation}
-              disabled={loading}
-              className="rounded-lg bg-emerald-600 px-5 py-2 font-semibold text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
-            >
-              {loading ? 'Simulating...' : '▶ Run Simulation'}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-3 text-sm font-medium text-red-700 border border-red-200">
-            {error}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-6 lg:flex-row items-start">
-          <div className="w-full lg:w-48 shrink-0 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <GatePalette />
-          </div>
-
-          <div className="flex-1 flex flex-col gap-6 w-full">
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <CircuitCanvas />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <MeasurementHistogram 
-                data={simulationResult} 
-                loading={loading}
-              />
-
-              <BlochSphereVisualizer 
-                data={simulationResult} 
-                numQubits={store.numQubits}
-                loading={loading}
-              />
-            </div>
-
-            <QiskitPreview />
-          </div>
-        </div>
-      </main>
-    </DndProvider>
-  )
+        </DndProvider>
+    )
 }
