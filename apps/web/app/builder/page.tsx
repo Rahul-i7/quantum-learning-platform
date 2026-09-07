@@ -189,7 +189,7 @@ export default function BuilderPage() {
                                 <div className="bg-white grow p-5 rounded-lg shadow-sm border border-gray-200">
                                     <h2 className="text-lg text-gray-800 mb-2">AI Explanation</h2>
                                     {aiExplanation && (
-                                        <pre className="whitespace-pre-wrap text-sm text-gray-700">{aiExplanation}</pre>
+                                        <pre className="h-68 whitespace-pre-wrap text-sm text-gray-700 overflow-scroll">{aiExplanation}</pre>
                                     )}
                                 </div>
 
