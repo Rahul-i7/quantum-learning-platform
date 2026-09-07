@@ -305,15 +305,27 @@ def simulate_circuit(circuit: Dict[str, Any] | str, shots: int = 1024) -> Dict[s
     if sim_service_url:
         try:
             with httpx.Client(timeout=10.0) as client:
+                # Role 3's /simulate expects the circuit fields FLAT at the
+                # top level (num_qubits, num_clbits, gates, shots) — not
+                # wrapped under a "circuit" key. Sending it wrapped causes a
+                # 422 from FastAPI every time, which used to be swallowed by
+                # the except-and-fallback below with no visible warning.
+                payload = {**circuit, "shots": shots}
                 res = client.post(
                     f"{sim_service_url.rstrip('/')}/simulate",
-                    json={"circuit": circuit, "shots": shots}
+                    json=payload,
                 )
                 if res.status_code == 200:
-                    data = res.json()
-                    return data
+                    return res.json()
+                logger.warning(
+                    "Simulation service at %s returned %s: %s — falling back to local simulator.",
+                    sim_service_url, res.status_code, res.text[:500],
+                )
         except Exception:
-            logger.debug(f"External simulation service ({sim_service_url}) not running. Using local quantum simulator.")
+            logger.warning(
+                "Simulation service at %s unreachable — falling back to local simulator.",
+                sim_service_url, exc_info=True,
+            )
 
     # Built-in local quantum simulator fallback
     result = LocalQuantumSimulator.simulate(circuit, shots=shots)

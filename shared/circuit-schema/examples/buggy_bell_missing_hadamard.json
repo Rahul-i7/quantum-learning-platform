@@ -1,6 +1,6 @@
 {
   "num_qubits": 2,
-  "num_classical_bits": 2,
+  "num_clbits": 2,
   "metadata": {
     "title": "Buggy Bell State (Missing Hadamard)",
     "description": "Student attempted to create a Bell state, but omitted the H gate on qubit 0, so no superposition is formed.",
@@ -8,6 +8,6 @@
   },
   "gates": [
     { "type": "cx", "qubits": [0, 1] },
-    { "type": "measure", "qubits": [0, 1], "classical_bits": [0, 1] }
+    { "type": "measure", "qubits": [0, 1], "clbits": [0, 1] }
   ]
 }
