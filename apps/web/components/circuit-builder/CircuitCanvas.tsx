@@ -26,7 +26,7 @@ function DropCell({ qubitIndex, stepIndex, pendingCX, setPendingCX }: CellProps)
     const [{ isOver, canDrop }, drop] = useDrop(() => ({
         accept: 'GATE',
         drop: (item: { type: string; gateType: string }) => {
-            if (item.gateType === "CX") {
+            if (item.gateType === "cx") {
                 setPendingCX({ qubitIndex, stepIndex })
             } else {
                 addGate({
@@ -49,8 +49,8 @@ function DropCell({ qubitIndex, stepIndex, pendingCX, setPendingCX }: CellProps)
     }
 
     const isPendingControl =
-        pendingCX?.qubitIndex === qubitIndex &&
-        pendingCX?.stepIndex !== stepIndex
+        pendingCX?.qubitIndex !== qubitIndex &&
+        pendingCX?.stepIndex === stepIndex
 
     const handleCellClick = () => {
         if (pendingCX && pendingCX.stepIndex === stepIndex && pendingCX.qubitIndex !== qubitIndex) {
