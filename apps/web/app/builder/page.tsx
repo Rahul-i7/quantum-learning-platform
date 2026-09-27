@@ -205,6 +205,7 @@ export default function BuilderPage() {
                                     data={simulationResult}
                                     numQubits={store.numQubits}
                                     loading={loading}
+                                    showreset={true}
                                 />
                             </div>
 

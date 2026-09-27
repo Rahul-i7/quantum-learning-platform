@@ -12,29 +12,38 @@ export interface Topic {
 export type TopicBlock =
   | { type: "p"; text: string }
   | { type: "matrix"; label: string; rows: string[] }
-  | { type: "note"; text: string };
+  | { type: "note"; text: string }
+  | { type: "interactive"; component: "qubit-transformation" };
 
 export const TOPICS: Topic[] = [
   {
-    id: "qubits",
-    title: "Qubits & Superposition",
-    category: "fundamentals",
-    summary: "The basic unit of quantum information, and why it isn't just a fancy bit.",
-    body: [
-      {
-        type: "p",
-        text: "A classical bit is always either 0 or 1. A qubit's state is a combination — a superposition — of both: |ψ⟩ = α|0⟩ + β|1⟩, where α and β are complex numbers called amplitudes.",
-      },
-      {
-        type: "p",
-        text: "You never observe α and β directly. Measuring the qubit collapses it to a definite 0 or 1, with probability |α|² of getting 0 and |β|² of getting 1. Those two probabilities must add up to 1 — that's why you'll often see amplitudes like 1/√2 (≈0.707) in this platform's results: (1/√2)² + (1/√2)² = 0.5 + 0.5 = 1.",
-      },
-      {
-        type: "note",
-        text: "In the builder, the \"probabilities\" panel after running a circuit is exactly this: |amplitude|² for each possible measurement outcome.",
-      },
-    ],
-  },
+  id: "qubits",
+  title: "Qubits & Superposition",
+  category: "fundamentals",
+  summary:
+    "The basic unit of quantum information, and why it isn't just a fancy bit.",
+  body: [
+    {
+      type: "p",
+      text: "A classical bit is always either 0 or 1. A qubit's state is a combination — a superposition — of both: |ψ⟩ = α|0⟩ + β|1⟩, where α and β are complex numbers called amplitudes.",
+    },
+
+    {
+      type: "interactive",
+      component: "qubit-transformation",
+    },
+
+    {
+      type: "p",
+      text: "You never observe α and β directly. Measuring the qubit collapses it to a definite 0 or 1, with probability |α|² of getting 0 and |β|² of getting 1. Those two probabilities must add up to 1 — that's why you'll often see amplitudes like 1/√2 (≈0.707) in this platform's results: (1/√2)² + (1/√2)² = 0.5 + 0.5 = 1.",
+    },
+
+    {
+      type: "note",
+      text: "In the builder, the \"probabilities\" panel after running a circuit is exactly this: |amplitude|² for each possible measurement outcome.",
+    },
+  ],
+},
   {
     id: "bloch-sphere",
     title: "The Bloch Sphere",

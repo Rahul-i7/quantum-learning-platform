@@ -85,6 +85,8 @@ export default function BlochSphereVisualizer({
     numQubits = 3,
     loading = false,
     variant = "default",
+    showreset = false,
+    animated = false,
 }) {
     const mountRef = useRef(null);
     const threeRef = useRef({});
@@ -100,9 +102,66 @@ export default function BlochSphereVisualizer({
     const effectiveNumQubits = data?.num_qubits || numQubits || 3;
     const qubitsList = Array.from({ length: effectiveNumQubits }, (_, i) => i);
 
-    const blochState = useMemo(() => {
-        return computeBlochVector(data, selectedQubit);
-    }, [data, selectedQubit]);
+    const targetBlochState = useMemo(() => {
+    return computeBlochVector(data, selectedQubit);
+}, [data, selectedQubit]);
+
+const [displayedBlochState, setDisplayedBlochState] =
+    useState(targetBlochState);
+
+useEffect(() => {
+    if (!animated) {
+        setDisplayedBlochState(targetBlochState);
+        return;
+    }
+
+    const start = displayedBlochState;
+    const end = targetBlochState;
+
+    let frame;
+    const startTime = performance.now();
+    const duration = 550;
+
+    const easeInOut = (t) => {
+        return t < 0.5
+            ? 2 * t * t
+            : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    };
+
+    const animate = (now) => {
+        const progress = Math.min(
+            1,
+            (now - startTime) / duration
+        );
+
+        const t = easeInOut(progress);
+
+        setDisplayedBlochState({
+            x: start.x + (end.x - start.x) * t,
+            y: start.y + (end.y - start.y) * t,
+            z: start.z + (end.z - start.z) * t,
+            mag: start.mag + (end.mag - start.mag) * t,
+            prob0:
+                start.prob0 +
+                (end.prob0 - start.prob0) * t,
+            prob1:
+                start.prob1 +
+                (end.prob1 - start.prob1) * t,
+            isDefault:
+                progress < 1
+                    ? start.isDefault
+                    : end.isDefault,
+        });
+
+        if (progress < 1) {
+            frame = requestAnimationFrame(animate);
+        }
+    };
+
+    frame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(frame);
+}, [targetBlochState, animated]);
 
     useEffect(() => {
         const mount = mountRef.current;
@@ -226,7 +285,7 @@ export default function BlochSphereVisualizer({
         const { arrow, dot } = threeRef.current;
         if (!arrow || !dot) return;
 
-        const { x, y, z, mag } = blochState;
+        const { x, y, z, mag } = displayedBlochState;
 
         if (mag < 0.08) {
             arrow.visible = false;
@@ -238,7 +297,7 @@ export default function BlochSphereVisualizer({
             arrow.setDirection(dir);
             arrow.setLength(Math.max(0.2, mag), 0.16 * mag + 0.04, 0.08 * mag + 0.02);
         }
-    }, [blochState]);
+    }, [displayedBlochState]);
 
     const onPointerDown = (e) => {
         dragRef.current = { dragging: true, lastX: e.clientX, lastY: e.clientY };
@@ -282,7 +341,7 @@ export default function BlochSphereVisualizer({
                         </h3>
 
                         <p className="text-xs text-gray-500">
-                            {blochState.isDefault
+                            {displayedBlochState.isDefault
                                 ? "Showing ground state |0⟩"
                                 : `State representation for Qubit ${selectedQubit}`}
                         </p>
@@ -312,7 +371,7 @@ export default function BlochSphereVisualizer({
                 className={
                     isHero
                         ? "relative min-h-0 flex-1 overflow-hidden"
-                        : "relative min-h-[260px] flex-1 overflow-hidden rounded-lg border border-gray-100 bg-slate-50/50"
+                        : "relative min-h-65 flex-1 overflow-hidden rounded-lg border border-gray-100 bg-slate-50/50"
                 }
             >
                 {loading && (
@@ -334,7 +393,7 @@ export default function BlochSphereVisualizer({
                 />
 
                 {/* Reset */}
-                <button
+                {showreset && <button
                     onClick={resetView}
                     className={
                         isHero
@@ -344,7 +403,7 @@ export default function BlochSphereVisualizer({
                 >
                     <RotateCcw size={12} />
                     Reset
-                </button>
+                </button>}
 
                 {/* Drag hint */}
                 <div
@@ -369,9 +428,9 @@ export default function BlochSphereVisualizer({
 
                         <span className="rounded border border-gray-200 bg-gray-50 px-2 py-0.5 font-mono font-semibold text-gray-800">
                             (
-                            {blochState.x.toFixed(2)},{" "}
-                            {blochState.y.toFixed(2)},{" "}
-                            {blochState.z.toFixed(2)}
+                            {displayedBlochState.x.toFixed(2)},{" "}
+                            {displayedBlochState.y.toFixed(2)},{" "}
+                            {displayedBlochState.z.toFixed(2)}
                             )
                         </span>
                     </div>
@@ -381,7 +440,7 @@ export default function BlochSphereVisualizer({
                             <div className="flex justify-between text-xs">
                                 <span className="font-mono text-gray-600">P(|0⟩)</span>
                                 <span className="font-mono font-medium text-gray-800">
-                                    {(blochState.prob0 * 100).toFixed(1)}%
+                                    {(displayedBlochState.prob0 * 100).toFixed(1)}%
                                 </span>
                             </div>
 
@@ -391,7 +450,7 @@ export default function BlochSphereVisualizer({
                                     style={{
                                         width: `${Math.max(
                                             0,
-                                            Math.min(100, blochState.prob0 * 100)
+                                            Math.min(100, displayedBlochState.prob0 * 100)
                                         )}%`,
                                     }}
                                 />
@@ -402,7 +461,7 @@ export default function BlochSphereVisualizer({
                             <div className="flex justify-between text-xs">
                                 <span className="font-mono text-gray-600">P(|1⟩)</span>
                                 <span className="font-mono font-medium text-gray-800">
-                                    {(blochState.prob1 * 100).toFixed(1)}%
+                                    {(displayedBlochState.prob1 * 100).toFixed(1)}%
                                 </span>
                             </div>
 
@@ -412,7 +471,7 @@ export default function BlochSphereVisualizer({
                                     style={{
                                         width: `${Math.max(
                                             0,
-                                            Math.min(100, blochState.prob1 * 100)
+                                            Math.min(100, displayedBlochState.prob1 * 100)
                                         )}%`,
                                     }}
                                 />
@@ -420,9 +479,9 @@ export default function BlochSphereVisualizer({
                         </div>
                     </div>
 
-                    {blochState.mag < 0.85 && !blochState.isDefault && (
+                    {displayedBlochState.mag < 0.85 && !displayedBlochState.isDefault && (
                         <p className="mt-0.5 text-[11px] text-amber-600">
-                            Qubit vector length is {blochState.mag.toFixed(2)} &lt; 1
+                            Qubit vector length is {displayedBlochState.mag.toFixed(2)} &lt; 1
                             (entangled / mixed with other qubits).
                         </p>
                     )}
