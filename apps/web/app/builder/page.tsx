@@ -12,6 +12,7 @@ import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisual
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import NavBar from '@/components/nav/NavBar'
 import { Sparkle } from 'lucide-react'
+import AIExplanation from '@/components/circuit-builder/AIExplanation'
 
 export default function BuilderPage() {
     const store = useCircuitStore()
@@ -116,104 +117,330 @@ export default function BuilderPage() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="bg-gray-50 h-screen w-screen">
+            <div className="min-h-screen bg-[#fafafa] text-zinc-950">
                 <NavBar />
-                <main className="min-h-screen bg-gray-100 p-8">
 
-                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-800">Circuit Builder</h1>
-                            <p className="text-sm text-gray-500">Interactive quantum algorithm design and simulation</p>
-                        </div>
+                <main className="mx-auto w-full max-w-[1600px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+                    {/* Builder Header */}
+                    <header className="mb-8 border-b border-zinc-200 pb-6">
+                        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                            <div>
+                                <div className="mb-3 flex items-center gap-3">
+                                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+                                        QMentor / Builder
+                                    </span>
 
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
-                                <span className="text-sm font-medium text-gray-600">Qubits</span>
-                                <button
-                                    onClick={() => handleQubitChange(store.numQubits - 1)}
-                                    disabled={store.numQubits <= MIN_QUBITS}
-                                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
-                                    aria-label="Decrease qubit count"
-                                >
-                                    <Minus className="h-3.5 w-3.5" />
-                                </button>
-                                <span className="w-4 text-center font-mono text-sm font-semibold text-gray-800">
-                                    {store.numQubits}
-                                </span>
-                                <button
-                                    onClick={() => handleQubitChange(store.numQubits + 1)}
-                                    disabled={store.numQubits >= MAX_QUBITS}
-                                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 cursor-pointer"
-                                    aria-label="Increase qubit count"
-                                >
-                                    <Plus className="h-3.5 w-3.5" />
-                                </button>
+                                    <span className="h-px w-8 bg-zinc-300" />
+
+                                    <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400">
+                                        Quantum Workspace
+                                    </span>
+                                </div>
+
+                                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
+                                    Circuit Builder
+                                </h1>
+
+                                <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
+                                    Construct, simulate, and inspect quantum circuits one gate at a
+                                    time.
+                                </p>
                             </div>
 
-                            <button
-                                onClick={handleRunSimulation}
-                                disabled={loading}
-                                className="rounded-lg bg-emerald-600 px-5 py-2 font-semibold text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
-                            >
-                                {loading ? 'Simulating...' : '▶ Run Simulation'}
-                            </button>
+                            {/* Controls */}
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-3">
+                                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                        Qubits
+                                    </span>
 
-                            <button
-                                onClick={handleAskAi}
-                                disabled={aiLoading}
-                                className="cursor-pointer flex justify-center items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 transition-colors"
-                            >
-                                <Sparkle className="h-3.5 w-3.5" />
-                                {aiLoading ? 'Explaining…' : 'Ask AI to Explain'}
-                            </button>
+                                    <div className="flex items-center border border-zinc-200 bg-white">
+                                        <button
+                                            onClick={() =>
+                                                handleQubitChange(Math.max(MIN_QUBITS, store.numQubits - 1))
+                                            }
+                                            disabled={store.numQubits <= MIN_QUBITS}
+                                            className="flex h-8 w-8 items-center justify-center border-r border-zinc-200 text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
+                                        >
+                                            <Minus className="h-3.5 w-3.5" />
+                                        </button>
+
+                                        <span className="flex h-8 min-w-10 items-center justify-center font-mono text-xs font-semibold text-zinc-900">
+                                            {String(store.numQubits).padStart(2, '0')}
+                                        </span>
+
+                                        <button
+                                            onClick={() =>
+                                                handleQubitChange(Math.min(MAX_QUBITS, store.numQubits + 1))
+                                            }
+                                            disabled={store.numQubits >= MAX_QUBITS}
+                                            className="flex h-8 w-8 items-center justify-center border-l border-zinc-200 text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
+                                        >
+                                            <Plus className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="hidden h-8 w-px bg-zinc-200 sm:block" />
+
+                                <button
+                                    onClick={handleRunSimulation}
+                                    disabled={loading}
+                                    className="flex h-9 items-center gap-2 bg-zinc-950 px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {loading ? 'Running...' : 'Run Simulation'}
+                                </button>
+
+                                <button
+                                    onClick={handleAskAi}
+                                    disabled={aiLoading}
+                                    className="flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <Sparkle className="h-3.5 w-3.5" />
+                                    {aiLoading ? 'Thinking...' : 'Ask AI'}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </header>
 
+                    {/* Error */}
                     {error && (
-                        <div className="mb-6 rounded-md bg-red-50 p-3 text-sm font-medium text-red-700 border border-red-200">
+                        <div className="mb-6 border-l-2 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {error}
                         </div>
                     )}
 
-                    <div className="flex flex-col gap-6 lg:flex-row items-start">
-                        <div className="w-full lg:w-48 shrink-0 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <GatePalette />
-                        </div>
+                    {/* Circuit Workspace */}
+                    <section className="border border-zinc-200 bg-white">
+                        <div className="grid lg:grid-cols-[280px_minmax(0,1fr)_280px]">
+                            {/* Gate Library */}
+                            <aside className="border-b border-zinc-200 lg:border-b-0 lg:border-r">
+                                <div className="border-b border-zinc-200 px-5 py-4">
+                                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                        01 / Gate Library
+                                    </div>
+                                    <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                        Operations
+                                    </div>
+                                </div>
 
-                        <div className="flex-1 flex flex-col gap-6 w-full">
-                            <div className="flex gap-5 w-full">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <GatePalette />
+                            </aside>
+
+                            {/* Circuit */}
+                            <section className="min-w-0">
+                                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                                    <div>
+                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                            02 / Circuit
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            Quantum Register
+                                        </div>
+                                    </div>
+
+                                    <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
+                                        8 steps
+                                    </span>
+                                </div>
+
+                                <div className="min-h-[420px] p-5">
                                     <CircuitCanvas />
                                 </div>
+                            </section>
 
-                                <div className="bg-white grow p-5 rounded-lg shadow-sm border border-gray-200">
-                                    <h2 className="text-lg text-gray-800 mb-2">AI Explanation</h2>
-                                    {aiExplanation && (
-                                        <pre className="h-68 whitespace-pre-wrap text-sm text-gray-700 overflow-scroll">{aiExplanation}</pre>
-                                    )}
+                            {/* AI */}
+                            <aside className="border-t border-zinc-200 lg:border-l lg:border-t-0">
+                                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                                    <div>
+                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                            03 / Analysis
+                                        </div>
+
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            AI Explanation
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className={`h-1.5 w-1.5 rounded-full ${aiLoading
+                                                ? 'animate-pulse bg-blue-500'
+                                                : aiExplanation
+                                                    ? 'bg-emerald-500'
+                                                    : 'bg-zinc-300'
+                                            }`}
+                                    />
                                 </div>
 
-                            </div>
+                                <div className="flex min-h-105 max-h-105 overflow-y-auto flex-col">
+                                    {aiLoading ? (
+                                        /* Loading */
+                                        <div className="flex flex-1 flex-col p-5">
+                                            <div className="mb-6 flex items-center gap-2">
+                                                <div className="h-px w-5 bg-blue-500" />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <MeasurementHistogram
-                                    data={simulationResult}
-                                    loading={loading}
-                                />
+                                                <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-600">
+                                                    Analyzing circuit
+                                                </span>
+                                            </div>
 
-                                <BlochSphereVisualizer
-                                    data={simulationResult}
-                                    numQubits={store.numQubits}
-                                    loading={loading}
-                                    showreset={true}
-                                />
-                            </div>
+                                            <div className="space-y-3">
+                                                <div className="h-2 w-3/4 animate-pulse bg-zinc-100" />
+                                                <div className="h-2 w-full animate-pulse bg-zinc-100" />
+                                                <div className="h-2 w-5/6 animate-pulse bg-zinc-100" />
+                                                <div className="h-2 w-2/3 animate-pulse bg-zinc-100" />
+                                            </div>
 
-                            <QiskitPreview />
+                                            <div className="mt-auto border-t border-zinc-100 pt-4">
+                                                <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
+                                                    Reading gate sequence...
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ) : aiExplanation ? (
+                                        /* Explanation */
+                                        <div className="flex flex-1 flex-col">
+                                            <div className="border-b border-zinc-100 px-5 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                                                        Analysis complete
+                                                    </span>
 
+                                                    <span className="h-px flex-1 bg-zinc-100" />
+                                                </div>
+                                            </div>
 
+                                            <div className="flex-1 overflow-y-auto px-5 py-5">
+                                                <AIExplanation content={aiExplanation} />
+                                            </div>
+
+                                            <div className="border-t border-zinc-100 px-5 py-3">
+                                                <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
+                                                    Generated from current circuit
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Empty */
+                                        <div className="flex flex-1 flex-col p-5">
+                                            <div className="flex flex-1 flex-col items-center justify-center text-center">
+                                                <div className="mb-5 flex h-10 w-10 items-center justify-center border border-zinc-200 bg-zinc-50">
+                                                    <Sparkle className="h-4 w-4 text-blue-600" />
+                                                </div>
+
+                                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                                                    No analysis yet
+                                                </div>
+
+                                                <p className="mt-3 max-w-[210px] text-sm font-medium leading-5 text-zinc-800">
+                                                    Let QMentor explain what your circuit is doing.
+                                                </p>
+
+                                                <p className="mt-2 max-w-[210px] text-xs leading-5 text-zinc-400">
+                                                    Add gates to the register, then ask the AI to analyze the
+                                                    resulting quantum operation.
+                                                </p>
+                                            </div>
+
+                                            <div className="border-t border-zinc-100 pt-4">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
+                                                        AI Tutor
+                                                    </span>
+
+                                                    <span className="font-mono text-[8px] text-zinc-300">
+                                                        READY
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </aside>
                         </div>
-                    </div>
+                    </section>
+
+                    {/* Results */}
+                    {simulationResult && (
+                        <section className="mt-10">
+                            <div className="mb-5 flex items-end justify-between border-b border-zinc-200 pb-3">
+                                <div>
+                                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                                        Simulation
+                                    </div>
+
+                                    <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950">
+                                        Results
+                                    </h2>
+                                </div>
+
+                                <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
+                                    State analysis
+                                </span>
+                            </div>
+
+                            <div className="grid gap-6 lg:grid-cols-2">
+                                {/* Histogram */}
+                                <div className="border border-zinc-200 bg-white">
+                                    <div className="border-b border-zinc-200 px-5 py-4">
+                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                            Measurement
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            Probability distribution
+                                        </div>
+                                    </div>
+
+                                    <div className="p-5">
+                                        <MeasurementHistogram
+                                            data={simulationResult.measurements}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Bloch Sphere */}
+                                <div className="border border-zinc-200 bg-white">
+                                    <div className="border-b border-zinc-200 px-5 py-4">
+                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                            Quantum State
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            Bloch representation
+                                        </div>
+                                    </div>
+
+                                    <div className="p-5">
+                                        <BlochSphereVisualizer
+                                            data={simulationResult}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Qiskit Code */}
+                    <section className="mt-10">
+                        <div className="mb-5 flex items-end justify-between border-b border-zinc-200 pb-3">
+                            <div>
+                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                                    Export
+                                </div>
+
+                                <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950">
+                                    Qiskit Code
+                                </h2>
+                            </div>
+
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
+                                Python
+                            </span>
+                        </div>
+
+                        <div className="border border-zinc-200 bg-white">
+                            <QiskitPreview />
+                        </div>
+                    </section>
                 </main>
             </div>
         </DndProvider>

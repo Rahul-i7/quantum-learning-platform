@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/supabase/AuthProvider";
-
+import 'katex/dist/katex.min.css'
 
 const poppins = Poppins({
     subsets: ["latin"],
