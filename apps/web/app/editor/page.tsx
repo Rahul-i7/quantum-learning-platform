@@ -6,6 +6,7 @@ import MeasurementHistogram from '@/components/visualizations/MeasurementHistogr
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
 import QuantumCodeEditor from '@/components/editor/QuantumCodeEditor'
 import { useCircuitStore } from '@/lib/store/circuit-store'
+import CircuitPreview from '@/components/editor/CircuitPreview'
 
 export default function EditorPage() {
     const numQubits = useCircuitStore((state) => state.numQubits)
@@ -134,6 +135,20 @@ export default function EditorPage() {
                             <div className="mt-1 text-sm font-semibold text-zinc-900">
                                 Circuit & Results
                             </div>
+                        </div>
+
+                        <div className="border-b border-zinc-200 p-5">
+                            <div className="mb-4">
+                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                    Circuit
+                                </div>
+
+                                <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                    Generated circuit
+                                </div>
+                            </div>
+
+                            <CircuitPreview />
                         </div>
 
                         <div className="min-h-[560px]">

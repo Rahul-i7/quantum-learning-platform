@@ -41,22 +41,48 @@ export function parseQiskitCode(code: string): ParseResult {
     }
 
     const numQubits = Number(match[1])
-    const gates: Gate[] = []
 
+    if (numQubits < 1) {
+      return {
+        success: false,
+        error: 'QuantumCircuit must contain at least one qubit.',
+      }
+    }
+
+    const gates: Gate[] = []
     let step = 0
 
     for (const line of lines) {
-      const h = line.match(/^qc\.h\(\s*(\d+)\s*\)/)
-      const x = line.match(/^qc\.x\(\s*(\d+)\s*\)/)
+      // Ignore imports, comments and the circuit declaration.
+      if (
+        line.startsWith('from ') ||
+        line.startsWith('import ') ||
+        line.startsWith('#') ||
+        /^qc\s*=\s*QuantumCircuit\s*\(/.test(line)
+      ) {
+        continue
+      }
+
+      const h = line.match(/^qc\.h\(\s*(\d+)\s*\)$/)
+      const x = line.match(/^qc\.x\(\s*(\d+)\s*\)$/)
       const cx = line.match(
-        /^qc\.cx\(\s*(\d+)\s*,\s*(\d+)\s*\)/
+        /^qc\.cx\(\s*(\d+)\s*,\s*(\d+)\s*\)$/
       )
 
       if (h) {
+        const qubit = Number(h[1])
+
+        if (qubit >= numQubits) {
+          return {
+            success: false,
+            error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+          }
+        }
+
         gates.push({
           id: `editor-h-${step}`,
           type: 'h',
-          qubits: [Number(h[1])],
+          qubits: [qubit],
           step,
         })
 
@@ -65,10 +91,19 @@ export function parseQiskitCode(code: string): ParseResult {
       }
 
       if (x) {
+        const qubit = Number(x[1])
+
+        if (qubit >= numQubits) {
+          return {
+            success: false,
+            error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+          }
+        }
+
         gates.push({
           id: `editor-x-${step}`,
           type: 'x',
-          qubits: [Number(x[1])],
+          qubits: [qubit],
           step,
         })
 
@@ -77,10 +112,30 @@ export function parseQiskitCode(code: string): ParseResult {
       }
 
       if (cx) {
+        const control = Number(cx[1])
+        const target = Number(cx[2])
+
+        if (
+          control >= numQubits ||
+          target >= numQubits
+        ) {
+          return {
+            success: false,
+            error: `CX gate references a qubit outside the ${numQubits}-qubit circuit.`,
+          }
+        }
+
+        if (control === target) {
+          return {
+            success: false,
+            error: 'A CX gate requires two different qubits.',
+          }
+        }
+
         gates.push({
           id: `editor-cx-${step}`,
           type: 'cx',
-          qubits: [Number(cx[1]), Number(cx[2])],
+          qubits: [control, target],
           step,
         })
 
@@ -88,7 +143,7 @@ export function parseQiskitCode(code: string): ParseResult {
         continue
       }
 
-      if (line.startsWith('qc.measure_all()')) {
+      if (line === 'qc.measure_all()') {
         gates.push({
           id: `editor-measure-${step}`,
           type: 'measure',
@@ -100,6 +155,23 @@ export function parseQiskitCode(code: string): ParseResult {
         })
 
         step++
+        continue
+      }
+
+      /*
+       * Any other qc.* operation is unsupported.
+       *
+       * We deliberately check this after the supported
+       * operations so ordinary Python/import lines can
+       * still exist in the editor.
+       */
+      if (/^qc\./.test(line)) {
+        const operation = line.match(/^qc\.([a-zA-Z_][a-zA-Z0-9_]*)/)
+
+        return {
+          success: false,
+          error: `Unsupported Qiskit operation: qc.${operation?.[1] ?? 'unknown'}`,
+        }
       }
     }
 
