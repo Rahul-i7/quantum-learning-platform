@@ -41,6 +41,13 @@ export function circuitToQiskitCode(circuit: CircuitState): string {
                     code += `qc.cx(${gate.qubits[0]}, ${gate.qubits[1]})\n`
                 }
                 break
+            case 'y':
+                code += `qc.y(${gate.qubits[0]})\n`
+                break
+
+            case 'z':
+                code += `qc.z(${gate.qubits[0]})\n`
+                break
 
             case 'measure':
                 code += `qc.measure_all()\n`
