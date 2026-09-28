@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 import {
   BarChart,
   Bar,
@@ -9,151 +9,220 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
-} from 'recharts';
-import { BarChart3, Loader2 } from 'lucide-react';
+} from 'recharts'
+import { BarChart3, Loader2 } from 'lucide-react'
 
-export default function MeasurementHistogram({ data, loading = false }) {
+
+export default function MeasurementHistogram({
+  data,
+  loading = false,
+}) {
   const totalShots = useMemo(() => {
     const counts = data?.counts || {}
-    if (!counts) return 0;
-    return Object.values(counts).reduce((a, b) => a + b, 0);
-  }, [data]);
+
+    return Object.values(counts).reduce(
+      (total, count) => total + count,
+      0
+    )
+  }, [data])
 
   const chartData = useMemo(() => {
     const counts = data?.counts || {}
-    if (counts && Object.keys(counts).length > 0) {
+
+    if (Object.keys(counts).length > 0) {
       return Object.entries(counts)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([bitstring, count]) => ({
           bitstring,
           count,
           probability: totalShots > 0 ? count / totalShots : 0,
-        }));
+        }))
     }
 
-    if (data?.probabilities && Object.keys(data.probabilities).length > 0) {
-      return Object.entries(data.probabilities)
+    const probabilities = data?.probabilities || {}
+
+    if (Object.keys(probabilities).length > 0) {
+      return Object.entries(probabilities)
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([bitstring, prob]) => ({
+        .map(([bitstring, probability]) => ({
           bitstring,
           count: null,
-          probability: prob,
-        }));
+          probability,
+        }))
     }
 
-    return [];
-  }, [data, totalShots]);
+    return []
+  }, [data, totalShots])
 
-  const hasData = chartData.length > 0;
+  const hasData = chartData.length > 0
 
   return (
-    <div className="flex flex-col h-full rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="flex h-full flex-col bg-white">
+      {/* Header */}
+      <div className="mb-5 flex items-start justify-between gap-4 border-b border-zinc-200 pb-4">
         <div>
-          <h3 className="text-base font-semibold text-gray-800">
-            Measurement Outcomes
-          </h3>
-          <p className="text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-blue-600" />
+
+            <h3 className="text-sm font-semibold text-zinc-950">
+              Measurement Outcomes
+            </h3>
+          </div>
+
+          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-zinc-400">
             {hasData
               ? totalShots > 0
-                ? `${totalShots.toLocaleString()} shots across ${chartData.length} observed states`
-                : `State probabilities across ${chartData.length} basis states`
+                ? `${totalShots.toLocaleString()} shots · ${chartData.length} observed states`
+                : `State probabilities · ${chartData.length} basis states`
               : 'Run simulation to inspect measurement probabilities'}
           </p>
         </div>
+
         {hasData && (
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 border border-blue-200">
+          <span className="shrink-0 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-600">
             {totalShots > 0 ? `${totalShots} Shots` : 'Statevector'}
           </span>
         )}
       </div>
 
-      <div className="relative flex-1 min-h-[260px] flex items-center justify-center">
+      {/* Chart */}
+      <div className="relative flex min-h-[280px] flex-1 items-center justify-center">
         {loading && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xs rounded-lg">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-600 mb-2" />
-            <span className="text-xs font-medium text-gray-600">Simulating circuit...</span>
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/85 backdrop-blur-sm">
+            <Loader2 className="mb-3 h-5 w-5 animate-spin text-blue-600" />
+
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Simulating circuit
+            </span>
           </div>
         )}
 
         {!hasData && !loading ? (
-          <div className="flex flex-col items-center justify-center text-center p-6 border border-dashed border-gray-200 rounded-lg w-full h-full bg-gray-50/50">
-            <div className="h-10 w-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
-              <BarChart3 className="h-5 w-5" />
-            </div>
-            <p className="text-sm font-medium text-gray-700">No simulation results</p>
-            <p className="text-xs text-gray-400 mt-1 max-w-xs">
-              Add quantum gates to the canvas and click "Run Simulation" to see the output distribution.
+          <div className="flex h-full min-h-[260px] w-full flex-col items-center justify-center border border-dashed border-zinc-200">
+            <BarChart3 className="mb-3 h-5 w-5 text-zinc-300" />
+
+            <p className="text-sm font-medium text-zinc-600">
+              No simulation results
+            </p>
+
+            <p className="mt-1 max-w-xs text-center text-xs leading-5 text-zinc-400">
+              Add quantum gates to the circuit and run the simulation
+              to inspect the output distribution.
             </p>
           </div>
         ) : (
-          <div className="w-full h-full min-h-[240px]">
+          <div className="h-full min-h-[260px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <BarChart
+                data={chartData}
+                margin={{
+                  top: 12,
+                  right: 12,
+                  left: -18,
+                  bottom: 18,
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="2 4"
+                  stroke="#e4e4e7"
+                  vertical={false}
+                />
+
                 <XAxis
                   dataKey="bitstring"
-                  tick={{ fill: '#475569', fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
-                  axisLine={{ stroke: '#cbd5e1' }}
+                  tick={{
+                    fill: '#52525b',
+                    fontFamily: 'ui-monospace, monospace',
+                    fontSize: 11,
+                  }}
+                  axisLine={{
+                    stroke: '#d4d4d8',
+                  }}
                   tickLine={false}
                 />
+
                 <YAxis
-                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                  tick={{ fill: '#64748b', fontSize: 11 }}
-                  axisLine={{ stroke: '#cbd5e1' }}
+                  tickFormatter={(value) =>
+                    `${(value * 100).toFixed(0)}%`
+                  }
+                  tick={{
+                    fill: '#71717a',
+                    fontFamily: 'ui-monospace, monospace',
+                    fontSize: 10,
+                  }}
+                  axisLine={false}
                   tickLine={false}
                   domain={[0, 1]}
                 />
+
                 <Tooltip
-                  cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
+                  cursor={{
+                    fill: 'rgba(37, 99, 235, 0.04)',
+                  }}
                   content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="rounded-lg border border-gray-200 bg-white p-2.5 shadow-md text-xs font-sans">
-                          <p className="font-mono font-bold text-blue-600">|{data.bitstring}⟩</p>
-                          <p className="text-gray-700 mt-1">
-                            Probability: <span className="font-semibold font-mono">{(data.probability * 100).toFixed(2)}%</span>
-                          </p>
-                          {data.count !== null && (
-                            <p className="text-gray-500 text-[11px]">
-                              Count: {data.count} shots
-                            </p>
-                          )}
-                        </div>
-                      );
+                    if (!active || !payload || !payload.length) {
+                      return null
                     }
-                    return null;
+
+                    const item = payload[0].payload
+
+                    return (
+                      <div className="border border-zinc-200 bg-white px-3 py-2.5 shadow-lg">
+                        <p className="font-mono text-xs font-semibold text-blue-600">
+                          |{item.bitstring}⟩
+                        </p>
+
+                        <div className="mt-1.5 flex items-baseline gap-2">
+                          <span className="text-[11px] text-zinc-500">
+                            Probability
+                          </span>
+
+                          <span className="font-mono text-xs font-semibold text-zinc-900">
+                            {(item.probability * 100).toFixed(2)}%
+                          </span>
+                        </div>
+
+                        {item.count !== null && (
+                          <p className="mt-0.5 font-mono text-[10px] text-zinc-400">
+                            {item.count} shots
+                          </p>
+                        )}
+                      </div>
+                    )
                   }}
                 />
-                <Bar dataKey="probability" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${entry.bitstring}`}
-                      fill={index % 2 === 0 ? '#2563eb' : '#3b82f6'}
-                    />
-                  ))}
-                </Bar>
+
+                <Bar
+                  dataKey="probability"
+                  fill="#2563eb"
+                  radius={[2, 2, 0, 0]}
+                  maxBarSize={48}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
         )}
       </div>
 
+      {/* State readout */}
       {hasData && (
-        <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-zinc-200 pt-4">
           {chartData.map((item) => (
             <div
               key={item.bitstring}
-              className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-gray-50 border border-gray-200 font-mono text-xs text-gray-700"
+              className="flex items-center gap-2"
             >
-              <span className="font-bold text-blue-600">|{item.bitstring}⟩</span>
-              <span className="text-gray-500">{(item.probability * 100).toFixed(1)}%</span>
+              <span className="font-mono text-[11px] font-semibold text-blue-600">
+                |{item.bitstring}⟩
+              </span>
+
+              <span className="font-mono text-[10px] text-zinc-400">
+                {(item.probability * 100).toFixed(1)}%
+              </span>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
+  )
 }

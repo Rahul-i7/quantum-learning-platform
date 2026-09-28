@@ -264,10 +264,10 @@ export default function BuilderPage() {
 
                                     <div
                                         className={`h-1.5 w-1.5 rounded-full ${aiLoading
-                                                ? 'animate-pulse bg-blue-500'
-                                                : aiExplanation
-                                                    ? 'bg-emerald-500'
-                                                    : 'bg-zinc-300'
+                                            ? 'animate-pulse bg-blue-500'
+                                            : aiExplanation
+                                                ? 'bg-emerald-500'
+                                                : 'bg-zinc-300'
                                             }`}
                                     />
                                 </div>
@@ -379,43 +379,40 @@ export default function BuilderPage() {
                                 </span>
                             </div>
 
-                            <div className="grid gap-6 lg:grid-cols-2">
-                                {/* Histogram */}
-                                <div className="border border-zinc-200 bg-white">
-                                    <div className="border-b border-zinc-200 px-5 py-4">
-                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                                            Measurement
+                            {simulationResult && (
+                                <section className="mt-8 border-t border-zinc-200 pt-8">
+                                    <div className="mb-5 flex items-end justify-between">
+                                        <div>
+                                            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                                04 / Simulation
+                                            </div>
+                                            <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
+                                                Measurement & quantum state
+                                            </h2>
                                         </div>
-                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
-                                            Probability distribution
-                                        </div>
+
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400">
+                                            Statevector / Measurement
+                                        </span>
                                     </div>
 
-                                    <div className="p-5">
-                                        <MeasurementHistogram
-                                            data={simulationResult.measurements}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Bloch Sphere */}
-                                <div className="border border-zinc-200 bg-white">
-                                    <div className="border-b border-zinc-200 px-5 py-4">
-                                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                                            Quantum State
+                                    <div className="grid gap-px border border-zinc-200 bg-zinc-200 lg:grid-cols-2">
+                                        <div className="min-w-0 bg-white p-5">
+                                            <MeasurementHistogram
+                                                data={simulationResult}
+                                                loading={loading}
+                                            />
                                         </div>
-                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
-                                            Bloch representation
+
+                                        <div className="min-w-0 bg-white p-5">
+                                            <BlochSphereVisualizer
+                                                data={simulationResult}
+                                                variant="hero"
+                                            />
                                         </div>
                                     </div>
-
-                                    <div className="p-5">
-                                        <BlochSphereVisualizer
-                                            data={simulationResult}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                                </section>
+                            )}
                         </section>
                     )}
 
