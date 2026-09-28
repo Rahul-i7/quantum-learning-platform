@@ -111,7 +111,7 @@ export default function MeasurementHistogram({
             </p>
           </div>
         ) : (
-          <div className="h-full min-h-[260px] w-full">
+          <div className="h-65 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}

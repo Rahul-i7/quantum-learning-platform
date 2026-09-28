@@ -10,6 +10,7 @@ import {
   BookOpen,
   LogOut,
   LogIn,
+  Code,
 } from 'lucide-react'
 
 import { useAuth } from '@/lib/supabase/AuthProvider'
@@ -17,6 +18,7 @@ import { useAuth } from '@/lib/supabase/AuthProvider'
 const LINKS = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
   { href: '/builder', label: 'Builder', icon: LayoutGrid },
+  { href: '/editor', label: 'Editor', icon: Code },
   { href: '/dashboard', label: 'Dashboard', icon: Gauge },
 ]
 
