@@ -194,7 +194,7 @@ export default function BuilderPage() {
                                 <button
                                     onClick={handleAskAi}
                                     disabled={aiLoading}
-                                    className="cursor-pointerflex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="cursor-pointer flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <Sparkle className="h-3.5 w-3.5" />
                                     {aiLoading ? 'Thinking...' : 'Ask AI'}
