@@ -133,9 +133,14 @@ Ensure you have the following installed on your machine:
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   NEXT_PUBLIC_SIMULATION_API_URL=http://localhost:8000
-   NEXT_PUBLIC_AI_TUTOR_API_URL=http://localhost:8001
-   NEXT_PUBLIC_CONTENT_API_URL=http://localhost:8002
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+
+   # Server-side API proxies (Next.js route handlers)
+   SIMULATION_SERVICE_URL=http://localhost:8000
+   AI_TUTOR_SERVICE_URL=http://localhost:8001
+
+   # Client-side service API URL
+   NEXT_PUBLIC_CONTENT_SERVICE_URL=http://localhost:8002
    ```
 
 ---

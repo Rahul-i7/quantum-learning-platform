@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const SIMULATION_SERVICE_URL =
-  process.env.SIMULATION_SERVICE_URL ?? "http://localhost:8001";
+  process.env.SIMULATION_SERVICE_URL ?? "http://localhost:8000";
 
 export async function POST(req: NextRequest) {
  
