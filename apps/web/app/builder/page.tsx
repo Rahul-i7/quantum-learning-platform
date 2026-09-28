@@ -186,7 +186,7 @@ export default function BuilderPage() {
                                 <button
                                     onClick={handleRunSimulation}
                                     disabled={loading}
-                                    className="flex h-9 items-center gap-2 bg-zinc-950 px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="cursor-pointer flex h-9 items-center gap-2 bg-zinc-950 px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {loading ? 'Running...' : 'Run Simulation'}
                                 </button>
@@ -194,7 +194,7 @@ export default function BuilderPage() {
                                 <button
                                     onClick={handleAskAi}
                                     disabled={aiLoading}
-                                    className="flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="cursor-pointerflex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <Sparkle className="h-3.5 w-3.5" />
                                     {aiLoading ? 'Thinking...' : 'Ask AI'}
@@ -205,8 +205,13 @@ export default function BuilderPage() {
 
                     {/* Error */}
                     {error && (
-                        <div className="mb-6 border-l-2 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-700">
-                            {error}
+                        <div className="mb-6 border-l-2 border-red-500 bg-red-50 px-4 py-3">
+                            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-red-500">
+                                Simulation Error
+                            </div>
+                            <p className="mt-1 text-sm leading-6 text-red-700">
+                                {error}
+                            </p>
                         </div>
                     )}
 
@@ -244,7 +249,7 @@ export default function BuilderPage() {
                                     </span>
                                 </div>
 
-                                <div className="min-h-[420px] p-5">
+                                <div className="min-h-105 p-5">
                                     <CircuitCanvas />
                                 </div>
                             </section>
