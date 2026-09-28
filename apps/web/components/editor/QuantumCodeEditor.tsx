@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import Editor from '@monaco-editor/react'
 import { AlertCircle, Check, Play } from 'lucide-react'
 
@@ -18,13 +18,18 @@ qc.cx(0, 1)
 qc.measure_all()
 `
 
+export interface QuantumCodeEditorRef {
+  apply: () => { success: boolean; error?: string }
+}
+
 interface QuantumCodeEditorProps {
   onApply?: () => void
 }
 
-export default function QuantumCodeEditor({
-  onApply,
-}: QuantumCodeEditorProps) {
+const QuantumCodeEditor = forwardRef<
+  QuantumCodeEditorRef,
+  QuantumCodeEditorProps
+>(function QuantumCodeEditor({ onApply }, ref) {
   const numQubits = useCircuitStore((state) => state.numQubits)
   const gates = useCircuitStore((state) => state.gates)
 
@@ -65,13 +70,16 @@ export default function QuantumCodeEditor({
     setError('')
   }, [numQubits, gates])
 
-  const handleApply = () => {
+  const handleApply = (): { success: boolean; error?: string } => {
     const result = parseQiskitCode(code)
 
     if (!result.success || !result.circuit) {
       setStatus('error')
       setError(result.error ?? 'Unable to parse circuit.')
-      return
+      return {
+        success: false,
+        error: result.error ?? 'Unable to parse circuit.',
+      }
     }
 
     reset()
@@ -85,7 +93,16 @@ export default function QuantumCodeEditor({
     setStatus('success')
 
     onApply?.()
+    return { success: true }
   }
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      apply: handleApply,
+    }),
+    [code]
+  )
 
   return (
     <div className="flex h-[560px] flex-col bg-[#0b0d10]">
@@ -160,4 +177,6 @@ export default function QuantumCodeEditor({
       </div>
     </div>
   )
-}
+})
+
+export default QuantumCodeEditor

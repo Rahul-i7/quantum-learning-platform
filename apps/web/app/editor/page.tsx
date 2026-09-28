@@ -1,24 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import NavBar from '@/components/nav/NavBar'
 import MeasurementHistogram from '@/components/visualizations/MeasurementHistogram'
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
-import QuantumCodeEditor from '@/components/editor/QuantumCodeEditor'
+import QuantumCodeEditor, {
+    type QuantumCodeEditorRef,
+} from '@/components/editor/QuantumCodeEditor'
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import CircuitPreview from '@/components/editor/CircuitPreview'
 
 export default function EditorPage() {
-    const numQubits = useCircuitStore((state) => state.numQubits)
-    const gates = useCircuitStore((state) => state.gates)
+    const editorRef = useRef<QuantumCodeEditorRef>(null)
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [simulationResult, setSimulationResult] = useState<any>(null)
 
     const handleRunSimulation = async () => {
-        setLoading(true)
         setError('')
+
+        // Auto-apply current editor code to parser & store before running simulation
+        if (editorRef.current) {
+            const applyResult = editorRef.current.apply()
+
+            if (!applyResult.success) {
+                setError(applyResult.error ?? 'Unable to parse circuit code.')
+                setSimulationResult(null)
+                return
+            }
+        }
+
+        const { numQubits, gates } = useCircuitStore.getState()
+
+        setLoading(true)
 
         try {
             const formattedGates = [...gates]
@@ -123,7 +138,7 @@ export default function EditorPage() {
                             </span>
                         </div>
 
-                        <QuantumCodeEditor />
+                        <QuantumCodeEditor ref={editorRef} />
                     </div>
 
                     <aside className="min-w-0">
