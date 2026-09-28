@@ -362,64 +362,44 @@ export default function BuilderPage() {
 
                     {/* Results */}
                     {simulationResult && (
-                        <section className="mt-10">
-                            <div className="mb-5 flex items-end justify-between border-b border-zinc-200 pb-3">
+                        <section className="mt-8 border-t border-zinc-200 pt-8">
+                            <div className="mb-5 flex items-end justify-between">
                                 <div>
-                                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
-                                        Simulation
+                                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                                        04 / Simulation
                                     </div>
 
-                                    <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950">
-                                        Results
+                                    <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
+                                        Measurement & quantum state
                                     </h2>
+
+                                    <p className="mt-1 text-xs text-zinc-400">
+                                        Inspect the measured distribution and resulting qubit state.
+                                    </p>
                                 </div>
 
-                                <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
-                                    State analysis
+                                <span className="hidden font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400 sm:block">
+                                    Statevector / Measurement
                                 </span>
                             </div>
 
-                            {simulationResult && (
-                                <section className="mt-8 border-t border-zinc-200 pt-8">
-                                    <div className="mb-5 flex items-end justify-between">
-                                        <div>
-                                            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                                                04 / Simulation
-                                            </div>
+                            <div className="grid border border-zinc-200 lg:grid-cols-2">
+                                <div className="min-w-0 bg-white p-5 lg:border-r lg:border-zinc-200">
+                                    <MeasurementHistogram
+                                        data={simulationResult}
+                                        loading={loading}
+                                    />
+                                </div>
 
-                                            <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
-                                                Measurement & quantum state
-                                            </h2>
-
-                                            <p className="mt-1 text-xs text-zinc-400">
-                                                Inspect the measured distribution and resulting qubit state.
-                                            </p>
-                                        </div>
-
-                                        <span className="hidden font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400 sm:block">
-                                            Statevector / Measurement
-                                        </span>
-                                    </div>
-
-                                    <div className="grid border border-zinc-200 lg:grid-cols-2">
-                                        <div className="min-w-0 bg-white p-5 lg:border-r lg:border-zinc-200">
-                                            <MeasurementHistogram
-                                                data={simulationResult}
-                                                loading={loading}
-                                            />
-                                        </div>
-
-                                        <div className="min-w-0 bg-white p-5">
-                                            <BlochSphereVisualizer
-                                                data={simulationResult}
-                                                variant="default"
-                                                loading={loading}
-                                                animated
-                                            />
-                                        </div>
-                                    </div>
-                                </section>
-                            )}
+                                <div className="min-w-0 bg-white p-5">
+                                    <BlochSphereVisualizer
+                                        data={simulationResult}
+                                        variant="default"
+                                        loading={loading}
+                                        animated
+                                    />
+                                </div>
+                            </div>
                         </section>
                     )}
 
