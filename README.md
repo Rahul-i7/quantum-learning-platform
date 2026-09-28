@@ -84,13 +84,13 @@ QMentor is structured as a decoupled monorepo containing a modern Next.js fronte
 
 ```mermaid
 graph TD
-    Client[Next.js 16 Web App<br/>Port 3000] -->|Circuit JSON & Simulation Requests| SimService[Simulation Microservice<br/>Python FastAPI + Qiskit Aer<br/>Port 8000]
-    Client -->|AI Tutor Prompts & Context| AITutor[AI Tutor Microservice<br/>Python FastAPI + Gemini AI<br/>Port 8001]
-    Client -->|Courses, Quizzes & Progress| ContentService[Content/Progress Service<br/>Python FastAPI<br/>Port 8002]
-    Client -->|User Auth & State| Supabase[(Supabase DB & Auth)]
+    Client["Next.js Web App (Port 3000)"] -->|"Circuit JSON & Sim Requests"| SimService["Simulation Microservice (FastAPI + Qiskit Aer - Port 8000)"]
+    Client -->|"AI Prompts & Context"| AITutor["AI Tutor Microservice (FastAPI + Gemini AI - Port 8001)"]
+    Client -->|"Courses, Quizzes & Progress"| ContentService["Content & Progress Service (FastAPI - Port 8002)"]
+    Client -->|"User Auth & Session"| Supabase[("Supabase DB & Auth")]
     
-    AITutor -->|Tool Calls / Circuit Eval| SimService
-    ContentService -->|Persists Progress| Supabase
+    AITutor -->|"Circuit Evaluation"| SimService
+    ContentService -->|"Persists User Data"| Supabase
 ```
 
 | Component | Technology Stack | Port | Description |
@@ -258,5 +258,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the QMentor Team for Quantum Computing Enthusiasts & Students Worldwide.</sub>
+  <sub>Built with ❤️ by the Memory Reboot Team for Quantum Computing Enthusiasts & Students Worldwide.</sub>
 </div>

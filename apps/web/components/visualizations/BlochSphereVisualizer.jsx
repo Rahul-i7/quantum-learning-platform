@@ -165,7 +165,7 @@ export default function BlochSphereVisualizer({
   showreset = false,
   animated = false,
 }) {
-  const mountRef = useRef<HTMLDivElement>(null)
+  const mountRef = useRef(null)
   const threeRef = useRef({})
   const dragRef = useRef({
     dragging: false,

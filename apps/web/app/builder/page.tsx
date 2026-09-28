@@ -386,18 +386,23 @@ export default function BuilderPage() {
                                             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                                 04 / Simulation
                                             </div>
+
                                             <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
                                                 Measurement & quantum state
                                             </h2>
+
+                                            <p className="mt-1 text-xs text-zinc-400">
+                                                Inspect the measured distribution and resulting qubit state.
+                                            </p>
                                         </div>
 
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400">
+                                        <span className="hidden font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400 sm:block">
                                             Statevector / Measurement
                                         </span>
                                     </div>
 
-                                    <div className="grid gap-px border border-zinc-200 bg-zinc-200 lg:grid-cols-2">
-                                        <div className="min-w-0 bg-white p-5">
+                                    <div className="grid border border-zinc-200 lg:grid-cols-2">
+                                        <div className="min-w-0 bg-white p-5 lg:border-r lg:border-zinc-200">
                                             <MeasurementHistogram
                                                 data={simulationResult}
                                                 loading={loading}
@@ -407,7 +412,9 @@ export default function BuilderPage() {
                                         <div className="min-w-0 bg-white p-5">
                                             <BlochSphereVisualizer
                                                 data={simulationResult}
-                                                variant="hero"
+                                                variant="default"
+                                                loading={loading}
+                                                animated
                                             />
                                         </div>
                                     </div>
