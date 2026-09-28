@@ -15,21 +15,6 @@ import {
 import { Loader2, Dice5, Info } from 'lucide-react';
 import { COLORS, panelStyle, primaryButtonStyle, textareaStyle, presetButtonStyle } from './theme';
 
-// ---------------------------------------------------------------------------
-// Shared mock data shape (the thing to sync with Role 3 / Backend Lead):
-//
-//   {
-//     num_qubits: 2,
-//     statevector: [ {re,im}, {re,im}, ... ],  // 2^num_qubits amplitudes
-//     counts: { "00": 512, "11": 488 }         // measured outcomes
-//   }
-//
-// Bitstring convention: index i in the statevector array maps to the
-// bitstring i.toString(2).padStart(num_qubits, '0'), read left-to-right as
-// qubit 0, qubit 1, ... qubit (n-1). This must match whatever Role 3's
-// Simulation Service actually returns — confirm before wiring up real data.
-// ---------------------------------------------------------------------------
-
 const SQRT1_2 = 1 / Math.sqrt(2);
 
 const PRESETS = [
@@ -58,11 +43,7 @@ const PRESETS = [
 
 const SIMULATED_DELAY_MS = 400;
 
-// --- Math -------------------------------------------------------------------
 
-// Reduced single-qubit Bloch vector via partial trace over a pure n-qubit
-// statevector. Returns {x,y,z} with |vector| <= 1 — length < 1 means the
-// qubit is mixed (i.e. entangled with the rest of the system).
 function reducedBlochVector(statevector, numQubits, qubitIndex) {
   const dim = 1 << numQubits;
   const bitPos = numQubits - 1 - qubitIndex;

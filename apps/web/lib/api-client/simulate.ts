@@ -13,5 +13,5 @@ export async function runCircuit(circuit: { num_qubits: number; gates: Gate[] })
     throw new Error(err.error ?? `Request failed: ${res.status}`);
   }
 
-  return res.json(); // shape TBD — log this first response and adjust your result-display component to match
+  return res.json();
 }
