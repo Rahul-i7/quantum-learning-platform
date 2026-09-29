@@ -11,13 +11,13 @@ load_dotenv(override=True)  # .env wins over stale OS environment variables
 class Settings(BaseModel):
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
     # Default model: gemini-2.5-flash with graceful fallback list when high demand/rate limits occur
-    default_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    default_model: str = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
     # Tried in order when the primary model is overloaded, rate-limited (429), or unavailable (503/404)
     fallback_models: list[str] = [
         m.strip()
         for m in os.getenv(
             "GEMINI_FALLBACK_MODELS",
-            "gemini-2.5-flash,gemini-2.5-flash-lite,gemini-1.5-flash,gemini-2.0-flash,gemini-2.5-pro"
+            "gemini-3.1-flash-lite,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-1.5-flash,gemini-2.0-flash,gemini-2.5-pro"
         ).split(",")
         if m.strip()
     ]
