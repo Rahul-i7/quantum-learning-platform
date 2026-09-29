@@ -145,74 +145,76 @@ export default function GatePalette() {
 
     return (
         <div className="px-5 py-5">
-            {/* Single qubit */}
-            <section>
-                <div className="mb-2 flex items-center gap-2">
-                    <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                        01
-                    </span>
+            <div className="overflow-y-auto h-80">
+                {/* Single qubit */}
+                <section>
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                            01
+                        </span>
 
-                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                        Single Qubit
-                    </span>
-                </div>
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                            Single Qubit
+                        </span>
+                    </div>
 
-                <div>
-                    {singleQubitGates.map((gate) => (
-                        <DraggableGate
-                            key={gate.type}
-                            gate={gate}
-                        />
-                    ))}
-                </div>
-            </section>
+                    <div>
+                        {singleQubitGates.map((gate) => (
+                            <DraggableGate
+                                key={gate.type}
+                                gate={gate}
+                            />
+                        ))}
+                    </div>
+                </section>
 
-            {/* Multi qubit */}
-            <section className="mt-7">
-                <div className="mb-2 flex items-center gap-2">
-                    <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                        02
-                    </span>
+                {/* Multi qubit */}
+                <section className="mt-7">
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                            02
+                        </span>
 
-                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                        Multi Qubit
-                    </span>
-                </div>
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                            Multi Qubit
+                        </span>
+                    </div>
 
-                <div>
-                    {multiQubitGates.map((gate) => (
-                        <DraggableGate
-                            key={gate.type}
-                            gate={gate}
-                        />
-                    ))}
-                </div>
-            </section>
+                    <div>
+                        {multiQubitGates.map((gate) => (
+                            <DraggableGate
+                                key={gate.type}
+                                gate={gate}
+                            />
+                        ))}
+                    </div>
+                </section>
 
-            {/* Measurement */}
-            <section className="mt-7">
-                <div className="mb-2 flex items-center gap-2">
-                    <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                        03
-                    </span>
+                {/* Measurement */}
+                <section className="mt-7">
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                            03
+                        </span>
 
-                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                        Measurement
-                    </span>
-                </div>
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                            Measurement
+                        </span>
+                    </div>
 
-                <div>
-                    {measurementGates.map((gate) => (
-                        <DraggableGate
-                            key={gate.type}
-                            gate={gate}
-                        />
-                    ))}
-                </div>
-            </section>
+                    <div>
+                        {measurementGates.map((gate) => (
+                            <DraggableGate
+                                key={gate.type}
+                                gate={gate}
+                            />
+                        ))}
+                    </div>
+                </section>
+            </div>
 
             {/* Hint */}
-            <div className="mt-8 border-t border-zinc-200 pt-4">
+            <div className="mt-2 border-t border-zinc-200 pt-4">
                 <p className="font-mono text-[9px] leading-4 text-zinc-400">
                     DRAG AN OPERATION
                     <br />
