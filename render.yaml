@@ -15,12 +15,6 @@ services:
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
-      - key: SUPABASE_JWT_SECRET
-        sync: false
       - key: SIMULATION_SERVICE_URL
         value: https://quantum-simulation.onrender.com
 
@@ -33,10 +27,6 @@ services:
     plan: free
     envVars:
       - key: GEMINI_API_KEY
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: SIMULATION_SERVICE_URL
         value: https://quantum-simulation.onrender.com
