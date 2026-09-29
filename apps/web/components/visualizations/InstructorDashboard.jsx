@@ -12,8 +12,19 @@ import {
   Cell,
 } from 'recharts';
 import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed, Wifi, WifiOff } from 'lucide-react';
-import { COLORS, panelStyle, presetButtonStyle } from './theme';
 import { contentApi } from '@/lib/api-client/content';
+
+// Learn page ke look ke hisaab se colors (zinc + blue-600 accent).
+// Recharts ko hex values chahiye, isliye yahan local rakhe hain.
+const COLORS = {
+  accent: '#2563eb',   // blue-600
+  accent2: '#059669',  // emerald-600
+  textDim: '#71717a',  // zinc-500
+  textBright: '#18181b', // zinc-900
+  border: '#e4e4e7',   // zinc-200
+  grid: '#f4f4f5',     // zinc-100
+  panel: '#ffffff',
+};
 
 // Matches supabase/seed.sql's demo cohort (see db/memory_store.py::DEMO_COHORT_ID
 // on the content-progress service when Supabase isn't configured yet).
@@ -166,290 +177,329 @@ export default function InstructorDashboard() {
   const isLoading = status === 'loading';
 
   return (
-    <div
-      className="w-full h-full min-h-screen flex flex-col md:flex-row"
-      style={{ background: COLORS.bg, fontFamily: 'system-ui, sans-serif' }}
-    >
-      {/* Main charts area */}
-      <div className="flex-1 p-4 sm:p-6 flex flex-col gap-5">
-        <div>
-          <h2 style={{ color: COLORS.textBright, fontSize: '1.05rem', fontWeight: 600 }}>
-            {cohort ? cohort.cohortName : 'Instructor dashboard'}
-          </h2>
-          <p style={{ color: COLORS.textDim, fontSize: '0.8rem', marginTop: 4 }}>
-            {isEmpty ? 'No cohort loaded yet' : `${cohortStats?.count ?? 0} students`}
-          </p>
+    <div className="w-full">
+      {/* Hero / page header (Learn page style) */}
+      <section className="relative overflow-hidden border-b border-zinc-200">
+        <div className="pointer-events-none absolute inset-0 opacity-40">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, #e4e4e7 1px, transparent 1px),
+                linear-gradient(to bottom, #e4e4e7 1px, transparent 1px)
+              `,
+              backgroundSize: '64px 64px',
+            }}
+          />
         </div>
 
-        {isEmpty && !isLoading && (
-          <div
-            style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: '32px 20px', textAlign: 'center' }}
-          >
-            <p style={{ color: COLORS.textDim, fontSize: '0.85rem' }}>
-              Choose a class section to load cohort progress
-            </p>
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+              Dashboard / Instructor
+            </span>
+            <span className="h-px w-12 bg-zinc-300" />
           </div>
-        )}
 
-        {isLoading && (
-          <div className="flex items-center gap-2 px-4 py-3" style={{ background: COLORS.panel, border: `1px solid ${COLORS.border}`, alignSelf: 'flex-start' }}>
-            <Loader2 size={15} className="animate-spin" style={{ color: COLORS.accent }} />
-            <span style={{ color: COLORS.textBright, fontSize: '0.8rem' }}>Loading cohort data…</span>
-          </div>
-        )}
+          <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-6xl">
+            Track your cohort
+            <br />
+            <span className="text-zinc-400">at a glance.</span>
+          </h1>
 
-        {status === 'ready' && cohort && (
-          <>
-            {/* Summary chips */}
-            <div className="flex flex-wrap gap-3">
-              <StatChip label="Avg. completion" value={`${cohortStats.avgCompletion}%`} />
-              <StatChip label="Avg. quiz score" value={`${cohortStats.avgQuiz}%`} />
-              <StatChip label="Top performer" value={cohortStats.top.name} accent />
-              <StatChip label="Needs attention" value={cohortStats.bottom.name} accent2 />
+          <p className="mt-7 max-w-xl text-base leading-7 text-zinc-500">
+            Monitor completion, quiz scores, and challenge progress across
+            every class section — and spot who needs attention.
+          </p>
+        </div>
+      </section>
+
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-8 lg:flex-row lg:px-8">
+        {/* Main charts area */}
+        <div className="flex min-w-0 flex-1 flex-col gap-6">
+          <div className="border-b border-zinc-200 pb-6">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                Cohort
+              </span>
+              <span className="h-px w-8 bg-zinc-300" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400">
+                {isEmpty ? 'No cohort loaded yet' : `${cohortStats?.count ?? 0} students`}
+              </span>
             </div>
+            <h2 className="text-3xl font-semibold tracking-[-0.035em] text-zinc-950">
+              {cohort ? cohort.cohortName : 'Instructor dashboard'}
+            </h2>
+          </div>
 
-            {/* Per-student completion chart */}
-            <div style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: 16 }}>
-              <div style={{ color: COLORS.textBright, fontSize: '0.9rem', fontWeight: 600, marginBottom: 2 }}>
-                Completion by student
+          {isEmpty && !isLoading && (
+            <div className="border border-zinc-200 bg-white px-5 py-8 text-center">
+              <p className="text-sm text-zinc-500">
+                Choose a class section to load cohort progress
+              </p>
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="flex items-center gap-2 self-start border border-zinc-200 bg-white px-4 py-3">
+              <Loader2 size={15} className="animate-spin text-blue-600" />
+              <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                Loading cohort data…
+              </span>
+            </div>
+          )}
+
+          {status === 'ready' && cohort && (
+            <>
+              {/* Summary chips */}
+              <div className="flex flex-wrap gap-3">
+                <StatChip label="Avg. completion" value={`${cohortStats.avgCompletion}%`} />
+                <StatChip label="Avg. quiz score" value={`${cohortStats.avgQuiz}%`} />
+                <StatChip label="Top performer" value={cohortStats.top.name} accent />
+                <StatChip label="Needs attention" value={cohortStats.bottom.name} accent2 />
               </div>
-              <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 10 }}>
-                Sorted lowest to highest — click a bar for detail
+
+              {/* Per-student completion chart */}
+              <div className="border border-zinc-200 bg-white p-5">
+                <div className="text-sm font-semibold text-zinc-950">Completion by student</div>
+                <div className="mb-3 mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                  Sorted lowest to highest — click a bar for detail
+                </div>
+                <div style={{ width: '100%', height: 260 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={studentChartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={COLORS.grid} vertical={false} />
+                      <XAxis
+                        dataKey="shortName"
+                        tick={{ fill: COLORS.textDim, fontSize: 11 }}
+                        axisLine={{ stroke: COLORS.border }}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tickFormatter={(v) => `${v}%`}
+                        tick={{ fill: COLORS.textDim, fontSize: 11 }}
+                        axisLine={{ stroke: COLORS.border }}
+                        tickLine={false}
+                        domain={[0, 100]}
+                      />
+                      <Tooltip
+                        cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }}
+                        contentStyle={{
+                          background: COLORS.panel,
+                          border: `1px solid ${COLORS.border}`,
+                          borderRadius: 0,
+                          fontFamily: 'ui-monospace, monospace',
+                          fontSize: 12,
+                        }}
+                        labelStyle={{ color: COLORS.textBright }}
+                        itemStyle={{ color: COLORS.textBright }}
+                        formatter={(value) => [`${value}%`, 'completion']}
+                      />
+                      <Bar
+                        dataKey="completionPct"
+                        radius={0}
+                        maxBarSize={36}
+                        onClick={(data) => setSelectedId(data.id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {studentChartData.map((s) => (
+                          <Cell
+                            key={s.id}
+                            fill={s.id === selectedId ? '#18181b' : COLORS.accent}
+                            opacity={selectedId && s.id !== selectedId ? 0.35 : 1}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-              <div style={{ width: '100%', height: 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={studentChartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.grid} vertical={false} />
-                    <XAxis
-                      dataKey="shortName"
-                      tick={{ fill: COLORS.textDim, fontSize: 11 }}
-                      axisLine={{ stroke: COLORS.border }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tickFormatter={(v) => `${v}%`}
-                      tick={{ fill: COLORS.textDim, fontSize: 11 }}
-                      axisLine={{ stroke: COLORS.border }}
-                      tickLine={false}
-                      domain={[0, 100]}
-                    />
-                    <Tooltip
-                      cursor={{ fill: 'rgba(94, 234, 212, 0.06)' }}
-                      contentStyle={{
-                        background: COLORS.panel,
-                        border: `1px solid ${COLORS.border}`,
-                        borderRadius: 0,
-                        fontFamily: 'ui-monospace, monospace',
-                        fontSize: 12,
-                      }}
-                      labelStyle={{ color: COLORS.textBright }}
-                      itemStyle={{ color: COLORS.textBright }}
-                      formatter={(value) => [`${value}%`, 'completion']}
-                    />
-                    <Bar
-                      dataKey="completionPct"
-                      radius={[2, 2, 0, 0]}
-                      onClick={(data) => setSelectedId(data.id)}
-                      style={{ cursor: 'pointer' }}
+
+              {/* Module completion chart */}
+              <div className="border border-zinc-200 bg-white p-5">
+                <div className="text-sm font-semibold text-zinc-950">Average completion by module</div>
+                <div className="mb-3 mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                  Where the whole cohort is spending the most time
+                </div>
+                <div style={{ width: '100%', height: Math.max(160, moduleChartData.length * 44 + 40) }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={moduleChartData}
+                      layout="vertical"
+                      margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
                     >
-                      {studentChartData.map((s) => (
-                        <Cell
-                          key={s.id}
-                          fill={s.id === selectedId ? COLORS.accent2 : COLORS.accent}
-                          opacity={selectedId && s.id !== selectedId ? 0.4 : 1}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                      <CartesianGrid strokeDasharray="3 3" stroke={COLORS.grid} horizontal={false} />
+                      <XAxis
+                        type="number"
+                        domain={[0, 100]}
+                        tickFormatter={(v) => `${v}%`}
+                        tick={{ fill: COLORS.textDim, fontSize: 11 }}
+                        axisLine={{ stroke: COLORS.border }}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        type="category"
+                        dataKey="module"
+                        width={170}
+                        tick={{ fill: COLORS.textDim, fontSize: 11 }}
+                        axisLine={{ stroke: COLORS.border }}
+                        tickLine={false}
+                      />
+                      <Tooltip
+                        cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }}
+                        contentStyle={{
+                          background: COLORS.panel,
+                          border: `1px solid ${COLORS.border}`,
+                          borderRadius: 0,
+                          fontFamily: 'ui-monospace, monospace',
+                          fontSize: 12,
+                        }}
+                        labelStyle={{ color: COLORS.textBright }}
+                        itemStyle={{ color: COLORS.textBright }}
+                        formatter={(value) => [`${value}%`, 'avg. completion']}
+                      />
+                      <Bar dataKey="avgCompletion" radius={0} fill={COLORS.accent} barSize={8} background={{ fill: '#f4f4f5' }} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-            </div>
-
-            {/* Module completion chart */}
-            <div style={{ border: `1px solid ${COLORS.border}`, background: COLORS.panel, borderRadius: 8, padding: 16 }}>
-              <div style={{ color: COLORS.textBright, fontSize: '0.9rem', fontWeight: 600, marginBottom: 2 }}>
-                Average completion by module
-              </div>
-              <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 10 }}>
-                Where the whole cohort is spending the most time
-              </div>
-              <div style={{ width: '100%', height: 200 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={moduleChartData}
-                    layout="vertical"
-                    margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.grid} horizontal={false} />
-                    <XAxis
-                      type="number"
-                      domain={[0, 100]}
-                      tickFormatter={(v) => `${v}%`}
-                      tick={{ fill: COLORS.textDim, fontSize: 11 }}
-                      axisLine={{ stroke: COLORS.border }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="module"
-                      width={150}
-                      tick={{ fill: COLORS.textDim, fontSize: 11 }}
-                      axisLine={{ stroke: COLORS.border }}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      cursor={{ fill: 'rgba(94, 234, 212, 0.06)' }}
-                      contentStyle={{
-                        background: COLORS.panel,
-                        border: `1px solid ${COLORS.border}`,
-                        borderRadius: 0,
-                        fontFamily: 'ui-monospace, monospace',
-                        fontSize: 12,
-                      }}
-                      labelStyle={{ color: COLORS.textBright }}
-                      itemStyle={{ color: COLORS.textBright }}
-                      formatter={(value) => [`${value}%`, 'avg. completion']}
-                    />
-                    <Bar dataKey="avgCompletion" radius={[0, 2, 2, 0]} fill={COLORS.accent2} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Sidebar: cohort overview or student detail */}
-      <div className="w-full md:w-96 flex flex-col gap-6 p-4 sm:p-6 md:overflow-y-auto" style={panelStyle}>
-        <div>
-          <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 8 }}>
-            Class sections
-          </div>
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={loadLiveCohort}
-              className="flex items-center gap-2 py-3 sm:py-2 px-3 text-sm text-left"
-              style={presetButtonStyle(activePreset === 'Live — Content Service')}
-            >
-              {activePreset === 'Live — Content Service' && !liveError ? (
-                <Wifi size={13} style={{ color: COLORS.accent }} />
-              ) : (
-                <WifiOff size={13} style={{ color: COLORS.textDim }} />
-              )}
-              Live — Content Service
-            </button>
-            {PRESETS.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => applyPreset(p)}
-                className="py-3 sm:py-2 px-3 text-sm text-left"
-                style={presetButtonStyle(activePreset === p.label)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-          {liveError && (
-            <p style={{ color: COLORS.textDim, fontSize: '0.7rem', marginTop: 8 }}>{liveError}</p>
+            </>
           )}
         </div>
 
-        {status === 'ready' && selectedStudent && (
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: 14 }}>
-            <button
-              onClick={() => setSelectedId(null)}
-              className="flex items-center gap-1.5 mb-3"
-              style={{ color: COLORS.textDim, fontSize: '0.75rem', background: 'transparent' }}
-            >
-              <ArrowLeft size={13} />
-              Back to cohort overview
-            </button>
+        {/* Sidebar: cohort overview or student detail */}
+        <aside className="w-full shrink-0 lg:w-80">
+          <div className="flex flex-col gap-7 lg:sticky lg:top-24">
+            <div>
+              <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                Class sections
+              </div>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={loadLiveCohort}
+                  className={`flex items-center gap-2 border px-3 py-3 text-left text-xs font-medium transition-all sm:py-2.5 ${
+                    activePreset === 'Live — Content Service'
+                      ? 'border-blue-600 bg-white text-zinc-950'
+                      : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
+                  }`}
+                >
+                  {activePreset === 'Live — Content Service' && !liveError ? (
+                    <Wifi size={13} className="text-blue-600" />
+                  ) : (
+                    <WifiOff size={13} className="text-zinc-400" />
+                  )}
+                  Live — Content Service
+                </button>
+                {PRESETS.map((p) => (
+                  <button
+                    key={p.label}
+                    onClick={() => applyPreset(p)}
+                    className={`border px-3 py-3 text-left text-xs font-medium transition-all sm:py-2.5 ${
+                      activePreset === p.label
+                        ? 'border-blue-600 bg-white text-zinc-950'
+                        : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              {liveError && (
+                <p className="mt-2 text-[11px] text-zinc-500">{liveError}</p>
+              )}
+            </div>
 
-            <div style={{ color: COLORS.textBright, fontSize: '0.95rem', fontWeight: 600 }}>
-              {selectedStudent.name}
-            </div>
-            <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginTop: 2 }}>
-              {selectedStudent.completionPct}% complete · active {selectedStudent.lastActive}
-            </div>
+            {status === 'ready' && selectedStudent && (
+              <div className="border border-zinc-200 bg-white p-4">
+                <button
+                  onClick={() => setSelectedId(null)}
+                  className="mb-4 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
+                >
+                  <ArrowLeft size={13} />
+                  Back to cohort overview
+                </button>
 
-            <div style={{ color: COLORS.textDim, fontSize: '0.72rem', margin: '14px 0 8px' }}>
-              Module progress
-            </div>
-            <div className="flex flex-col gap-2">
-              {selectedStudent.moduleProgress.map((pct, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div style={{ width: 100, color: COLORS.textBright, fontSize: '0.72rem' }}>
-                    {MODULES[i]}
-                  </div>
-                  <div className="flex-1 h-2" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: COLORS.accent }} />
-                  </div>
-                  <div style={{ width: 32, textAlign: 'right', color: COLORS.textDim, fontSize: '0.7rem', fontFamily: 'ui-monospace, monospace' }}>
-                    {pct}%
-                  </div>
+                <div className="text-base font-semibold text-zinc-950">
+                  {selectedStudent.name}
                 </div>
-              ))}
-            </div>
-
-            <div style={{ color: COLORS.textDim, fontSize: '0.72rem', margin: '14px 0 8px' }}>
-              Quiz scores
-            </div>
-            <div style={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.78rem', color: COLORS.textBright, lineHeight: 1.7 }}>
-              {selectedStudent.quizzes.map((q) => (
-                <div key={q.name}>
-                  {q.name}: {q.score}/{q.max}
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                  {selectedStudent.completionPct}% complete · active {selectedStudent.lastActive}
                 </div>
-              ))}
-            </div>
 
-            <div style={{ color: COLORS.textDim, fontSize: '0.72rem', margin: '14px 0 8px' }}>
-              Coding challenges
-            </div>
-            <div className="flex flex-col gap-2">
-              {selectedStudent.challenges.map((c) => {
-                const meta = statusMeta(c.status);
-                const Icon = meta.icon;
-                return (
-                  <div key={c.name} className="flex items-center gap-2">
-                    <Icon size={14} style={{ color: meta.color, flexShrink: 0 }} />
-                    <span style={{ color: COLORS.textBright, fontSize: '0.78rem' }}>{c.name}</span>
-                  </div>
-                );
-              })}
-            </div>
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                  Module progress
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  {selectedStudent.moduleProgress.map((pct, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-24 text-[11px] text-zinc-700">{MODULES[i]}</div>
+                      <div className="h-px flex-1 bg-zinc-200">
+                        <div className="h-px bg-blue-600 transition-all duration-500" style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="w-9 text-right font-mono text-[10px] text-zinc-400">
+                        {pct}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                  Quiz scores
+                </div>
+                <div className="font-mono text-xs leading-7 text-zinc-900">
+                  {selectedStudent.quizzes.map((q) => (
+                    <div key={q.name}>
+                      {q.name}: {q.score}/{q.max}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                  Coding challenges
+                </div>
+                <div className="flex flex-col gap-2">
+                  {selectedStudent.challenges.map((c) => {
+                    const meta = statusMeta(c.status);
+                    const Icon = meta.icon;
+                    return (
+                      <div key={c.name} className="flex items-center gap-2">
+                        <Icon size={14} style={{ color: meta.color, flexShrink: 0 }} />
+                        <span className="text-xs text-zinc-700">{c.name}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {status === 'ready' && !selectedStudent && cohortStats && (
+              <div className="border border-zinc-200 bg-white p-4">
+                <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                  Cohort overview
+                </div>
+                <div className="font-mono text-xs leading-8 text-zinc-900">
+                  <div>Students: {cohortStats.count}</div>
+                  <div>Avg. completion: {cohortStats.avgCompletion}%</div>
+                  <div>Avg. quiz score: {cohortStats.avgQuiz}%</div>
+                </div>
+                <div className="mt-3 border-t border-zinc-100 pt-3 text-[11px] leading-5 text-zinc-500">
+                  Click any bar in the chart to see that student's full breakdown.
+                </div>
+              </div>
+            )}
           </div>
-        )}
-
-        {status === 'ready' && !selectedStudent && cohortStats && (
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: 14 }}>
-            <div style={{ color: COLORS.textDim, fontSize: '0.75rem', marginBottom: 8 }}>
-              Cohort overview
-            </div>
-            <div style={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.82rem', color: COLORS.textBright, lineHeight: 1.9 }}>
-              <div>Students: {cohortStats.count}</div>
-              <div>Avg. completion: {cohortStats.avgCompletion}%</div>
-              <div>Avg. quiz score: {cohortStats.avgQuiz}%</div>
-            </div>
-            <div style={{ color: COLORS.textDim, fontSize: '0.72rem', marginTop: 12 }}>
-              Click any bar in the chart to see that student's full breakdown.
-            </div>
-          </div>
-        )}
-
-
+        </aside>
       </div>
     </div>
   );
 }
 
 function StatChip({ label, value, accent, accent2 }) {
-  const color = accent ? COLORS.accent : accent2 ? COLORS.accent2 : COLORS.textBright;
+  const color = accent ? 'text-blue-600' : accent2 ? 'text-emerald-600' : 'text-zinc-900';
   return (
-    <div style={{ border: `1px solid ${COLORS.border}`, padding: '10px 14px', flex: '1 1 160px' }}>
-      <div style={{ color: COLORS.textDim, fontSize: '0.7rem' }}>{label}</div>
-      <div style={{ color, fontSize: '1rem', fontWeight: 600, marginTop: 2, fontFamily: 'ui-monospace, monospace' }}>
-        {value}
-      </div>
+    <div className="flex-[1_1_160px] border border-zinc-200 bg-white px-4 py-3">
+      <div className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{label}</div>
+      <div className={`mt-1 font-mono text-base font-semibold ${color}`}>{value}</div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ Handles multi-turn Socratic tutoring, tool calling into simulation, and adaptive
 from __future__ import annotations
 import json
 import logging
+import os
 import re
 from typing import Dict, Any, List, Optional, Tuple
 
@@ -64,22 +65,85 @@ class QuantumAITutor:
     """
 
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
-        self.api_key = api_key or settings.gemini_api_key
+        raw_key = api_key or settings.gemini_api_key or ""
+        # Remove accidental quotes / spaces around the key in .env
+        self.api_key = raw_key.strip().strip('"').strip("'")
         self.model = model or settings.default_model
         self.client = None
+        # Human-readable reason shown to the user whenever we fall back to offline mode
+        self.last_error: Optional[str] = None
 
-        if GENAI_AVAILABLE and self.api_key:
+        if not GENAI_AVAILABLE:
+            self.last_error = "google-genai SDK is not installed (pip install -r requirements.txt)."
+        elif not self.api_key:
+            self.last_error = "GEMINI_API_KEY is not set in services/ai-tutor/.env."
+            logger.info(
+                "GEMINI_API_KEY not provided. AI Tutor running with local quantum simulation engine and heuristic pedagogical reasoning."
+            )
+        else:
+            k = self.api_key
+            logger.info(f"Gemini key loaded: {k[:12]}...{k[-3:]} ({len(k)} chars)")
             try:
-                self.client = genai.Client(api_key=self.api_key)
-                logger.info(f"Initialized Gemini client with model {self.model}")
+                # AI Studio now issues "AQ." auth keys; they work with the normal Gemini API client.
+                # Vertex AI mode is only used if you explicitly set GEMINI_USE_VERTEX=true.
+                use_vertex = os.getenv("GEMINI_USE_VERTEX", "").strip().lower() in ("1", "true", "yes")
+                if use_vertex:
+                    self.client = genai.Client(vertexai=True, api_key=self.api_key)
+                    logger.info(f"Initialized Gemini client (Vertex AI express mode) with model {self.model}")
+                else:
+                    self.client = genai.Client(api_key=self.api_key)
+                    logger.info(f"Initialized Gemini client (AI Studio) with model {self.model}")
             except Exception as e:
                 logger.error(f"Failed to initialize Gemini Client: {e}")
+                self.last_error = f"Could not initialize Gemini client: {self._short_error(e)}"
                 self.client = None
-        else:
-            if not self.api_key:
-                logger.info(
-                    "GEMINI_API_KEY not provided. AI Tutor running with local quantum simulation engine and heuristic pedagogical reasoning."
+
+    @staticmethod
+    def _short_error(e: Exception) -> str:
+        """Compact, user-friendly error message (no giant JSON dumps)."""
+        text = str(e)
+        m = re.search(r"'message': '([^']+)'", text)
+        msg = m.group(1) if m else text
+        return msg.strip()[:220]
+
+    @staticmethod
+    def _is_model_error(e: Exception) -> bool:
+        """True when the failure is about the model itself (safe to retry with another model)."""
+        code = getattr(e, "code", None)
+        text = str(e).upper()
+        if "API_KEY_INVALID" in text or "PERMISSION_DENIED" in text or "UNAUTHENTICATED" in text:
+            return False
+        return code == 404 or "NOT_FOUND" in text or "IS NOT FOUND" in text or "NOT SUPPORTED" in text
+
+    def _generate(self, contents, config):
+        """
+        Call Gemini with the configured model; if that model is unavailable, try the
+        fallback models from settings. Auth/quota errors are raised immediately.
+        Sets self.last_error so callers can tell the user why the offline fallback was used.
+        """
+        models = [self.model] + [m for m in settings.fallback_models if m != self.model]
+        last_exc: Optional[Exception] = None
+        for name in models:
+            try:
+                response = self.client.models.generate_content(
+                    model=name, contents=contents, config=config
                 )
+                if name != self.model:
+                    logger.warning(f"Model '{self.model}' unavailable, answered with '{name}' instead.")
+                self.last_error = None
+                return response
+            except Exception as e:
+                last_exc = e
+                self.last_error = self._short_error(e)
+                if not self._is_model_error(e):
+                    raise
+                logger.warning(f"Model '{name}' unavailable ({self.last_error}). Trying next model...")
+        raise last_exc  # every model failed
+
+    def _offline_notice(self) -> str:
+        """Markdown note appended to offline answers so the reason is visible in the UI."""
+        reason = self.last_error or "AI model did not respond."
+        return f"\n\n> **AI Tutor is offline** - showing the built-in explanation instead.  \n> Reason: {reason}"
 
     def is_gemini_connected(self) -> bool:
         return self.client is not None
@@ -148,8 +212,7 @@ class QuantumAITutor:
                 # Append current user prompt
                 contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
 
-                response = self.client.models.generate_content(
-                    model=self.model,
+                response = self._generate(
                     contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=system_instruction,
@@ -173,9 +236,11 @@ class QuantumAITutor:
                 logger.error(f"Error invoking Gemini API: {e}. Falling back to rule-guided response.")
 
         # Offline / Fallback Socratic responder
-        return self._generate_fallback_chat_response(
+        fallback = self._generate_fallback_chat_response(
             message, circuit, circuit_sim_result, profile_data, pedagogical_context
         )
+        fallback.response += self._offline_notice()
+        return fallback
 
     def explain_circuit(
         self,
@@ -213,8 +278,7 @@ class QuantumAITutor:
 
         if self.client:
             try:
-                response = self.client.models.generate_content(
-                    model=self.model,
+                response = self._generate(
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=MASTER_TUTOR_SYSTEM_INSTRUCTION,
@@ -232,7 +296,9 @@ class QuantumAITutor:
                 logger.error(f"Gemini explain error: {e}")
 
         # Fallback explainer
-        return self._generate_fallback_explanation(circuit, sim_summary, profile)
+        fallback = self._generate_fallback_explanation(circuit, sim_summary, profile)
+        fallback.explanation += self._offline_notice()
+        return fallback
 
     def debug_circuit(
         self,
@@ -298,8 +364,7 @@ class QuantumAITutor:
                     comparison_summary=comparison_summary,
                     learner_context=pedagogical_context
                 )
-                response = self.client.models.generate_content(
-                    model=self.model,
+                response = self._generate(
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=MASTER_TUTOR_SYSTEM_INSTRUCTION,
@@ -371,8 +436,7 @@ class QuantumAITutor:
                     simulation_summary=json.dumps(sim_data, indent=2),
                     target_criteria=target_criteria
                 )
-                response = self.client.models.generate_content(
-                    model=self.model,
+                response = self._generate(
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=MASTER_TUTOR_SYSTEM_INSTRUCTION,
