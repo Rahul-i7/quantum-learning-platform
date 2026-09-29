@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: quantum-simulation
+    runtime: python
+    rootDir: services/simulation
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+
+  - type: web
+    name: quantum-content-progress
+    runtime: python
+    rootDir: services/content-progress
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: SIMULATION_SERVICE_URL
+        value: https://quantum-simulation.onrender.com
+
+  - type: web
+    name: quantum-ai-tutor
+    runtime: python
+    rootDir: services/ai-tutor
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SIMULATION_SERVICE_URL
+        value: https://quantum-simulation.onrender.com
