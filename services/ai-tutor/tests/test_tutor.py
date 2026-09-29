@@ -77,3 +77,21 @@ def test_tutor_chat_fallback_and_questions():
     assert res.simulation_called is True
     assert len(res.response) > 0
     assert len(res.suggested_questions) > 0
+
+
+def test_is_model_error_high_demand_and_rate_limits():
+    """Verify that 429 rate limits, 503 high demand, and quota errors are detected as model fallback triggers."""
+    class MockError(Exception):
+        def __init__(self, msg, code=None):
+            super().__init__(msg)
+            self.code = code
+
+    # Rate limits and high demand should trigger fallback (return True)
+    assert QuantumAITutor._is_model_error(MockError("429 RESOURCE_EXHAUSTED: Rate limit exceeded", code=429)) is True
+    assert QuantumAITutor._is_model_error(MockError("503 Service Unavailable: High demand on model gemini-3.6-flash", code=503)) is True
+    assert QuantumAITutor._is_model_error(MockError("Model gemini-3.6-flash is temporarily overloaded", code=500)) is True
+
+    # Auth and invalid key errors should NOT trigger model fallback (return False)
+    assert QuantumAITutor._is_model_error(MockError("API_KEY_INVALID: Provided key is not active")) is False
+    assert QuantumAITutor._is_model_error(MockError("PERMISSION_DENIED: Access denied")) is False
+

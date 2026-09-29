@@ -108,37 +108,68 @@ class QuantumAITutor:
 
     @staticmethod
     def _is_model_error(e: Exception) -> bool:
-        """True when the failure is about the model itself (safe to retry with another model)."""
-        code = getattr(e, "code", None)
+        """True when the failure is model unavailability, rate limits, high demand, or transient server errors."""
         text = str(e).upper()
-        if "API_KEY_INVALID" in text or "PERMISSION_DENIED" in text or "UNAUTHENTICATED" in text:
+        # Invalid key, bad auth, or permission issues cannot be fixed by switching models
+        if any(term in text for term in ["API_KEY_INVALID", "PERMISSION_DENIED", "UNAUTHENTICATED", "INVALID_ARGUMENT"]):
             return False
-        return code == 404 or "NOT_FOUND" in text or "IS NOT FOUND" in text or "NOT SUPPORTED" in text
+
+        code = getattr(e, "code", None)
+        if code in (404, 429, 500, 502, 503, 504):
+            return True
+
+        error_keywords = [
+            "NOT_FOUND", "NOT FOUND", "IS NOT FOUND", "NOT SUPPORTED", "MODEL_NOT_FOUND",
+            "RESOURCE_EXHAUSTED", "QUOTA", "RATE_LIMIT", "RATE LIMIT", "TOO MANY REQUESTS",
+            "OVERLOADED", "HIGH DEMAND", "BUSY", "UNAVAILABLE", "TEMPORARILY_UNAVAILABLE",
+            "SERVER ERROR", "INTERNAL", "DEADLINE_EXCEEDED", "503", "429"
+        ]
+        return any(kw in text for kw in error_keywords)
 
     def _generate(self, contents, config):
         """
-        Call Gemini with the configured model; if that model is unavailable, try the
-        fallback models from settings. Auth/quota errors are raised immediately.
-        Sets self.last_error so callers can tell the user why the offline fallback was used.
+        Call Gemini with the configured primary model. If that model is unavailable,
+        rate-limited (429), or overloaded (503), try fallback models in sequence.
         """
-        models = [self.model] + [m for m in settings.fallback_models if m != self.model]
+        candidates = [self.model]
+        for m in settings.fallback_models:
+            if m not in candidates:
+                candidates.append(m)
+
         last_exc: Optional[Exception] = None
-        for name in models:
-            try:
-                response = self.client.models.generate_content(
-                    model=name, contents=contents, config=config
-                )
-                if name != self.model:
-                    logger.warning(f"Model '{self.model}' unavailable, answered with '{name}' instead.")
-                self.last_error = None
-                return response
-            except Exception as e:
-                last_exc = e
-                self.last_error = self._short_error(e)
-                if not self._is_model_error(e):
-                    raise
-                logger.warning(f"Model '{name}' unavailable ({self.last_error}). Trying next model...")
-        raise last_exc  # every model failed
+        for name in candidates:
+            # Try primary/fallback model with retry on transient high-demand glitches
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    response = self.client.models.generate_content(
+                        model=name, contents=contents, config=config
+                    )
+                    if name != self.model:
+                        logger.warning(
+                            f"Model '{self.model}' unavailable/overloaded. Answered using fallback model '{name}' instead."
+                        )
+                    self.last_error = None
+                    return response
+                except Exception as e:
+                    last_exc = e
+                    self.last_error = self._short_error(e)
+                    if not self._is_model_error(e):
+                        # Auth or fatal non-model error; fail fast
+                        raise e
+
+                    if attempt < max_retries - 1:
+                        import time
+                        time.sleep(0.5 * (attempt + 1))
+                        logger.warning(
+                            f"High demand for model '{name}' (attempt {attempt + 1}): {self.last_error}. Retrying..."
+                        )
+                    else:
+                        logger.warning(
+                            f"Model '{name}' unavailable or overloaded ({self.last_error}) after retries. Trying next fallback model..."
+                        )
+
+        raise last_exc  # every model candidate failed
 
     def _offline_notice(self) -> str:
         """Markdown note appended to offline answers so the reason is visible in the UI."""
