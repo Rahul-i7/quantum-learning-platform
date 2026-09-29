@@ -147,7 +147,7 @@ export default function BuilderPage() {
                             </div>
 
                             {/* Controls */}
-                            <div className="flex items-center gap-6">
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-6">
                                 <div className="flex items-center gap-3">
                                     <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                         Qubits
