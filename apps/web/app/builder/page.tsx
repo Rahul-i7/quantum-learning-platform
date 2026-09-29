@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus, Sparkle } from 'lucide-react'
 import GatePalette from '@/components/circuit-builder/GatePalette'
 import CircuitCanvas from '@/components/circuit-builder/CircuitCanvas'
 import QiskitPreview from '@/components/circuit-builder/QiskitPreview'
@@ -11,7 +11,6 @@ import MeasurementHistogram from '@/components/visualizations/MeasurementHistogr
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import NavBar from '@/components/nav/NavBar'
-import { Sparkle } from 'lucide-react'
 import AIExplanation from '@/components/circuit-builder/AIExplanation'
 
 export default function BuilderPage() {
