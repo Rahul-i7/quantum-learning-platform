@@ -30,12 +30,72 @@ export default function CircuitCanvas() {
             if (pendingGate && canvasRef.current) {
                 const rect = canvasRef.current.getBoundingClientRect()
 
-                setMousePos({
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
-                })
-            }
-        }
+  const [controlCenter, setControlCenter] =
+    useState({
+      x: 0,
+      y: 0,
+    })
+
+  useEffect(() => {
+    const handleMouseMove = (
+      e: MouseEvent
+    ) => {
+      if (pendingGate && canvasRef.current) {
+        const rect =
+          canvasRef.current.getBoundingClientRect()
+
+        setMousePos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        })
+      }
+
+      if (pendingCX && canvasRef.current) {
+        const rect =
+          canvasRef.current.getBoundingClientRect()
+
+        setMousePos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        })
+      }
+    }
+
+    window.addEventListener(
+      'mousemove',
+      handleMouseMove
+    )
+
+    return () => {
+      window.removeEventListener(
+        'mousemove',
+        handleMouseMove
+      )
+    }
+  }, [pendingGate, pendingCX])
+
+  useEffect(() => {
+    const handleKeyDown = (
+      e: KeyboardEvent
+    ) => {
+      if (e.key === 'Escape') {
+        setPendingGate(null)
+        setPendingCX(null)
+      }
+    }
+
+    window.addEventListener(
+      'keydown',
+      handleKeyDown
+    )
+
+    return () => {
+      window.removeEventListener(
+        'keydown',
+        handleKeyDown
+      )
+    }
+  }, [setPendingGate, setPendingCX])
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -89,7 +149,49 @@ export default function CircuitCanvas() {
             gate.qubits.length === 2
     )
 
-    return (
+  useEffect(() => {
+    if (!pendingCX || !canvasRef.current) {
+      setControlCenter({ x: 0, y: 0 })
+      return
+    }
+
+    const cellEl = canvasRef.current.querySelector(
+      `[data-qubit="${pendingCX.qubitIndex}"][data-step="${pendingCX.stepIndex}"]`
+    ) as HTMLElement | null
+
+    if (!cellEl) {
+      setControlCenter({ x: 0, y: 0 })
+      return
+    }
+
+    const cellRect = cellEl.getBoundingClientRect()
+    const canvasRect =
+      canvasRef.current.getBoundingClientRect()
+
+    setControlCenter({
+      x:
+        cellRect.left -
+        canvasRect.left +
+        cellRect.width / 2,
+      y:
+        cellRect.top -
+        canvasRect.top +
+        cellRect.height / 2,
+    })
+  }, [pendingCX])
+
+  /*
+   * Find CX gates so we can show the
+   * vertical connection between their
+   * control and target qubits.
+   */
+  const cxGates = gates.filter(
+    (gate) =>
+      gate.type === 'cx' &&
+      gate.qubits.length === 2
+  )
+
+  return (
         <div
             ref={canvasRef}
             className="relative overflow-x-auto bg-white">

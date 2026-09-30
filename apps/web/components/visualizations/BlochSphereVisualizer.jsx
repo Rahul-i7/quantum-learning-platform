@@ -178,10 +178,6 @@ export default function BlochSphereVisualizer({
   const [selectedQubit, setSelectedQubit] =
     useState(qubitIndex)
 
-  useEffect(() => {
-    setSelectedQubit(qubitIndex)
-  }, [qubitIndex])
-
   const effectiveNumQubits =
     data?.num_qubits || numQubits || 3
 
@@ -199,8 +195,11 @@ export default function BlochSphereVisualizer({
 
   useEffect(() => {
     if (!animated) {
-      setDisplayedBlochState(targetBlochState)
-      return
+      const frame = requestAnimationFrame(() => {
+        setDisplayedBlochState(targetBlochState)
+      })
+
+      return () => cancelAnimationFrame(frame)
     }
 
     const start = displayedBlochState

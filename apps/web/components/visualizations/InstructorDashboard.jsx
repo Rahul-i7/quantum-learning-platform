@@ -81,39 +81,35 @@ function statusMeta(status) {
 }
 
 export default function InstructorDashboard() {
-  const [activePreset, setActivePreset] = useState('');
-  const [cohort, setCohort] = useState(null);
+  const initialPreset = PRESETS[0] ?? null;
+  const [activePreset, setActivePreset] = useState(initialPreset?.label ?? '');
+  const [cohort, setCohort] = useState(initialPreset?.data ?? null);
   const [selectedId, setSelectedId] = useState(null);
-  const [status, setStatus] = useState('empty');
+  const [status, setStatus] = useState(initialPreset ? 'ready' : 'empty');
   const [liveError, setLiveError] = useState('');
   const delayRef = useRef(null);
 
-  useEffect(() => {
-    // Auto-load first preset for now since backend is not connected
-    if (status === 'empty' && PRESETS.length > 0) {
-      applyPreset(PRESETS[0]);
-    }
-    return () => {
-      if (delayRef.current) clearTimeout(delayRef.current);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const runWithDelay = (fn) => {
+  function runWithDelay(fn) {
     setStatus('loading');
     if (delayRef.current) clearTimeout(delayRef.current);
     delayRef.current = setTimeout(() => {
       fn();
       setStatus('ready');
     }, SIMULATED_DELAY_MS);
-  };
+  }
 
-  const applyPreset = (preset) => {
+  function applyPreset(preset) {
     setActivePreset(preset.label);
     setLiveError('');
     setSelectedId(null);
     runWithDelay(() => setCohort(preset.data));
-  };
+  }
+
+  useEffect(() => {
+    return () => {
+      if (delayRef.current) clearTimeout(delayRef.current);
+    };
+  }, []);
 
   const loadLiveCohort = async () => {
     setActivePreset('Live — Content Service');
@@ -483,7 +479,7 @@ export default function InstructorDashboard() {
                   <div>Avg. quiz score: {cohortStats.avgQuiz}%</div>
                 </div>
                 <div className="mt-3 border-t border-zinc-100 pt-3 text-[11px] leading-5 text-zinc-500">
-                  Click any bar in the chart to see that student's full breakdown.
+                  Click any bar in the chart to see the full breakdown of the progress of the student.
                 </div>
               </div>
             )}
