@@ -11,6 +11,57 @@ export interface ParseResult {
     error?: string
 }
 
+function parseQiskitAngle(value: string): number | null {
+    const angle = value.trim().replace(/\s+/g, '')
+
+    // pi
+    if (angle === 'pi') {
+        return Math.PI
+    }
+
+    // -pi
+    if (angle === '-pi') {
+        return -Math.PI
+    }
+
+    // pi/2, -pi/2, 3*pi/2, -3*pi/2
+    const fraction = angle.match(
+        /^(-?\d+(?:\.\d+)?)?\*?pi\/(-?\d+(?:\.\d+)?)$/
+    )
+
+    if (fraction) {
+        const numerator = fraction[1] === undefined
+            ? 1
+            : Number(fraction[1])
+
+        const denominator = Number(fraction[2])
+
+        if (denominator === 0) {
+            return null
+        }
+
+        return (numerator * Math.PI) / denominator
+    }
+
+    // 2*pi, -2*pi
+    const piMultiple = angle.match(
+        /^(-?\d+(?:\.\d+)?)\*?pi$/
+    )
+
+    if (piMultiple) {
+        return Number(piMultiple[1]) * Math.PI
+    }
+
+    // Plain numeric value, e.g. 0.231
+    const numeric = Number(angle)
+
+    if (Number.isFinite(numeric)) {
+        return numeric
+    }
+
+    return null
+}
+
 export function parseQiskitCode(code: string): ParseResult {
     try {
         const lines = code
@@ -65,11 +116,18 @@ export function parseQiskitCode(code: string): ParseResult {
 
             const h = line.match(/^qc\.h\(\s*(\d+)\s*\)$/)
             const x = line.match(/^qc\.x\(\s*(\d+)\s*\)$/)
-            const cx = line.match(
-                /^qc\.cx\(\s*(\d+)\s*,\s*(\d+)\s*\)$/
-            )
+            const cx = line.match(/^qc\.cx\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
+            const cz = line.match(/^qc\.cz\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
+            const swap = line.match(/^qc\.swap\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
             const y = line.match(/^qc\.y\(\s*(\d+)\s*\)$/)
             const z = line.match(/^qc\.z\(\s*(\d+)\s*\)$/)
+            const s = line.match(/^qc\.s\(\s*(\d+)\s*\)$/)
+            const sdg = line.match(/^qc\.sdg\(\s*(\d+)\s*\)$/)
+            const t = line.match(/^qc\.t\(\s*(\d+)\s*\)$/)
+            const tdg = line.match(/^qc\.tdg\(\s*(\d+)\s*\)$/)
+            const rx = line.match(/^qc\.rx\(\s*([^,]+)\s*,\s*(\d+)\s*\)$/)
+            const ry = line.match(/^qc\.ry\(\s*([^,]+)\s*,\s*(\d+)\s*\)$/)
+            const rz = line.match(/^qc\.rz\(\s*([^,]+)\s*,\s*(\d+)\s*\)$/)
 
             if (h) {
                 const qubit = Number(h[1])
@@ -145,6 +203,69 @@ export function parseQiskitCode(code: string): ParseResult {
                 continue
             }
 
+            if (cz) {
+                const control = Number(cz[1])
+                const target = Number(cz[2])
+
+                if (
+                    control >= numQubits ||
+                    target >= numQubits
+                ) {
+                    return {
+                        success: false,
+                        error: `CZ gate references a qubit outside the ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                if (control === target) {
+                    return {
+                        success: false,
+                        error: 'A CZ gate requires two different qubits.',
+                    }
+                }
+
+                gates.push({
+                    id: `editor-cz-${step}`,
+                    type: 'cz',
+                    qubits: [control, target],
+                    step,
+                })
+
+                step++
+                continue
+            }
+            if (swap) {
+                const control = Number(swap[1])
+                const target = Number(swap[2])
+
+                if (
+                    control >= numQubits ||
+                    target >= numQubits
+                ) {
+                    return {
+                        success: false,
+                        error: `Swap gate references a qubit outside the ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                if (control === target) {
+                    return {
+                        success: false,
+                        error: 'A Swap gate requires two different qubits.',
+                    }
+                }
+
+                gates.push({
+                    id: `editor-swap-${step}`,
+                    type: 'cx',
+                    qubits: [control, target],
+                    step,
+                })
+
+                step++
+                continue
+            }
+
             if (y) {
                 const qubit = Number(y[1])
 
@@ -181,6 +302,182 @@ export function parseQiskitCode(code: string): ParseResult {
                     type: 'z',
                     qubits: [qubit],
                     step,
+                })
+
+                step++
+                continue
+            }
+
+            if (s) {
+                const qubit = Number(s[1])
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-s-${step}`,
+                    type: 's',
+                    qubits: [qubit],
+                    step,
+                })
+
+                step++
+                continue
+            }
+            if (t) {
+                const qubit = Number(t[1])
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-t-${step}`,
+                    type: 't',
+                    qubits: [qubit],
+                    step,
+                })
+
+                step++
+                continue
+            }
+            if (sdg) {
+                const qubit = Number(sdg[1])
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-sdg-${step}`,
+                    type: 'sdg',
+                    qubits: [qubit],
+                    step,
+                })
+
+                step++
+                continue
+            }
+            if (tdg) {
+                const qubit = Number(tdg[1])
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-tdg-${step}`,
+                    type: 'tdg',
+                    qubits: [qubit],
+                    step,
+                })
+
+                step++
+                continue
+            }
+
+            if (rx) {
+                const theta = parseQiskitAngle(rx[1])
+                const qubit = Number(rx[2])
+
+                if (theta === null) {
+                    return {
+                        success: false,
+                        error: `Invalid RX angle: ${rx[1]}`,
+                    }
+                }
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-rx-${step}`,
+                    type: 'rx',
+                    qubits: [qubit],
+                    step,
+                    params: {
+                        theta,
+                    },
+                })
+
+                step++
+                continue
+            }
+            if (ry) {
+                const theta = parseQiskitAngle(ry[1])
+                const qubit = Number(ry[2])
+
+                if (theta === null) {
+                    return {
+                        success: false,
+                        error: `Invalid RY angle: ${ry[1]}`,
+                    }
+                }
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-ry-${step}`,
+                    type: 'ry',
+                    qubits: [qubit],
+                    step,
+                    params: {
+                        theta,
+                    },
+                })
+
+                step++
+                continue
+            }
+
+            if (rz) {
+                const theta = parseQiskitAngle(rz[1])
+                const qubit = Number(rz[2])
+
+                if (theta === null) {
+                    return {
+                        success: false,
+                        error: `Invalid RZ angle: ${rz[1]}`,
+                    }
+                }
+
+                if (qubit >= numQubits) {
+                    return {
+                        success: false,
+                        error: `Qubit index ${qubit} is out of range for a ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                gates.push({
+                    id: `editor-rz-${step}`,
+                    type: 'rz',
+                    qubits: [qubit],
+                    step,
+                    params: {
+                        theta,
+                    },
                 })
 
                 step++

@@ -1,13 +1,32 @@
-export interface Gate {
-    id: string
-    type: string
-    qubits: number[]
-    step: number
-}
+import { Gate } from "../store/circuit-store"
 
 export interface CircuitState {
     numQubits: number
     gates: Gate[]
+}
+
+function formatQiskitAngle(theta?: number): string {
+    if (theta === undefined) {
+        return 'pi/2'
+    }
+
+    if (Math.abs(theta - Math.PI / 2) < 0.000001) {
+        return 'pi/2'
+    }
+
+    if (Math.abs(theta - Math.PI) < 0.000001) {
+        return 'pi'
+    }
+
+    if (Math.abs(theta - (3 * Math.PI) / 2) < 0.000001) {
+        return '3*pi/2'
+    }
+
+    if (Math.abs(theta - 2 * Math.PI) < 0.000001) {
+        return '2*pi'
+    }
+
+    return theta.toString()
 }
 
 export function circuitToQiskitCode(circuit: CircuitState): string {
@@ -41,12 +60,53 @@ export function circuitToQiskitCode(circuit: CircuitState): string {
                     code += `qc.cx(${gate.qubits[0]}, ${gate.qubits[1]})\n`
                 }
                 break
+
+            case 'cz':
+                if (gate.qubits.length >= 2) {
+                    code += `qc.cz(${gate.qubits[0]}, ${gate.qubits[1]})\n`
+                }
+                break
+
+            case 'swap':
+                if (gate.qubits.length >= 2) {
+                    code += `qc.swap(${gate.qubits[0]}, ${gate.qubits[1]})\n`
+                }
+                break
+
             case 'y':
                 code += `qc.y(${gate.qubits[0]})\n`
                 break
 
             case 'z':
                 code += `qc.z(${gate.qubits[0]})\n`
+                break
+
+            case 's':
+                code += `qc.s(${gate.qubits[0]})\n`
+                break
+
+            case 'sdg':
+                code += `qc.sdg(${gate.qubits[0]})\n`
+                break
+
+            case 't':
+                code += `qc.t(${gate.qubits[0]})\n`
+                break
+
+            case 'tdg':
+                code += `qc.tdg(${gate.qubits[0]})\n`
+                break
+
+            case 'rx':
+                code += `qc.rx(${formatQiskitAngle(gate.params?.theta)}, ${gate.qubits[0]})\n`
+                break
+
+            case 'ry':
+                code += `qc.ry(${formatQiskitAngle(gate.params?.theta)}, ${gate.qubits[0]})\n`
+                break
+
+            case 'rz':
+                code += `qc.rz(${formatQiskitAngle(gate.params?.theta)}, ${gate.qubits[0]})\n`
                 break
 
             case 'measure':

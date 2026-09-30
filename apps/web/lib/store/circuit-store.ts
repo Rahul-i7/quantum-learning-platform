@@ -2,12 +2,14 @@ import { create } from 'zustand';
 
 // --- TypeScript Types ---
 
-
 export interface Gate {
     id: string;
     type: string;
     qubits: number[];
     step: number;
+    params?: {
+        theta?: number
+    }
 }
 
 export interface CircuitState {

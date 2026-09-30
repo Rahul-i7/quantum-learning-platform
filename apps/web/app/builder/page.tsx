@@ -34,8 +34,6 @@ export default function BuilderPage() {
     const handleQubitChange = (next: number) => {
         const clamped = Math.max(MIN_QUBITS, Math.min(MAX_QUBITS, next))
         if (clamped === store.numQubits) return
-        // Changing qubit count can orphan gates on qubits that no longer exist,
-        // so reset the circuit rather than leaving dangling references.
         store.reset()
         store.setNumQubits(clamped)
         setSimulationResult(null)
@@ -56,6 +54,11 @@ export default function BuilderPage() {
                 .map((g) => ({
                     type: g.type.toLowerCase(),
                     qubits: g.qubits,
+                    ...(g.params?.theta !== undefined
+                        ? {
+                            params: [g.params.theta],
+                        }
+                        : {}),
                 }))
 
             const res = await fetch('/api/simulate', {
