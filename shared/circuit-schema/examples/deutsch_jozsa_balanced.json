@@ -1,0 +1,17 @@
+{
+  "num_qubits": 2,
+  "num_clbits": 1,
+  "metadata": {
+    "title": "Deutsch-Jozsa (Balanced Oracle)",
+    "description": "1-bit Deutsch-Jozsa with a balanced oracle (f(x)=x, implemented as CX). Measuring the input register never yields 0, proving f is balanced.",
+    "tags": ["algorithm", "deutsch-jozsa", "oracle", "intermediate"]
+  },
+  "gates": [
+    { "type": "x", "qubits": [1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [1] },
+    { "type": "cx", "qubits": [0, 1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "measure", "qubits": [0], "clbits": [0] }
+  ]
+}

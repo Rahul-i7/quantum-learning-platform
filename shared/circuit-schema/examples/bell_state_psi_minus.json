@@ -1,0 +1,16 @@
+{
+  "num_qubits": 2,
+  "num_clbits": 2,
+  "metadata": {
+    "title": "Bell State (|Psi->)",
+    "description": "Creates the entangled state: (|01> - |10>) / sqrt(2)",
+    "tags": ["entanglement", "bell-state", "beginner"]
+  },
+  "gates": [
+    { "type": "h", "qubits": [0] },
+    { "type": "z", "qubits": [0] },
+    { "type": "x", "qubits": [1] },
+    { "type": "cx", "qubits": [0, 1] },
+    { "type": "measure", "qubits": [0, 1], "clbits": [0, 1] }
+  ]
+}

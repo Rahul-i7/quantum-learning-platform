@@ -19,6 +19,9 @@ export interface CircuitState {
     addGate: (gate: Gate) => void;
     removeGate: (id: string) => void;
     reset: () => void;
+    // Atomically replaces the whole circuit (used by the template loader
+    // so the canvas never renders an in-between/orphaned state).
+    loadCircuit: (numQubits: number, gates: Gate[]) => void;
 }
 
 // --- Zustand Store ---
@@ -35,4 +38,5 @@ export const useCircuitStore = create<CircuitState>((set) => ({
         gates: state.gates.filter(g => g.id !== id)
     })),
     reset: () => set({ gates: [] }),
+    loadCircuit: (numQubits, gates) => set({ numQubits, gates }),
 }));

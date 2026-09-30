@@ -4,7 +4,7 @@
 export interface Topic {
     id: string;
     title: string;
-    category: "fundamentals" | "gates";
+    category: "fundamentals" | "gates" | "algorithms";
     summary: string;
     body: TopicBlock[];
 }
@@ -13,7 +13,10 @@ export type TopicBlock =
     | { type: "p"; text: string }
     | { type: "matrix"; label: string; rows: string[] }
     | { type: "note"; text: string }
-    | { type: "interactive"; component: "qubit-transformation" };
+    | { type: "interactive"; component: "qubit-transformation" }
+    // Rendered with KaTeX (see components/learn/Math.tsx). `tex` is raw
+    // LaTeX source, e.g. "|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle".
+    | { type: "math"; tex: string; caption?: string };
 
 export const TOPICS: Topic[] = [
     {
@@ -223,9 +226,146 @@ export const TOPICS: Topic[] = [
             },
         ],
     },
+
+    // --- Algorithms ---------------------------------------------------
+
+    {
+        id: "bell-states",
+        title: "Bell States",
+        category: "algorithms",
+        summary: "The four maximally entangled two-qubit states, and how to build each one.",
+        body: [
+            {
+                type: "p",
+                text: "The Bell states are the four simplest examples of maximal entanglement between two qubits. Every one of them is built the same way: an H gate on qubit 0, then a CX from qubit 0 to qubit 1 — the only thing that changes is what you do to the inputs before that.",
+            },
+            {
+                type: "math",
+                tex: "|\\Phi^+\\rangle = \\frac{1}{\\sqrt{2}}\\big(|00\\rangle + |11\\rangle\\big)",
+                caption: "Φ+ — start both qubits at |0⟩, then H(q0), CX(q0→q1).",
+            },
+            {
+                type: "math",
+                tex: "|\\Phi^-\\rangle = \\frac{1}{\\sqrt{2}}\\big(|00\\rangle - |11\\rangle\\big)",
+                caption: "Φ− — same as Φ+, but apply Z to q0 before the CX.",
+            },
+            {
+                type: "math",
+                tex: "|\\Psi^+\\rangle = \\frac{1}{\\sqrt{2}}\\big(|01\\rangle + |10\\rangle\\big)",
+                caption: "Ψ+ — same as Φ+, but apply X to q1 before the CX.",
+            },
+            {
+                type: "math",
+                tex: "|\\Psi^-\\rangle = \\frac{1}{\\sqrt{2}}\\big(|01\\rangle - |10\\rangle\\big)",
+                caption: "Ψ− — apply both X to q1 and Z to q0 before the CX.",
+            },
+            {
+                type: "note",
+                text: "Load the \"Bell States\" templates in the Circuit Builder to build all four and confirm each one's Measurement Outcomes panel — Φ± only ever show 00/11, Ψ± only ever show 01/10.",
+            },
+        ],
+    },
+    {
+        id: "teleportation",
+        title: "Quantum Teleportation",
+        category: "algorithms",
+        summary: "Moving an unknown qubit state across a shared entangled pair, without cloning it.",
+        body: [
+            {
+                type: "p",
+                text: "Teleportation transmits the state of one qubit (q0) onto another (q2) using a Bell pair shared in advance (q1 and q2) plus two classical bits of information — it never copies q0's state, which would violate the no-cloning theorem.",
+            },
+            {
+                type: "p",
+                text: "The circuit has three parts: first entangle q1 and q2 into a Bell pair (H then CX). Then entangle the unknown state on q0 with q1 (CX from q0 to q1, then H on q0). Finally, measure q0 and q1 — those two classical bits tell you which of four corrections (I, X, Z, or XZ) to apply to q2 to finish the job.",
+            },
+            {
+                type: "math",
+                tex: "|\\psi\\rangle_0 \\otimes |\\Phi^+\\rangle_{12} \\;\\xrightarrow{\\text{CX, H, measure}}\\; \\text{2 classical bits} \\;\\xrightarrow{\\text{correction}}\\; |\\psi\\rangle_2",
+            },
+            {
+                type: "note",
+                text: "This platform's schema doesn't support classically-conditioned gates, so the \"Teleportation\" template stops after the two measurements — that's the interesting entangling part of the protocol. Which correction q2 would need is determined entirely by those two measured bits.",
+            },
+        ],
+    },
+    {
+        id: "deutsch-jozsa",
+        title: "Deutsch-Jozsa Algorithm",
+        category: "algorithms",
+        summary: "One query to tell whether a hidden function is constant or balanced — exponentially fewer than any classical method.",
+        body: [
+            {
+                type: "p",
+                text: "You're given a black-box function f(x) that maps n bits to one bit, with a promise: f is either constant (same output for every input) or balanced (outputs 0 for exactly half of all inputs and 1 for the other half). Classically, you might need to check just over half of all 2ⁿ inputs in the worst case to be sure. Deutsch-Jozsa decides it with a single query to the quantum oracle.",
+            },
+            {
+                type: "p",
+                text: "The recipe: start the input register in |0⟩ and an ancilla qubit in |1⟩, apply H to every qubit, apply the oracle Uf (which flips the ancilla's phase depending on f), apply H to the input register again, then measure it.",
+            },
+            {
+                type: "math",
+                tex: "\\text{measure } 00\\ldots0 \\;\\Rightarrow\\; f \\text{ is constant} \\qquad \\text{any other result} \\;\\Rightarrow\\; f \\text{ is balanced}",
+            },
+            {
+                type: "note",
+                text: "Load the \"Deutsch-Jozsa\" templates in the builder — the constant-oracle one measures all zeros every time, and the balanced-oracle one (a CX from input to ancilla) never does. Same shape of circuit, opposite guaranteed outcome.",
+            },
+        ],
+    },
+    {
+        id: "grovers",
+        title: "Grover's Search Algorithm",
+        category: "algorithms",
+        summary: "Finding a marked item among N unsorted possibilities in roughly √N steps instead of N.",
+        body: [
+            {
+                type: "p",
+                text: "Searching an unsorted list of N items classically takes, on average, N/2 checks. Grover's algorithm finds a marked item using roughly √N applications of two steps: an oracle that flips the sign of the marked item's amplitude, and a \"diffusion\" operator that reflects every amplitude about their average — together they amplify the marked item's probability with each round.",
+            },
+            {
+                type: "math",
+                tex: "|\\psi\\rangle = \\frac{1}{\\sqrt{N}} \\sum_{x=0}^{N-1} |x\\rangle \\;\\xrightarrow{\\;(\\text{oracle} \\to \\text{diffusion})^{\\,r}\\;}\\; |x_{\\text{marked}}\\rangle,\\quad r \\approx \\frac{\\pi}{4}\\sqrt{N}",
+            },
+            {
+                type: "p",
+                text: "For the simplest useful case — 2 qubits, N = 4 possible states — a single round already gets you there: apply H to both qubits, apply the oracle for the marked state (for |11⟩, that's a CZ), then the diffusion operator (H, X, CZ, X, H on both qubits).",
+            },
+            {
+                type: "note",
+                text: "Load the \"Grover's Search\" template (marked state |11⟩, 2 qubits) and run it — the Measurement Outcomes panel should show close to 100% on 11, with the other three outcomes near zero, after just one oracle+diffusion round.",
+            },
+        ],
+    },
+    {
+        id: "shors",
+        title: "Shor's Algorithm",
+        category: "algorithms",
+        summary: "Factoring large numbers exponentially faster than the best known classical algorithms — the result that threatens RSA.",
+        body: [
+            {
+                type: "p",
+                text: "Shor's algorithm factors an integer N by reducing factoring to a different problem — period finding — and solving that with a quantum computer. Pick a random a < N, and look at the sequence a mod N, a² mod N, a³ mod N, ... . It's periodic with some period r. Once you know r, gcd(a^(r/2) ± 1, N) usually reveals a nontrivial factor of N.",
+            },
+            {
+                type: "math",
+                tex: "a^r \\equiv 1 \\pmod{N}",
+                caption: "The period r of aˣ mod N is exactly what the quantum part finds.",
+            },
+            {
+                type: "p",
+                text: "Finding r classically is about as hard as factoring itself. Quantumly, you put a register in superposition of every x, compute aˣ mod N into a second register (entangling the two), and apply the Quantum Fourier Transform to the first register — the QFT turns the hidden period into a measurable pattern of peaks, in time that scales polynomially in the number of digits of N instead of exponentially.",
+            },
+            {
+                type: "note",
+                text: "Shor's algorithm needs modular exponentiation and a Quantum Fourier Transform, both well beyond this builder's 6-qubit, 8-step canvas for any N worth factoring — there's no runnable template for it here. The pieces above (superposition, CX-built entanglement, and phase-sensitive gates like Z) are exactly what those two ingredients are made of, though, so everything you've built so far in this builder is the toolkit Shor's is assembled from.",
+            },
+        ],
+    },
 ];
 
 export const CATEGORY_LABELS: Record<Topic["category"], string> = {
     fundamentals: "Fundamentals",
     gates: "Gates in this Builder",
+    algorithms: "Algorithms",
 };

@@ -13,6 +13,7 @@ import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisual
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import NavBar from '@/components/nav/NavBar'
 import AIExplanation from '@/components/circuit-builder/AIExplanation'
+import TemplateLoader from '@/components/circuit-builder/TemplateLoader'
 
 export default function BuilderPage() {
     const store = useCircuitStore()
@@ -182,6 +183,14 @@ export default function BuilderPage() {
                                 </div>
 
                                 <div className="hidden h-8 w-px bg-zinc-200 sm:block" />
+
+                                <TemplateLoader
+                                    onLoad={() => {
+                                        setSimulationResult(null)
+                                        setAiExplanation(null)
+                                        setError(null)
+                                    }}
+                                />
 
                                 <button
                                     onClick={handleRunSimulation}

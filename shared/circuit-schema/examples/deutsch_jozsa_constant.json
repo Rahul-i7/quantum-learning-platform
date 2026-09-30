@@ -1,0 +1,16 @@
+{
+  "num_qubits": 2,
+  "num_clbits": 1,
+  "metadata": {
+    "title": "Deutsch-Jozsa (Constant Oracle)",
+    "description": "1-bit Deutsch-Jozsa with a constant oracle (f(x)=0, i.e. no oracle gates). Measuring the input register always yields 0, proving f is constant.",
+    "tags": ["algorithm", "deutsch-jozsa", "oracle", "intermediate"]
+  },
+  "gates": [
+    { "type": "x", "qubits": [1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "measure", "qubits": [0], "clbits": [0] }
+  ]
+}
