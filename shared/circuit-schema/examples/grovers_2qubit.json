@@ -1,0 +1,24 @@
+{
+  "num_qubits": 2,
+  "num_clbits": 2,
+  "metadata": {
+    "title": "Grover's Search (2-qubit, marks |11>)",
+    "description": "Single Grover iteration over 2 qubits: uniform superposition, oracle marking |11>, then diffusion. Measures |11> with near-certainty.",
+    "tags": ["algorithm", "grover", "search", "intermediate"]
+  },
+  "gates": [
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [1] },
+    { "type": "cz", "qubits": [0, 1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [1] },
+    { "type": "x", "qubits": [0] },
+    { "type": "x", "qubits": [1] },
+    { "type": "cz", "qubits": [0, 1] },
+    { "type": "x", "qubits": [0] },
+    { "type": "x", "qubits": [1] },
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [1] },
+    { "type": "measure", "qubits": [0, 1], "clbits": [0, 1] }
+  ]
+}

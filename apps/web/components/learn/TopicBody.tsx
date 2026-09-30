@@ -3,6 +3,7 @@
 import { Lightbulb } from 'lucide-react'
 import type { TopicBlock } from '@/lib/content/quantum-theory'
 import QuantumTransformation from './QuantumTransformation'
+import MathBlock from './Math'
 
 export default function TopicBody({
     blocks,
@@ -42,6 +43,19 @@ export default function TopicBody({
                             <pre className="overflow-x-auto px-4 py-5 font-mono text-sm leading-7 text-emerald-400">
                                 {block.rows.join('\n')}
                             </pre>
+                        </div>
+                    )
+                }
+
+                if (block.type === 'math') {
+                    return (
+                        <div key={i} className="max-w-3xl">
+                            <MathBlock tex={block.tex} display />
+                            {block.caption && (
+                                <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                                    {block.caption}
+                                </p>
+                            )}
                         </div>
                     )
                 }

@@ -1,0 +1,14 @@
+{
+  "num_qubits": 1,
+  "num_clbits": 1,
+  "metadata": {
+    "title": "BB84 (Mismatched Bases)",
+    "description": "Alice encodes bit 1 in the X (Hadamard) basis; Bob measures in the Z (computational) basis instead. Outcome is a random coin flip -- the mismatched-basis case BB84 discards.",
+    "tags": ["algorithm", "bb84", "cryptography", "beginner"]
+  },
+  "gates": [
+    { "type": "x", "qubits": [0] },
+    { "type": "h", "qubits": [0] },
+    { "type": "measure", "qubits": [0], "clbits": [0] }
+  ]
+}

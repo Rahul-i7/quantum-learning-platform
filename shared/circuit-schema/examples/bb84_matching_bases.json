@@ -1,0 +1,15 @@
+{
+  "num_qubits": 1,
+  "num_clbits": 1,
+  "metadata": {
+    "title": "BB84 (Matching Bases)",
+    "description": "Alice encodes bit 1 in the X (Hadamard) basis; Bob measures in the same basis. Outcome is deterministic (1) -- the matching-basis case BB84 keeps for the key.",
+    "tags": ["algorithm", "bb84", "cryptography", "beginner"]
+  },
+  "gates": [
+    { "type": "x", "qubits": [0] },
+    { "type": "h", "qubits": [0] },
+    { "type": "h", "qubits": [0] },
+    { "type": "measure", "qubits": [0], "clbits": [0] }
+  ]
+}
