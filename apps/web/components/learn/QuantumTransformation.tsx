@@ -181,9 +181,14 @@ export default function QuantumTransformation() {
     const [gate, setGate] = useState<Gate>('H')
     const [isTransforming, setIsTransforming] = useState(false)
 
-    useEffect(() => {
-        setIsTransforming(true)
+    const handleGateChange = (nextGate: Gate) => {
+        if (nextGate === gate) return
 
+        setGate(nextGate)
+        setIsTransforming(true)
+    }
+
+    useEffect(() => {
         const timer = window.setTimeout(() => {
             setIsTransforming(false)
         }, 550)

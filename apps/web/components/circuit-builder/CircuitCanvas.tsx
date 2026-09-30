@@ -296,6 +296,12 @@ export default function CircuitCanvas() {
   const canvasRef =
     useRef<HTMLDivElement>(null)
 
+  const [controlCenter, setControlCenter] =
+    useState({
+      x: 0,
+      y: 0,
+    })
+
   useEffect(() => {
     const handleMouseMove = (
       e: MouseEvent
@@ -345,50 +351,29 @@ export default function CircuitCanvas() {
     }
   }, [pendingCX])
 
-  const getControlCenter = () => {
-    if (
-      !pendingCX ||
-      !canvasRef.current
-    ) {
-      return {
-        x: 0,
-        y: 0,
-      }
+  useEffect(() => {
+    if (!pendingCX || !canvasRef.current) {
+      setControlCenter({ x: 0, y: 0 })
+      return
     }
 
-    const cellEl =
-      canvasRef.current.querySelector(
-        `[data-qubit="${pendingCX.qubitIndex}"][data-step="${pendingCX.stepIndex}"]`
-      ) as HTMLElement
+    const cellEl = canvasRef.current.querySelector(
+      `[data-qubit="${pendingCX.qubitIndex}"][data-step="${pendingCX.stepIndex}"]`
+    ) as HTMLElement | null
 
     if (!cellEl) {
-      return {
-        x: 0,
-        y: 0,
-      }
+      setControlCenter({ x: 0, y: 0 })
+      return
     }
 
-    const cellRect =
-      cellEl.getBoundingClientRect()
+    const cellRect = cellEl.getBoundingClientRect()
+    const canvasRect = canvasRef.current.getBoundingClientRect()
 
-    const canvasRect =
-      canvasRef.current.getBoundingClientRect()
-
-    return {
-      x:
-        cellRect.left -
-        canvasRect.left +
-        cellRect.width / 2,
-
-      y:
-        cellRect.top -
-        canvasRect.top +
-        cellRect.height / 2,
-    }
-  }
-
-  const controlCenter =
-    getControlCenter()
+    setControlCenter({
+      x: cellRect.left - canvasRect.left + cellRect.width / 2,
+      y: cellRect.top - canvasRect.top + cellRect.height / 2,
+    })
+  }, [pendingCX])
 
   /*
    * Find CX gates so we can show the

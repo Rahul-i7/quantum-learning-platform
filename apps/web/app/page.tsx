@@ -610,7 +610,7 @@ export default function Home() {
                                     </div>
 
                                     <div className="mt-3 text-zinc-600">
-                            // generated from circuit
+                            
                                     </div>
                                 </div>
                             </motion.div>
@@ -756,7 +756,7 @@ export default function Home() {
                                 </div>
 
                                 <h2 className="mt-5 max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.045em] text-zinc-950 sm:text-5xl lg:text-6xl">
-                                    Don't just learn what a qubit is.
+                                    Do not just learn what a qubit is.
                                     <br />
                                     <span className="text-zinc-400">
                                         Put one to work.
