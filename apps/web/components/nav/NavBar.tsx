@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import ProfileMenu from './ProfileMenu'
+import { AnimatePresence, motion } from 'motion/react'
 
 import {
     Atom,
@@ -29,6 +31,7 @@ export default function NavBar() {
     const pathname = usePathname()
     const { user, profile, role, signOut, configured } = useAuth()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [openProfile, setOpenProfile] = useState(false)
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/95 backdrop-blur-md">
@@ -49,41 +52,6 @@ export default function NavBar() {
                     </span>
                 </Link>
 
-                {/* Identity badge */}
-                <div
-                    className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 px-3.5 py-2"
-                    title={
-                        !configured
-                            ? 'Demo mode: sign-in is not configured.'
-                            : user
-                              ? `Signed in as ${profile?.name ?? 'Learner'}`
-                              : 'Not signed in'
-                    }
-                >
-                    <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                            role === 'instructor' || role === 'admin'
-                                ? 'bg-purple-500'
-                                : role === 'guest'
-                                  ? 'bg-amber-500'
-                                  : 'bg-blue-500'
-                        }`}
-                    />
-                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                        {!configured
-                            ? 'Demo'
-                            : role === 'instructor' || role === 'admin'
-                              ? 'Mentor'
-                              : role === 'guest'
-                                ? 'Guest'
-                                : role === 'student'
-                                  ? 'Student'
-                                  : 'Signed out'}
-                    </span>
-                    {user && profile && (
-                        <span className="text-xs text-zinc-500">{profile.name}</span>
-                    )}
-                </div>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden items-center gap-1 md:flex">
@@ -124,23 +92,11 @@ export default function NavBar() {
                                 Guest
                             </span>
                         ) : user ? (
-                            <button
-                                onClick={() => signOut()}
-                                className="
-                  flex h-9 items-center gap-2 rounded-md px-3
-                  text-sm text-zinc-600
-                  transition-colors
-                  hover:bg-zinc-50 hover:text-zinc-950
-                "
-                                title={user.email ?? undefined}
-                            >
-                                <LogOut
-                                    className="h-4 w-4"
-                                    strokeWidth={1.7}
-                                />
-                                <span className="hidden sm:inline">
-                                    Sign out
-                                </span>
+                            <button onClick={() => setOpenProfile(!openProfile)} className={`text-white flex h-9 w-9 cursor-pointer items-center justify-center rounded-full ${role === 'instructor' || role === 'admin'
+                                ? 'bg-purple-500'
+                                : 'bg-blue-500'
+                                }`}>
+                                {profile?.name[0].toUpperCase()}
                             </button>
                         ) : (
                             <Link
@@ -163,7 +119,18 @@ export default function NavBar() {
                         )}
                     </div>
                 </nav>
-
+                {(openProfile && user) && (
+                    <AnimatePresence>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, x: 10, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, x: 10, y: -10 }}
+                            className="absolute top-12 right-3 mt-2 w-56 rounded-md bg-white/95 shadow-lg py-1 border border-zinc-200"
+                        >
+                            <ProfileMenu />
+                        </motion.div>
+                    </AnimatePresence>
+                )}
                 {/* Mobile Menu Button */}
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

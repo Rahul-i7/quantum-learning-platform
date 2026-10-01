@@ -121,7 +121,7 @@ export default function EditorPage() {
                     </div>
                 </header>
 
-                <section className="grid min-h-[620px] border border-zinc-200 bg-white lg:grid-cols-[minmax(0,1fr)_420px]">
+                <section className="grid min-h-155 border border-zinc-200 bg-white lg:grid-cols-[minmax(0,1fr)_420px]">
                     <div className="min-w-0 border-b border-zinc-200 lg:border-b-0 lg:border-r">
                         <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
                             <div>

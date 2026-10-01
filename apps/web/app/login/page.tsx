@@ -66,147 +66,429 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
-        {/* Brand Header */}
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 shadow-inner">
-            <Sparkles className="h-6 w-6" />
+  <div className="min-h-screen bg-[#fafafa] text-zinc-950 lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+
+    {/* ========================================================= */}
+    {/* LEFT — QMentor identity / quantum visual                  */}
+    {/* ========================================================= */}
+
+    <section className="relative hidden min-h-screen overflow-hidden bg-[#0b0d10] text-white lg:flex lg:flex-col">
+
+      {/* Technical grid */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.09]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+        }}
+      />
+
+      {/* Blue glow */}
+      <div className="pointer-events-none absolute -left-32 top-1/4 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[120px]" />
+
+      {/* Header */}
+      <div className="relative z-10 flex items-center justify-between px-12 py-8">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center border border-blue-500/30 bg-blue-500/10">
+            <Sparkles className="h-4 w-4 text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {mode === 'signin' ? 'Welcome back' : 'Create an account'}
+
+          <span className="text-lg font-semibold tracking-tight">
+            QMentor
+          </span>
+        </div>
+
+        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          Quantum Learning System
+        </div>
+      </div>
+
+      {/* Main visual */}
+      <div className="relative z-10 flex flex-1 flex-col justify-center px-12 pb-20">
+
+        <div className="mb-5 flex items-center gap-3">
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-400">
+            Quantum Computing
+          </span>
+
+          <span className="h-px w-16 bg-zinc-700" />
+        </div>
+
+        <h2 className="max-w-xl text-6xl font-semibold leading-[0.95] tracking-[-0.055em] xl:text-7xl">
+          Learn to
+          <br />
+          <span className="text-blue-500">think</span>
+          <br />
+          in qubits.
+        </h2>
+
+        <p className="mt-8 max-w-md text-sm leading-7 text-zinc-400">
+          Explore quantum concepts, build circuits, write Qiskit code,
+          and understand what happens to the quantum state.
+        </p>
+
+        {/* Quantum visual */}
+        <div className="relative mt-16 h-[230px] w-full max-w-xl">
+
+          {/* horizontal axis */}
+          <div className="absolute left-0 right-0 top-1/2 h-px bg-zinc-800" />
+
+          {/* vertical axis */}
+          <div className="absolute bottom-0 left-1/2 top-0 w-px bg-zinc-800" />
+
+          {/* orbit 1 */}
+          <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-700" />
+
+          {/* orbit 2 */}
+          <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-800" />
+
+          {/* state vector */}
+          <div className="absolute left-1/2 top-1/2 h-24 w-px origin-bottom -translate-x-1/2 -translate-y-full rotate-[38deg] bg-blue-500">
+            <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.8)]" />
+          </div>
+
+          {/* center */}
+          <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500 shadow-[0_0_18px_rgba(59,130,246,0.7)]" />
+
+          {/* labels */}
+          <span className="absolute left-1/2 top-1 -translate-x-1/2 font-mono text-[9px] text-zinc-600">
+            |0⟩
+          </span>
+
+          <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-[9px] text-zinc-600">
+            |1⟩
+          </span>
+
+          <span className="absolute right-0 top-1/2 -translate-y-1/2 font-mono text-[9px] text-zinc-600">
+            +X
+          </span>
+
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 font-mono text-[9px] text-zinc-600">
+            −X
+          </span>
+
+          {/* metadata */}
+          <div className="absolute bottom-0 right-0 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-600">
+            STATE / 01
+          </div>
+        </div>
+
+        {/* Bottom metadata */}
+        <div className="mt-auto flex gap-10 pt-12">
+          <div>
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+              Learn
+            </div>
+            <div className="mt-1 text-xs text-zinc-400">
+              Quantum fundamentals
+            </div>
+          </div>
+
+          <div>
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+              Build
+            </div>
+            <div className="mt-1 text-xs text-zinc-400">
+              Interactive circuits
+            </div>
+          </div>
+
+          <div>
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+              Explore
+            </div>
+            <div className="mt-1 text-xs text-zinc-400">
+              Qiskit + simulation
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    {/* ========================================================= */}
+    {/* RIGHT — Authentication                                     */}
+    {/* ========================================================= */}
+
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-10 sm:px-8">
+
+      {/* subtle mobile/background grid */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.45]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(24,24,27,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(24,24,27,0.035) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-107.5">
+
+        {/* Mobile brand */}
+        <div className="mb-10 flex items-center justify-between lg:hidden">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center border border-blue-200 bg-blue-50">
+              <Sparkles className="h-4 w-4 text-blue-600" />
+            </div>
+
+            <span className="text-lg font-semibold tracking-tight">
+              QMentor
+            </span>
+          </div>
+
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400">
+            Quantum Learning
+          </span>
+        </div>
+
+        {/* Auth header */}
+        <div className="mb-8">
+
+          <div className="mb-4 flex items-center gap-3">
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+              {mode === 'signin' ? '01 / Sign in' : '01 / Create account'}
+            </span>
+
+            <span className="h-px w-10 bg-zinc-200" />
+          </div>
+
+          <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
+            {mode === 'signin'
+              ? 'Welcome back.'
+              : 'Start learning.'}
           </h1>
-          <p className="mt-1 text-xs text-gray-500">
-            Track your quantum lessons, quiz scores, and coding progress.
+
+          <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
+            {mode === 'signin'
+              ? 'Continue your quantum learning journey.'
+              : 'Create your QMentor account and begin exploring quantum computing.'}
           </p>
         </div>
 
 
-        {/* Supabase Unconfigured Warning */}
+        {/* Supabase warning */}
         {!configured && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
-            <span>
-              Supabase environment variables are missing. Authentication actions are disabled.
+          <div className="mb-5 flex items-start gap-3 border-l-2 border-amber-500 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+
+            <span className="leading-5">
+              Supabase environment variables are missing.
+              Authentication actions are disabled.
             </span>
           </div>
         )}
 
-        {/* Auth Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {mode === 'signup' && (
+
+        {/* Auth form */}
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-md border border-zinc-200 bg-white p-6 shadow-[0_18px_60px_rgba(0,0,0,0.05)] sm:p-7"
+        >
+
+          <div className="space-y-5">
+
+            {/* Name */}
+            {mode === 'signup' && (
+              <div>
+                <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                  Full name
+                </label>
+
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+
+                  <input
+                    type="text"
+                    placeholder="Alex Turing"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="
+                      h-11 w-full border border-zinc-200 bg-zinc-50/50
+                      pl-10 pr-3 text-sm text-zinc-900
+                      placeholder:text-zinc-400
+                      outline-none transition
+                      focus:border-blue-500 focus:bg-white
+                      focus:ring-1 focus:ring-blue-500
+                    "
+                  />
+                </div>
+              </div>
+            )}
+
+
+            {/* Email */}
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">Full Name</label>
+              <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                Email address
+              </label>
+
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+
                 <input
-                  type="text"
-                  placeholder="Alex Turing"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="email"
+                  required
+                  placeholder="alex@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="
+                    h-11 w-full border border-zinc-200 bg-zinc-50/50
+                    pl-10 pr-3 text-sm text-zinc-900
+                    placeholder:text-zinc-400
+                    outline-none transition
+                    focus:border-blue-500 focus:bg-white
+                    focus:ring-1 focus:ring-blue-500
+                  "
                 />
               </div>
             </div>
-          )}
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <input
-                type="email"
-                required
-                placeholder="alex@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
+
+            {/* Password */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                  Password
+                </label>
+
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    className="cursor-pointer hover:underline font-mono text-[9px] uppercase tracking-[0.12em] text-blue-600 hover:text-blue-700"
+                  >
+                    Forgot?
+                  </button>
+                )}
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="
+                    h-11 w-full border border-zinc-200 bg-zinc-50/50
+                    pl-10 pr-3 text-sm text-zinc-900
+                    placeholder:text-zinc-400
+                    outline-none transition
+                    focus:border-blue-500 focus:bg-white
+                    focus:ring-1 focus:ring-blue-500
+                  "
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <input
-                type="password"
-                required
-                minLength={6}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-          </div>
 
-          {error && (
-            <div className="flex items-center gap-2 text-xs font-medium text-red-600">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {notice && (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-800">
-              {notice}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting || !configured}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-          >
-            {submitting ? (
-              <span>Please wait…</span>
-            ) : mode === 'signin' ? (
-              <>
-                <LogIn className="h-4 w-4" />
-                <span>Sign in</span>
-              </>
-            ) : (
-              <>
-                <UserPlus className="h-4 w-4" />
-                <span>Create account</span>
-              </>
+            {/* Error */}
+            {error && (
+              <div className="flex items-start gap-2 border-l-2 border-red-500 bg-red-50 px-3 py-2.5 text-xs font-medium text-red-700">
+                <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
-          </button>
+
+
+            {/* Success */}
+            {notice && (
+              <div className="border-l-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-xs text-emerald-700">
+                {notice}
+              </div>
+            )}
+
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={submitting || !configured}
+              className="cursor-pointer 
+                group mt-1 flex h-11 w-full items-center justify-center
+                gap-2 bg-zinc-950 px-4 text-sm font-medium text-white
+                transition-all hover:bg-blue-600
+                active:bg-blue-700
+                disabled:cursor-not-allowed disabled:opacity-50
+              "
+            >
+              {submitting ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border border-white/30 border-t-white" />
+                  <span>Authenticating…</span>
+                </>
+              ) : mode === 'signin' ? (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign in to QMentor</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4" />
+                  <span>Create QMentor account</span>
+                </>
+              )}
+            </button>
+
+          </div>
+
+
+          {/* Guest */}
+          <div className="mt-6">
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-zinc-200" />
+
+              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400">
+                or
+              </span>
+
+              <div className="h-px flex-1 bg-zinc-200" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGuest}
+              disabled={submitting || !configured}
+              className="cursor-pointer 
+                mt-5 flex h-11 w-full items-center justify-center gap-2
+                border border-zinc-200 bg-white text-sm font-medium
+                text-zinc-700 transition-colors
+                hover:border-zinc-300 hover:bg-zinc-50
+                disabled:cursor-not-allowed disabled:opacity-50
+              "
+            >
+              <UserRound className="h-4 w-4 text-zinc-500" />
+              <span>Continue as guest</span>
+            </button>
+
+            <p className="mt-2.5 text-center text-[10px] leading-5 text-zinc-400">
+              Explore QMentor without an account.
+              <br />
+              Sign up later to keep your progress.
+            </p>
+          </div>
+
         </form>
 
-        {/* Guest login */}
-        <div className="mt-5">
-          <div className="relative flex items-center">
-            <div className="flex-grow border-t border-gray-200" />
-            <span className="mx-3 text-[11px] uppercase tracking-wide text-gray-400">or</span>
-            <div className="flex-grow border-t border-gray-200" />
-          </div>
-          <button
-            type="button"
-            onClick={handleGuest}
-            disabled={submitting || !configured}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-          >
-            <UserRound className="h-4 w-4" />
-            <span>Continue as guest</span>
-          </button>
-          <p className="mt-2 text-center text-[11px] text-gray-400">
-            Explore without an account. Sign up later to keep your progress.
-          </p>
-        </div>
 
-        {/* Footer Toggle Text */}
-        <div className="mt-6 text-center text-xs text-gray-500">
+        {/* Mode toggle */}
+        <div className="mt-7 text-center text-xs text-zinc-500">
           {mode === 'signin' ? (
             <p>
-              Don&apos;t have an account?{' '}
+              Don't have an account?{' '}
               <button
                 type="button"
                 onClick={() => toggleMode('signup')}
-                className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
               >
-                Sign up
+                Create one
               </button>
             </p>
           ) : (
@@ -215,14 +497,26 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => toggleMode('signin')}
-                className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
               >
                 Sign in
               </button>
             </p>
           )}
         </div>
+
+
+        {/* Footer metadata */}
+        <div className="mt-10 flex items-center justify-center gap-4 font-mono text-[8px] uppercase tracking-[0.16em] text-zinc-400">
+          <span>QMentor</span>
+          <span className="h-1 w-1 rounded-full bg-zinc-300" />
+          <span>Quantum Learning</span>
+          <span className="h-1 w-1 rounded-full bg-zinc-300" />
+          <span>v1.0</span>
+        </div>
+
       </div>
-    </div>
-  )
+    </section>
+  </div>
+)
 }

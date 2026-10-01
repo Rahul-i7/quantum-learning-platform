@@ -60,7 +60,7 @@ export default function TemplateLoader({
             </button>
 
             {open && (
-                <div className="absolute right-0 top-10 z-30 max-h-96 w-80 overflow-y-auto border border-zinc-200 bg-white shadow-lg">
+                <div className="rounded-md absolute right-0 top-10 z-30 max-h-96 w-80 overflow-y-auto border border-zinc-200 bg-white shadow-lg">
                     {categories.map((category) => (
                         <div key={category}>
                             <div className="border-b border-zinc-100 bg-zinc-50 px-4 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-zinc-400">
@@ -72,7 +72,7 @@ export default function TemplateLoader({
                                     <button
                                         key={template.id}
                                         onClick={() => handleLoad(template)}
-                                        className="block w-full border-b border-zinc-50 px-4 py-3 text-left transition-colors hover:bg-blue-50/50"
+                                        className="cursor-pointer block w-full border-b border-zinc-50 px-4 py-3 text-left transition-colors hover:bg-blue-50/50"
                                     >
                                         <div className="text-xs font-semibold text-zinc-900">
                                             {template.title}
