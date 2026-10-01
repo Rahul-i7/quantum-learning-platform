@@ -27,7 +27,7 @@ const LINKS = [
 
 export default function NavBar() {
     const pathname = usePathname()
-    const { user, signOut, configured } = useAuth()
+    const { user, profile, role, signOut, configured } = useAuth()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
@@ -49,18 +49,40 @@ export default function NavBar() {
                     </span>
                 </Link>
 
-                {/* Demo mode badge */}
+                {/* Identity badge */}
                 <div
                     className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 px-3.5 py-2"
-                    title="You're using QMentor as Alex. Sign-in is not required in this demo."
+                    title={
+                        !configured
+                            ? 'Demo mode: sign-in is not configured.'
+                            : user
+                              ? `Signed in as ${profile?.name ?? 'Learner'}`
+                              : 'Not signed in'
+                    }
                 >
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                            role === 'instructor' || role === 'admin'
+                                ? 'bg-purple-500'
+                                : role === 'guest'
+                                  ? 'bg-amber-500'
+                                  : 'bg-blue-500'
+                        }`}
+                    />
                     <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                        Demo
+                        {!configured
+                            ? 'Demo'
+                            : role === 'instructor' || role === 'admin'
+                              ? 'Mentor'
+                              : role === 'guest'
+                                ? 'Guest'
+                                : role === 'student'
+                                  ? 'Student'
+                                  : 'Signed out'}
                     </span>
-                    <span className="text-xs text-zinc-500">
-                        Alex
-                    </span>
+                    {user && profile && (
+                        <span className="text-xs text-zinc-500">{profile.name}</span>
+                    )}
                 </div>
 
                 {/* Desktop Navigation */}

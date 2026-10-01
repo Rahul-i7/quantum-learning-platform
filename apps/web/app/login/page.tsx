@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/supabase/AuthProvider'
-import { LogIn, UserPlus, Mail, Lock, User, AlertCircle, Sparkles } from 'lucide-react'
+import { LogIn, UserPlus, Mail, Lock, User, AlertCircle, Sparkles, UserRound } from 'lucide-react'
 
 export default function LoginPage() {
-  const { signInWithPassword, signUp, configured } = useAuth()
+  const { signInWithPassword, signUp, signInAsGuest, configured } = useAuth()
   const router = useRouter()
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -15,24 +15,49 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+
+  // Mentors land on the dashboard; everyone else starts in Learn.
+  function goHome(role?: string) {
+    router.push(role === 'instructor' || role === 'admin' ? '/dashboard' : '/learn')
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+    setNotice(null)
     setSubmitting(true)
-    
+
     const result =
       mode === 'signin'
         ? await signInWithPassword(email, password)
         : await signUp(email, password, name)
-        
+
     setSubmitting(false)
-    
+
     if (result.error) {
       setError(result.error)
       return
     }
-    router.push('/learn')
+    if (result.needsConfirmation) {
+      setNotice('Account created. Check your email and click the confirmation link, then sign in.')
+      setMode('signin')
+      return
+    }
+    goHome(result.role)
+  }
+
+  async function handleGuest() {
+    setError(null)
+    setNotice(null)
+    setSubmitting(true)
+    const result = await signInAsGuest()
+    setSubmitting(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    goHome('guest')
   }
 
   const toggleMode = (newMode: 'signin' | 'signup') => {
@@ -123,6 +148,12 @@ export default function LoginPage() {
             </div>
           )}
 
+          {notice && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-800">
+              {notice}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={submitting || !configured}
@@ -143,6 +174,27 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+
+        {/* Guest login */}
+        <div className="mt-5">
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-gray-200" />
+            <span className="mx-3 text-[11px] uppercase tracking-wide text-gray-400">or</span>
+            <div className="flex-grow border-t border-gray-200" />
+          </div>
+          <button
+            type="button"
+            onClick={handleGuest}
+            disabled={submitting || !configured}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          >
+            <UserRound className="h-4 w-4" />
+            <span>Continue as guest</span>
+          </button>
+          <p className="mt-2 text-center text-[11px] text-gray-400">
+            Explore without an account. Sign up later to keep your progress.
+          </p>
+        </div>
 
         {/* Footer Toggle Text */}
         <div className="mt-6 text-center text-xs text-gray-500">
