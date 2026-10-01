@@ -486,7 +486,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => toggleMode('signup')}
-                className="font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+                className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
               >
                 Create one
               </button>
@@ -497,7 +497,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => toggleMode('signin')}
-                className="font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+                className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
               >
                 Sign in
               </button>
