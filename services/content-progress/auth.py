@@ -16,8 +16,18 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-import jwt
+from jwt import PyJWKClient
 from fastapi import Header, HTTPException
+
+
+_jwks_client = None
+
+def _get_jwks_client():
+    global _jwks_client
+    if _jwks_client is None and settings.supabase_url:
+        url = f"{settings.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        _jwks_client = PyJWKClient(url, cache_keys=True)
+    return _jwks_client
 
 from config import settings
 
@@ -32,6 +42,18 @@ def verify_token(authorization: Optional[str]) -> Optional[str]:
         return None
 
     token = authorization.split(" ", 1)[1]
+    client = _get_jwks_client()
+    if client:
+        try:
+            signing_key = client.get_signing_key_from_jwt(token).key
+            payload = jwt.decode(
+                token, signing_key,
+                algorithms=["ES256", "RS256"],
+                audience="authenticated",
+            )
+        except jwt.PyJWTError as e:
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from e
+        return payload.get("sub")
 
     if not settings.supabase_jwt_secret:
         logger.warning("SUPABASE_JWT_SECRET not set — skipping signature verification (dev mode).")
