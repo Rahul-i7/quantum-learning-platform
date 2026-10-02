@@ -422,7 +422,6 @@ export default function BuilderPage() {
                                 <div className="min-w-0 bg-white p-5">
                                     <BlochSphereVisualizer
                                         data={simulationResult}
-                                        gates={store.gates}
                                         variant="default"
                                         loading={loading}
                                         animated

@@ -243,6 +243,7 @@ export default function EditorPage() {
                                         <BlochSphereVisualizer
                                             data={simulationResult}
                                             variant="default"
+                                            
                                             loading={loading}
                                             animated
                                         />

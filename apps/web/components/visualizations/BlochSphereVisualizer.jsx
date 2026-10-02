@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import { RotateCcw, Loader2, Orbit } from 'lucide-react'
-
+import { useCircuitStore } from '@/lib/store/circuit-store'
 /* ---------- PURE MATH START (no three.js / React in here; unit-tested separately) ---------- */
 
 const GROUND_STATE = {
@@ -225,7 +225,7 @@ export default function BlochSphereVisualizer({
     data,
     qubitIndex = 0,
     numQubits = 3,
-    gates,
+    gates = [],
     loading = false,
     variant = 'default',
     showReset = false,
@@ -237,6 +237,8 @@ export default function BlochSphereVisualizer({
     const displayedRef = useRef(null)
     const animRef = useRef(null)
     const dragRef = useRef({ dragging: false, lastX: 0, lastY: 0 })
+
+    const store = useCircuitStore()
 
     const isHero = variant === 'hero'
     const canReset = showReset || showreset
@@ -251,8 +253,6 @@ export default function BlochSphereVisualizer({
         setSelectedQubit(qubitIndex)
     }
 
-
-
     // Trust the statevector length first, then num_qubits, then the prop.
     const svLen = Array.isArray(data?.statevector) ? data.statevector.length : 0
     const fromStatevector = svLen > 1 ? Math.round(Math.log2(svLen)) : 0
@@ -262,7 +262,7 @@ export default function BlochSphereVisualizer({
     const activeQubit = Math.min(selectedQubit, effectiveNumQubits - 1)
     const qubitsList = Array.from({ length: effectiveNumQubits }, (_, i) => i)
 
-    const hasMeasurementGate = gates.some(
+    const hasMeasurementGate = store.gates.some(
         (gate) =>
             gate.type === 'measure' &&
             gate.qubits.includes(activeQubit)
