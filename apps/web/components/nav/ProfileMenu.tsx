@@ -55,7 +55,7 @@ export default function ProfileMenu() {
                         strokeWidth={1.7}
                     />
 
-                    <span className="hidden sm:inline">
+                    <span className="sm:inline">
                         Sign out
                     </span>
                 </button>
