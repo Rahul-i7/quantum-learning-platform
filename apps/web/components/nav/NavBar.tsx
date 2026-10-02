@@ -104,7 +104,7 @@ export default function NavBar() {
                         ) : (
                             <Link href="/login" className="flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-950">
                                 <LogIn className="h-4 w-4" strokeWidth={1.7} />
-                                <span className="sm:inline">Sign in</span>
+                                <span className="hidden sm:inline">Sign in</span>
                             </Link>
                         )}
                         {(openProfile && user) && (
@@ -123,20 +123,25 @@ export default function NavBar() {
                 </nav>
                 <div className="flex items-center gap-2 md:hidden">
                     {/* Profile */}
-                    {configured && user && (
+                    {configured && (
                         <div ref={mobileProfileRef} className="relative">
-                            <button
+                            {user ? (<button
                                 onClick={() => setOpenProfile(!openProfile)}
-                                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium text-white ${role === 'instructor' || role === 'admin'
+                                className={`flex cursor-pointer h-9 w-9 items-center justify-center rounded-full text-sm font-medium text-white ${role === 'instructor' || role === 'admin'
                                     ? 'bg-purple-500'
                                     : 'bg-blue-500'
                                     }`}
                                 aria-label="Open profile menu"
                             >
                                 {profile?.name?.[0]?.toUpperCase()}
-                            </button>
+                            </button>) : (
+                                <Link href="/login" className="flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-950">
+                                    <LogIn className="h-4 w-4" strokeWidth={1.7} />
+                                    <span className="hidden sm:inline">Sign in</span>
+                                </Link>
+                            )}
 
-                            <AnimatePresence>
+                            {(openProfile && user) && <AnimatePresence>
                                 {openProfile && (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.95, y: -6 }}
@@ -148,7 +153,7 @@ export default function NavBar() {
                                         <ProfileMenu />
                                     </motion.div>
                                 )}
-                            </AnimatePresence>
+                            </AnimatePresence>}
                         </div>
                     )}
 

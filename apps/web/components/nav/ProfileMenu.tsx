@@ -1,13 +1,11 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { LogOut, User as UserIcon, Settings } from 'lucide-react'
 import { useAuth } from '@/lib/supabase/AuthProvider'
 import Link from 'next/link'
 
 export default function ProfileMenu() {
-    const { user, profile, role, signOut, configured } = useAuth()
-    const router = useRouter()
+    const { user, profile, role, signOut } = useAuth()
 
     const items = [
         { "href": "/profile", "label": "Profile", "icon": UserIcon },
