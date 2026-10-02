@@ -1,44 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-{/*
-    01  SINGLE QUBIT
-
-H       Hadamard
-X       Pauli-X
-Y       Pauli-Y
-Z       Pauli-Z
-S       Phase
-S†      S dagger
-T       T gate
-T†      T dagger
-
-
-02  ROTATION
-
-RX      Rotation around X
-RY      Rotation around Y
-RZ      Rotation around Z
-
-
-03  MULTI QUBIT
-
-CX      Controlled-X
-CZ      Controlled-Z
-SWAP    Swap
-
-
-04  ADVANCED
-
-CCX     Toffoli
-CSWAP   Fredkin
-
-
-05  MEASUREMENT
-
-M       Measure
-    */}
-
 import { useDrag } from 'react-dnd'
 
 interface Gate {
@@ -149,6 +111,20 @@ const GATES = [
         description: 'Rotation around Z axis.',
     },
     {
+        label: 'CCX',
+        type: 'ccx',
+        category: 'advanced',
+        name: 'Toffoli',
+        description: 'Flips the target when both the controls are |1⟩.',
+    },
+    {
+        label: 'CX-X',
+        type: 'cswap',
+        category: 'advanced',
+        name: 'Fredkin',
+        description: 'Swaps the states of the two qubits when the control is |1⟩.',
+    },
+    {
         label: 'M',
         type: 'measure',
         category: 'measurement',
@@ -199,6 +175,7 @@ export default function GatePalette() {
     const singleQubitGates = GATES.filter((gate) => gate.category === 'single')
     const rotationGates = GATES.filter((gate) => gate.category === 'rotation')
     const multiQubitGates = GATES.filter((gate) => gate.category === 'multi')
+    const advancedGates = GATES.filter((gate) => gate.category === 'advanced')
     const measurementGates = GATES.filter((gate) => gate.category === 'measurement')
 
     return (
@@ -270,11 +247,33 @@ export default function GatePalette() {
                     </div>
                 </section>
 
-                {/* Measurement */}
+                {/* Advanced Gates */}
                 <section className="mt-7">
                     <div className="mb-2 flex items-center gap-2">
                         <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
                             04
+                        </span>
+
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                            Advanced Gates
+                        </span>
+                    </div>
+
+                    <div>
+                        {advancedGates.map((gate) => (
+                            <DraggableGate
+                                key={gate.type}
+                                gate={gate}
+                            />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Measurement */}
+                <section className="mt-7">
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                            05
                         </span>
 
                         <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">

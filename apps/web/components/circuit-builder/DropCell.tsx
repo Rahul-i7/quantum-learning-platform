@@ -6,15 +6,17 @@ interface CellProps {
     qubitIndex: number
     stepIndex: number
     pendingGate: {
-        type: 'cx' | 'cz' | 'swap'
+        type: 'cx' | 'cz' | 'swap' | 'ccx' | 'cswap'
         qubitIndex: number
         stepIndex: number
+        selectedQubits: number[]
     } | null
     setPendingGate: React.Dispatch<
         React.SetStateAction<{
-            type: 'cx' | 'cz' | 'swap'
+            type: 'cx' | 'cz' | 'swap' | 'ccx' | 'cswap'
             qubitIndex: number
             stepIndex: number
+            selectedQubits: number[]
         } | null>
     >
 }
@@ -48,23 +50,6 @@ export default function DropCell({
         )
     )
 
-    const cxGate = useCircuitStore((state) =>
-        state.gates.find(
-            (g) =>
-                g.type === 'cx' &&
-                g.step === stepIndex &&
-                g.qubits.includes(qubitIndex)
-        )
-    )
-    const swapGate = useCircuitStore((state) =>
-        state.gates.find(
-            (g) =>
-                g.type === 'swap' &&
-                g.step === stepIndex &&
-                g.qubits.includes(qubitIndex)
-        )
-    )
-
     const [{ isOver, canDrop }, drop] = useDrop(() => ({
         accept: 'GATE',
 
@@ -72,17 +57,18 @@ export default function DropCell({
             type: string
             gateType: string
         }) => {
-            if (item.gateType === 'cx' || item.gateType === 'cz' || item.gateType === 'swap') {
+            if (item.gateType === 'cx' || item.gateType === 'cz' || item.gateType === 'swap' || item.gateType === 'ccx' || item.gateType === 'cswap') {
                 setPendingGate({
                     type: item.gateType,
                     qubitIndex,
                     stepIndex,
+                    selectedQubits: [qubitIndex]
                 })
             } else {
                 addGate({
-                    id: `${item.gateType}-q${qubitIndex}-s${stepIndex}-${Date.now()}`,
+                    id: `${item.gateType}-${pendingGate?.selectedQubits.join('-')}-s${stepIndex}-${Date.now()}`,
                     type: item.gateType,
-                    qubits: [qubitIndex],
+                    qubits: pendingGate?.selectedQubits || [qubitIndex],
                     step: stepIndex,
                     ...(item.gateType === 'rx' || item.gateType === 'ry' || item.gateType === 'rz'
                         ? {
@@ -110,50 +96,81 @@ export default function DropCell({
         }
     }
 
+    const isPendingSelected =
+        pendingGate?.stepIndex === stepIndex &&
+        pendingGate.selectedQubits.includes(qubitIndex)
+
     const isPendingTarget =
         pendingGate?.stepIndex === stepIndex &&
-        pendingGate?.qubitIndex !== qubitIndex
+        !pendingGate.selectedQubits.includes(qubitIndex)
 
     const isCX =
-        cxGate?.type === 'cx' &&
-        cxGate.qubits.includes(qubitIndex)
+        gate?.type === 'cx' &&
+        gate.qubits.includes(qubitIndex)
     const isCXControl =
         isCX &&
-        cxGate?.qubits[0] === qubitIndex
+        gate?.qubits[0] === qubitIndex
 
     const isCXTarget =
         isCX &&
-        cxGate?.qubits[1] === qubitIndex
+        gate?.qubits[1] === qubitIndex
+    
+    const isCCXControl =
+        gate?.type === 'ccx' &&
+        (gate.qubits[0] === qubitIndex ||
+            gate.qubits[1] === qubitIndex)
 
-    const czGate = useCircuitStore((state) =>
-        state.gates.find(
-            (g) =>
-                g.type === 'cz' &&
-                g.step === stepIndex &&
-                g.qubits.includes(qubitIndex)
-        )
-    )
+    const isCCXTarget =
+        gate?.type === 'ccx' &&
+        gate.qubits[2] === qubitIndex
 
-    const isCZ = czGate?.type === 'cz'
+    const isCSWAPControl =
+        gate?.type === 'cswap' &&
+        gate.qubits[0] === qubitIndex
 
-    const isSwapGate = swapGate?.type === 'swap'
+    const isCSWAPTarget =
+        gate?.type === 'cswap' &&
+        (gate.qubits[1] === qubitIndex ||
+            gate.qubits[2] === qubitIndex)
+
+    const isCZ =
+        gate?.type === 'cz'
+
+    const isSwapGate =
+        gate?.type === 'swap'
 
     const handleCellClick = () => {
-        if (
-            pendingGate &&
-            pendingGate.stepIndex === stepIndex &&
-            pendingGate.qubitIndex !== qubitIndex
-        ) {
+        if (pendingGate) {
+            if (pendingGate.stepIndex !== stepIndex) return
+
+            if (pendingGate.selectedQubits.includes(qubitIndex)) {
+                return
+            }
+
+            const selectedQubits = [
+                ...pendingGate.selectedQubits,
+                qubitIndex,
+            ]
+
+            const requiredQubits =
+                pendingGate.type === 'ccx' || pendingGate.type === 'cswap'
+                    ? 3
+                    : 2
+
+            if (selectedQubits.length < requiredQubits) {
+                setPendingGate({
+                    ...pendingGate,
+                    selectedQubits,
+                })
+
+                return
+            }
             addGate({
                 id: `${pendingGate.type}-q${pendingGate.qubitIndex}-q${qubitIndex}-s${stepIndex}-${Date.now()}`,
                 type: pendingGate.type,
-                qubits: [
-                    pendingGate.qubitIndex,
-                    qubitIndex,
-                ],
+                qubits: selectedQubits,
                 step: stepIndex,
             })
-
             setPendingGate(null)
         }
     }
@@ -186,9 +203,14 @@ export default function DropCell({
             {isPendingTarget && !gate && (
                 <div className="absolute z-10 h-3 w-3 rounded-full border-2 border-blue-500 bg-white" />
             )}
+            {isPendingSelected && (
+                <div className="absolute z-20 flex h-8 w-8 items-center justify-center">
+                    <div className="h-3.5 w-3.5 rounded-full bg-blue-600" />
+                </div>
+            )}
 
             {/* Standard gate */}
-            {gate && !['cx', 'cz', 'swap'].includes(gate.type) && (
+            {gate && !['cx', 'cz', 'swap', 'ccx', 'cswap'].includes(gate.type) && (
                 <div className="group relative z-20 flex h-9 w-9 items-center justify-center border border-blue-600 bg-blue-600 font-mono text-[11px] font-semibold text-white shadow-[0_2px_8px_rgba(37,99,235,0.18)]">
                     {['rx', 'ry', 'rz'].includes(gate.type) ? (
                         <span className='flex flex-col items-center justify-center'>
@@ -260,6 +282,62 @@ export default function DropCell({
                     <button
                         onClick={handleRemove}
                         className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        <X size={10} />
+                    </button>
+                </div>
+            )}
+
+            {/* CCX gate */}
+            {isCCXControl && (
+                <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
+                    <div className="h-3.5 w-3.5 rounded-full bg-blue-600" />
+
+                    <button
+                        onClick={handleRemove}
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                    >
+                        <X size={10} />
+                    </button>
+                </div>
+            )}
+            {isCCXTarget && (
+                <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                        +
+                    </div>
+
+                    <button
+                        onClick={handleRemove}
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                    >
+                        <X size={10} />
+                    </button>
+                </div>
+            )}
+
+            {/* CSWAP gate */}
+            {isCSWAPControl && (
+                <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
+                    <div className="h-3.5 w-3.5 rounded-full bg-blue-600" />
+
+                    <button
+                        onClick={handleRemove}
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                    >
+                        <X size={10} />
+                    </button>
+                </div>
+            )}
+            {isCSWAPTarget && (
+                <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                        ×
+                    </div>
+
+                    <button
+                        onClick={handleRemove}
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                    >
                         <X size={10} />
                     </button>
                 </div>

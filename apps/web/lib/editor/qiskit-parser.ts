@@ -118,6 +118,8 @@ export function parseQiskitCode(code: string): ParseResult {
             const x = line.match(/^qc\.x\(\s*(\d+)\s*\)$/)
             const cx = line.match(/^qc\.cx\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
             const cz = line.match(/^qc\.cz\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
+            const ccx = line.match(/^qc\.ccx\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/)
+            const cswap = line.match(/^qc\.cswap\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/)
             const swap = line.match(/^qc\.swap\(\s*(\d+)\s*,\s*(\d+)\s*\)$/)
             const y = line.match(/^qc\.y\(\s*(\d+)\s*\)$/)
             const z = line.match(/^qc\.z\(\s*(\d+)\s*\)$/)
@@ -492,6 +494,73 @@ export function parseQiskitCode(code: string): ParseResult {
                         { length: numQubits },
                         (_, index) => index
                     ),
+                    step,
+                })
+
+                step++
+                continue
+            }
+            if (ccx) {
+                const control1 = Number(ccx[1])
+                const control2 = Number(ccx[2])
+                const target = Number(ccx[3])
+
+                if (
+                    control1 >= numQubits ||
+                    control2 >= numQubits ||
+                    target >= numQubits
+                ) {
+                    return {
+                        success: false,
+                        error: `CCX gate references a qubit outside the ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                if (control1 === control2 || control1 === target || control2 === target) {
+                    return {
+                        success: false,
+                        error: 'A CCX gate requires three different qubits.',
+                    }
+                }
+
+                gates.push({
+                    id: `editor-ccx-${step}`,
+                    type: 'ccx',
+                    qubits: [control1, control2, target],
+                    step,
+                })
+
+                step++
+                continue
+            }
+
+            if (cswap) {
+                const control1 = Number(cswap[1])
+                const control2 = Number(cswap[2])
+                const target = Number(cswap[3])
+
+                if (
+                    control1 >= numQubits ||
+                    control2 >= numQubits ||
+                    target >= numQubits
+                ) {
+                    return {
+                        success: false,
+                        error: `CSWAP gate references a qubit outside the ${numQubits}-qubit circuit.`,
+                    }
+                }
+
+                if (control1 === control2 || control1 === target || control2 === target) {
+                    return {
+                        success: false,
+                        error: 'A CSWAP gate requires three different qubits.',
+                    }
+                }
+
+                gates.push({
+                    id: `editor-cswap-${step}`,
+                    type: 'ccx',
+                    qubits: [control1, control2, target],
                     step,
                 })
 

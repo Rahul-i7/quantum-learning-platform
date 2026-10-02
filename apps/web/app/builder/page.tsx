@@ -119,6 +119,10 @@ export default function BuilderPage() {
         }
     }
 
+    const handleClearCircuit = () => {
+        store.reset()
+    }
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="min-h-screen bg-[#fafafa] text-zinc-950">
@@ -187,14 +191,6 @@ export default function BuilderPage() {
 
                                 <div className="hidden h-8 w-px bg-zinc-200 sm:block" />
 
-                                <TemplateLoader
-                                    onLoad={() => {
-                                        setSimulationResult(null)
-                                        setAiExplanation(null)
-                                        setError(null)
-                                    }}
-                                />
-
                                 <button
                                     onClick={handleRunSimulation}
                                     disabled={loading}
@@ -256,9 +252,24 @@ export default function BuilderPage() {
                                         </div>
                                     </div>
 
-                                    <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
-                                        8 steps
-                                    </span>
+                                    <div className="flex items-center gap-5">
+                                        <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
+                                            8 steps
+                                        </span>
+                                        <TemplateLoader
+                                            onLoad={() => {
+                                                setSimulationResult(null)
+                                                setAiExplanation(null)
+                                                setError(null)
+                                            }}
+                                        />
+                                        <button
+                                            onClick={handleClearCircuit}
+                                            className="cursor-pointer font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-red-500"
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="min-h-105 p-5">
@@ -411,6 +422,7 @@ export default function BuilderPage() {
                                 <div className="min-w-0 bg-white p-5">
                                     <BlochSphereVisualizer
                                         data={simulationResult}
+                                        gates={store.gates}
                                         variant="default"
                                         loading={loading}
                                         animated

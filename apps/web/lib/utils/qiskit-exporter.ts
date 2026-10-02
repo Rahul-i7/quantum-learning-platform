@@ -72,6 +72,16 @@ export function circuitToQiskitCode(circuit: CircuitState): string {
                     code += `qc.swap(${gate.qubits[0]}, ${gate.qubits[1]})\n`
                 }
                 break
+            case 'ccx':
+                if (gate.qubits.length >= 3) {
+                    code += `qc.ccx(${gate.qubits[0]}, ${gate.qubits[1]}, ${gate.qubits[2]})\n`
+                }
+                break
+            case 'cswap':
+                if (gate.qubits.length >= 3) {
+                    code += `qc.cswap(${gate.qubits[0]}, ${gate.qubits[1]}, ${gate.qubits[2]})\n`
+                }
+                break
 
             case 'y':
                 code += `qc.y(${gate.qubits[0]})\n`

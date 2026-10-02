@@ -61,7 +61,9 @@ def _validate(circuit_json: dict[str, Any]) -> None:
                 raise CircuitValidationError(f"gate[{i}]: '{gtype}' requires params=[angle]")
 
 
-def build_circuit(circuit_json: dict[str, Any]) -> QuantumCircuit:
+def build_circuit(
+    circuit_json: dict[str, Any], include_measurements: bool = True
+) -> QuantumCircuit:
     """Build a Qiskit QuantumCircuit from the shared JSON contract. Raises
     CircuitValidationError on any malformed input — call this before ever
     touching Qiskit's own APIs so validation errors are ours, not a stack
@@ -81,6 +83,8 @@ def build_circuit(circuit_json: dict[str, Any]) -> QuantumCircuit:
         params = gate.get("params") or []
 
         if gtype == "measure":
+            if not include_measurements:
+                continue
             clbits = gate.get("clbits") or qubits
             qc.measure(qubits, clbits)
         elif gtype in ("rx", "ry", "rz"):
@@ -96,8 +100,8 @@ def build_circuit(circuit_json: dict[str, Any]) -> QuantumCircuit:
 
 
 def simulate_circuit(circuit_json: dict[str, Any]) -> dict[str, Any]:
-    """Run the circuit and return statevector (if no measurements collapse
-    it first), measurement counts, and probabilities — all JSON-safe."""
+    """Run the circuit and return the statevector (pre-measurement), measurement
+    counts (when the circuit measures), and probabilities — all JSON-safe."""
     qc = build_circuit(circuit_json)
     has_measurement = any(g["type"] == "measure" for g in circuit_json["gates"])
     shots = circuit_json.get("shots", 1024)
@@ -109,12 +113,18 @@ def simulate_circuit(circuit_json: dict[str, Any]) -> dict[str, Any]:
         "probabilities": None,
     }
 
-    # Statevector only makes sense pre-measurement (no collapse yet).
+    # Statevector of the circuit *as if no measurement had happened*. Learners want to see
+    # the state before it collapses (Bloch sphere), and the measured counts below show the
+    # outcome. Without this, any circuit containing a Measure gate lost its statevector,
+    # and unmeasured qubits were misreported from counts (their classical bit stays 0).
+    # Note: for mid-circuit measurements this ignores the collapse.
+    qc_unitary = build_circuit(circuit_json, include_measurements=False)
+    sv = Statevector.from_instruction(qc_unitary)
+    result["statevector"] = [[c.real, c.imag] for c in sv.data]
+    result["statevector_premeasurement"] = has_measurement
+
     if not has_measurement:
-        sv = Statevector.from_instruction(qc)
-        result["statevector"] = [[c.real, c.imag] for c in sv.data]
-        probs = sv.probabilities_dict()
-        result["probabilities"] = probs
+        result["probabilities"] = sv.probabilities_dict()
     else:
         backend = AerSimulator()
         job = backend.run(qc, shots=shots)

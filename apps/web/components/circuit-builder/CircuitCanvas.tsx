@@ -16,9 +16,10 @@ export default function CircuitCanvas() {
 
     const [pendingGate, setPendingGate] =
         useState<{
-            type: 'cx' | 'cz' | 'swap'
+            type: 'cx' | 'cz' | 'swap' | 'ccx' | 'cswap'
             qubitIndex: number
             stepIndex: number
+            selectedQubits: number[]
         } | null>(null)
 
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -58,8 +59,8 @@ export default function CircuitCanvas() {
         }
 
         const cellEl = canvasRef.current.querySelector(
-                `[data-qubit="${pendingGate.qubitIndex}"][data-step="${pendingGate.stepIndex}"]`
-            ) as HTMLElement
+            `[data-qubit="${pendingGate.qubitIndex}"][data-step="${pendingGate.stepIndex}"]`
+        ) as HTMLElement
 
         if (!cellEl) {
             return { x: 0, y: 0 }
@@ -85,14 +86,40 @@ export default function CircuitCanvas() {
 
     const multiQubitGates = gates.filter(
         (gate) =>
-            ['cx', 'cz', 'swap'].includes(gate.type) &&
-            gate.qubits.length === 2
+            ['cx', 'cz', 'swap', 'ccx', 'cswap'].includes(gate.type) &&
+            gate.qubits.length >= 2
     )
 
     return (
         <div
             ref={canvasRef}
             className="relative overflow-x-auto bg-white">
+            {pendingGate && (
+                <div className="mb-3 flex items-center justify-between border border-blue-200 bg-blue-50 px-3 py-2">
+                    <div>
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-500">
+                            Placing {pendingGate.type.toUpperCase()}
+                        </span>
+
+                        <p className="mt-0.5 text-xs text-blue-700">
+                            {pendingGate.type === 'ccx' || pendingGate.type === 'cswap'
+                                ? `Select ${3 - pendingGate.selectedQubits.length} more ${3 - pendingGate.selectedQubits.length === 1
+                                    ? 'qubit'
+                                    : 'qubits'
+                                }`
+                                : `Select ${2 - pendingGate.selectedQubits.length} more qubit${2 - pendingGate.selectedQubits.length === 1 ? '' : 's'
+                                }`}
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => setPendingGate(null)}
+                        className="cursor-pointer font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-500 hover:text-blue-700"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            )}
             {/* Pending multi-qubit gate guide */}
             {pendingGate && (
                 <svg className="pointer-events-none absolute inset-0 z-40 h-full w-full">
@@ -108,6 +135,7 @@ export default function CircuitCanvas() {
                     />
                 </svg>
             )}
+
 
             {/* Circuit header */}
             <div className="flex items-center border-b border-zinc-200 bg-zinc-50/70">
@@ -157,10 +185,8 @@ export default function CircuitCanvas() {
 
                 {/* Active multi-qubit gates connections */}
                 {multiQubitGates.map((gate) => {
-                    const control = gate.qubits[0]
-                    const target = gate.qubits[1]
-                    const min = Math.min(control, target)
-                    const max = Math.max(control, target)
+                    const min = Math.min(...gate.qubits)
+                    const max = Math.max(...gate.qubits)
 
                     return (
                         <div

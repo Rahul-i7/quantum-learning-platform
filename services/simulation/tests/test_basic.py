@@ -61,3 +61,23 @@ def test_rejects_too_many_qubits():
     }
     with pytest.raises(CircuitValidationError):
         simulate_circuit(circuit)
+
+
+def test_statevector_kept_when_circuit_has_measurement():
+    # H on q0 (unmeasured), H on q1 then measure q1. The statevector must still be present
+    # and describe the state BEFORE measurement: both qubits in |+>.
+    result = simulate_circuit(
+        {
+            "num_qubits": 2,
+            "gates": [
+                {"type": "h", "qubits": [0]},
+                {"type": "h", "qubits": [1]},
+                {"type": "measure", "qubits": [1]},
+            ],
+        }
+    )
+    assert result["statevector"] is not None
+    assert result["statevector_premeasurement"] is True
+    assert result["counts"] is not None
+    amps = [round(abs(a[0]), 3) for a in result["statevector"]]
+    assert amps == [0.5, 0.5, 0.5, 0.5]
