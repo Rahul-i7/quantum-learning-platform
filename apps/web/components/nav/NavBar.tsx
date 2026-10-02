@@ -104,7 +104,7 @@ export default function NavBar() {
                         ) : (
                             <Link href="/login" className="flex h-9 items-center gap-2 rounded-md px-3 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-950">
                                 <LogIn className="h-4 w-4" strokeWidth={1.7} />
-                                <span className="hidden sm:inline">Sign in</span>
+                                <span className="sm:inline">Sign in</span>
                             </Link>
                         )}
                         {(openProfile && user) && (
