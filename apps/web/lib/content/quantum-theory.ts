@@ -13,7 +13,15 @@ export type TopicBlock =
     | { type: "p"; text: string }
     | { type: "matrix"; label: string; rows: string[] }
     | { type: "note"; text: string }
-    | { type: "interactive"; component: "qubit-transformation" }
+    | { type: "interactive"; component: "qubit-transformation"; defaultGate?: "I" | "X" | "Y" | "Z" | "H" }
+    | { type: "interactive"; component: "bloch-explorer" }
+    | { type: "interactive"; component: "measurement-demo" }
+    | { type: "interactive"; component: "entanglement-demo" }
+    | { type: "interactive"; component: "two-qubit-gate-demo" }
+    | { type: "interactive"; component: "shors-periodicity" }
+    // Renders one or more circuits from lib/content/circuit-templates.ts
+    // as an SVG diagram (see components/learn/CircuitDiagramView.tsx).
+    | { type: "interactive"; component: "circuit-diagram"; templateIds: string[] }
     // Rendered with KaTeX (see components/learn/Math.tsx). `tex` is raw
     // LaTeX source, e.g. "|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle".
     | { type: "math"; tex: string; caption?: string };
@@ -62,6 +70,10 @@ export const TOPICS: Topic[] = [
                 text: "Gates that act on one qubit are rotations of this point around the sphere. This is exactly what the Bloch sphere visualizer in the builder is showing you — it's not a separate simulation, it's a picture of the same statevector math the simulator computed.",
             },
             {
+                type: "interactive",
+                component: "bloch-explorer",
+            },
+            {
                 type: "note",
                 text: "If a qubit is entangled with another (see below), its individual point moves inside the sphere rather than on the surface — that shrinking is a visual signal of entanglement, not measurement noise.",
             },
@@ -82,6 +94,10 @@ export const TOPICS: Topic[] = [
                 text: "The classic example — and the one this platform's CX gate is built to create — is the Bell state: apply H to one qubit, then CX with that qubit as control. The result is 50% chance of measuring both qubits as 0, 50% chance of both as 1, and 0% chance of ever seeing them different.",
             },
             {
+                type: "interactive",
+                component: "entanglement-demo",
+            },
+            {
                 type: "note",
                 text: "Try it: place an H gate, then a CX from that qubit to another, and run the circuit. Check the Measurement Outcomes panel — you should see only '00' and '11' bars, never '01' or '10'.",
             },
@@ -100,6 +116,10 @@ export const TOPICS: Topic[] = [
             {
                 type: "p",
                 text: "Because outcomes are probabilistic, a single run doesn't tell you the full picture. Real quantum hardware (and simulators, when you use a measure gate) run the same circuit many times — 'shots' — and report counts: how many times each bitstring showed up.",
+            },
+            {
+                type: "interactive",
+                component: "measurement-demo",
             },
             {
                 type: "note",
@@ -123,6 +143,11 @@ export const TOPICS: Topic[] = [
                 rows: ["[ 1   1 ]", "[ 1  -1 ]"],
             },
             {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "H",
+            },
+            {
                 type: "note",
                 text: "On the Bloch sphere, H rotates |0⟩ (north pole) to the equator — the point exactly between the poles, representing equal probability of either outcome.",
             },
@@ -142,6 +167,11 @@ export const TOPICS: Topic[] = [
                 type: "matrix",
                 label: "X =",
                 rows: ["[ 0  1 ]", "[ 1  0 ]"],
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "X",
             },
             {
                 type: "note",
@@ -164,6 +194,11 @@ export const TOPICS: Topic[] = [
                 rows: ["[ 0 -i ]", "[ i  0 ]"],
             },
             {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "Y",
+            },
+            {
                 type: "note",
                 text: "On the Bloch sphere, Y is a 180° rotation around the sphere's Y-axis — it maps the +x state |+⟩ to the -x state |-⟩ and vice versa.",
             },
@@ -182,6 +217,11 @@ export const TOPICS: Topic[] = [
                 type: "matrix",
                 label: "Z =",
                 rows: ["[ 1  0 ]", "[ 0 -1 ]"],
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "Z",
             },
             {
                 type: "note",
@@ -205,6 +245,10 @@ export const TOPICS: Topic[] = [
                 text: "When the control qubit is in superposition (say, after an H gate) rather than a definite 0 or 1, CX entangles the two qubits — the 'flip the target' and 'don't flip it' possibilities both exist at once, linked to the control's state.",
             },
             {
+                type: "interactive",
+                component: "two-qubit-gate-demo",
+            },
+            {
                 type: "note",
                 text: "This is exactly the two-step gate in the builder: click a qubit wire to set it as control, then click the target wire to complete the connection.",
             },
@@ -219,6 +263,10 @@ export const TOPICS: Topic[] = [
             {
                 type: "p",
                 text: "Placing a Measure gate on a qubit tells the simulator to actually sample an outcome for that qubit rather than just reporting the underlying probabilities — this is what makes the 'counts' (shot-based results) appear instead of 'probabilities'.",
+            },
+            {
+                type: "interactive",
+                component: "measurement-demo",
             },
             {
                 type: "note",
@@ -260,6 +308,10 @@ export const TOPICS: Topic[] = [
                 caption: "Ψ− — apply both X to q1 and Z to q0 before the CX.",
             },
             {
+                type: "interactive",
+                component: "entanglement-demo",
+            },
+            {
                 type: "note",
                 text: "Load the \"Bell States\" templates in the Circuit Builder to build all four and confirm each one's Measurement Outcomes panel — Φ± only ever show 00/11, Ψ± only ever show 01/10.",
             },
@@ -282,6 +334,11 @@ export const TOPICS: Topic[] = [
             {
                 type: "math",
                 tex: "|\\psi\\rangle_0 \\otimes |\\Phi^+\\rangle_{12} \\;\\xrightarrow{\\text{CX, H, measure}}\\; \\text{2 classical bits} \\;\\xrightarrow{\\text{correction}}\\; |\\psi\\rangle_2",
+            },
+            {
+                type: "interactive",
+                component: "circuit-diagram",
+                templateIds: ["teleportation"],
             },
             {
                 type: "note",
@@ -308,6 +365,11 @@ export const TOPICS: Topic[] = [
                 tex: "\\text{measure } 00\\ldots0 \\;\\Rightarrow\\; f \\text{ is constant} \\qquad \\text{any other result} \\;\\Rightarrow\\; f \\text{ is balanced}",
             },
             {
+                type: "interactive",
+                component: "circuit-diagram",
+                templateIds: ["deutsch-jozsa-constant", "deutsch-jozsa-balanced"],
+            },
+            {
                 type: "note",
                 text: "Load the \"Deutsch-Jozsa\" templates in the builder — the constant-oracle one measures all zeros every time, and the balanced-oracle one (a CX from input to ancilla) never does. Same shape of circuit, opposite guaranteed outcome.",
             },
@@ -330,6 +392,11 @@ export const TOPICS: Topic[] = [
             {
                 type: "p",
                 text: "For the simplest useful case — 2 qubits, N = 4 possible states — a single round already gets you there: apply H to both qubits, apply the oracle for the marked state (for |11⟩, that's a CZ), then the diffusion operator (H, X, CZ, X, H on both qubits).",
+            },
+            {
+                type: "interactive",
+                component: "circuit-diagram",
+                templateIds: ["grover-2qubit"],
             },
             {
                 type: "note",
@@ -355,6 +422,10 @@ export const TOPICS: Topic[] = [
             {
                 type: "p",
                 text: "Finding r classically is about as hard as factoring itself. Quantumly, you put a register in superposition of every x, compute aˣ mod N into a second register (entangling the two), and apply the Quantum Fourier Transform to the first register — the QFT turns the hidden period into a measurable pattern of peaks, in time that scales polynomially in the number of digits of N instead of exponentially.",
+            },
+            {
+                type: "interactive",
+                component: "shors-periodicity",
             },
             {
                 type: "note",

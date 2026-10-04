@@ -177,8 +177,14 @@ function probability(state: Complex) {
     return state[0] ** 2 + state[1] ** 2
 }
 
-export default function QuantumTransformation() {
-    const [gate, setGate] = useState<Gate>('H')
+export default function QuantumTransformation({
+    defaultGate = 'H',
+}: {
+    // Lets gate lessons (H/X/Y/Z) preselect their own gate in the same
+    // widget used on the qubits lesson, instead of duplicating it.
+    defaultGate?: Gate
+}) {
+    const [gate, setGate] = useState<Gate>(defaultGate)
     const [isTransforming, setIsTransforming] = useState(false)
 
     const handleGateChange = (nextGate: Gate) => {
@@ -240,7 +246,7 @@ export default function QuantumTransformation() {
                     </div>
 
                     <button
-                        onClick={() => setGate('H')}
+                        onClick={() => setGate(defaultGate)}
                         className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
                     >
                         <RotateCcw className="h-3 w-3" />

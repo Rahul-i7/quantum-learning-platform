@@ -4,6 +4,12 @@ import { Lightbulb } from 'lucide-react'
 import type { TopicBlock } from '@/lib/content/quantum-theory'
 import QuantumTransformation from './QuantumTransformation'
 import MathBlock from './Math'
+import BlochExplorer from './BlochExplorer'
+import ProbabilityCollapseDemo from './ProbabilityCollapseDemo'
+import TwoQubitCorrelationDemo from './TwoQubitCorrelationDemo'
+import TwoQubitGateDemo from './TwoQubitGateDemo'
+import CircuitDiagramView from './CircuitDiagramView'
+import ShorsPeriodicityChart from './ShorsPeriodicityChart'
 
 export default function TopicBody({
     blocks,
@@ -62,7 +68,35 @@ export default function TopicBody({
 
                 if (block.type === 'interactive') {
                     if (block.component === 'qubit-transformation') {
-                        return <QuantumTransformation key={i} />
+                        return (
+                            <QuantumTransformation
+                                key={i}
+                                defaultGate={block.defaultGate}
+                            />
+                        )
+                    }
+                    if (block.component === 'bloch-explorer') {
+                        return <BlochExplorer key={i} />
+                    }
+                    if (block.component === 'measurement-demo') {
+                        return <ProbabilityCollapseDemo key={i} />
+                    }
+                    if (block.component === 'entanglement-demo') {
+                        return <TwoQubitCorrelationDemo key={i} />
+                    }
+                    if (block.component === 'two-qubit-gate-demo') {
+                        return <TwoQubitGateDemo key={i} />
+                    }
+                    if (block.component === 'shors-periodicity') {
+                        return <ShorsPeriodicityChart key={i} />
+                    }
+                    if (block.component === 'circuit-diagram') {
+                        return (
+                            <CircuitDiagramView
+                                key={i}
+                                templateIds={block.templateIds}
+                            />
+                        )
                     }
                 }
 
