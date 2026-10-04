@@ -259,9 +259,7 @@ export default function LoginPage() {
                         </div>
 
                         <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
-                            {mode === 'signin'
-                                ? 'Welcome back.'
-                                : 'Start learning.'}
+                            {mode === 'signin'? 'Welcome back.' : 'Start learning.'}
                         </h1>
 
                         <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
