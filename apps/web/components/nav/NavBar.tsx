@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ProfileMenu from './ProfileMenu'
 import { AnimatePresence, motion } from 'motion/react'
-import { Atom, LayoutGrid, Gauge, BookOpen, LogOut, LogIn, Code, Menu, X } from 'lucide-react'
+import { Atom, LayoutGrid, Gauge, BookOpen, LogIn, Code, Menu, X } from 'lucide-react'
 import { useAuth } from '@/lib/supabase/AuthProvider'
 
 const LINKS = [
