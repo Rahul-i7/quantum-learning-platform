@@ -93,7 +93,7 @@ export default function CircuitCanvas() {
     return (
         <div
             ref={canvasRef}
-            className="relative overflow-x-auto bg-white">
+            className="relative  bg-white">
             {pendingGate && (
                 <div className="mb-3 flex items-center justify-between border border-blue-200 bg-blue-50 px-3 py-2">
                     <div>

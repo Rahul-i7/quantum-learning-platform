@@ -116,7 +116,8 @@ async def chat_with_tutor(
             message=req.message,
             circuit=req.circuit,
             history=req.history,
-            user_id=req.user_id or "beginner_alex",
+            user_name=req.user_name,
+            user_id=req.user_id or "default_learner",
             skill_override=req.skill_level_override,
             style_override=req.learning_style_override
         )
@@ -137,7 +138,8 @@ async def explain_concept_or_circuit(
     try:
         response = tutor.explain_circuit(
             circuit=req.circuit,
-            user_id=req.user_id or "beginner_alex",
+            user_id=req.user_id or "default_learner",
+            user_name=req.user_name,
             query=req.concept_or_circuit_query,
             skill_override=req.skill_level,
             style_override=req.learning_style
@@ -160,7 +162,7 @@ async def debug_circuit_submission(
         response = tutor.debug_circuit(
             circuit=req.circuit,
             target_objective=req.target_objective,
-            user_id=req.user_id or "beginner_alex",
+            user_id=req.user_id or "default_learner",
             reference_circuit=req.reference_circuit
         )
         return response
