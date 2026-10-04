@@ -264,11 +264,13 @@ class QuantumAITutor:
                     config=types.GenerateContentConfig(
                         system_instruction=system_instruction,
                         temperature=0.7,
-                        tools=[simulate_circuit, get_learner_profile, compare_circuits, bloch_target_to_gates],
+                        tools=[bloch_target_to_gates],
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(maximum_remote_calls=3),
                     )
                 )
-
-                reply_text = response.text or "I inspected your circuit and quantum state."
+                if not response.text:
+                    raise RuntimeError("Gemini returned no text (tool loop or empty reply)")
+                reply_text = response.text
                 reply_text, proposed_circuit = extract_circuit_proposal(reply_text)
 
                 # Generate follow-up suggestions
