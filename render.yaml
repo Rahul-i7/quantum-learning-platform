@@ -19,7 +19,7 @@ services:
     plan: free
     envVars:
       - key: SIMULATION_SERVICE_URL
-        value: https://quantum-simulation.onrender.com
+        value: https://quantum-simulation-opbx.onrender.com
       - key: PYTHON_VERSION
         value: 3.11.9
 
@@ -34,6 +34,6 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: SIMULATION_SERVICE_URL
-        value: https://quantum-simulation.onrender.com
+        value: https://quantum-simulation-opbx.onrender.com
       - key: PYTHON_VERSION
         value: 3.11.9
