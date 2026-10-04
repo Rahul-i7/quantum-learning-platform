@@ -13,11 +13,13 @@ export type TopicBlock =
     | { type: "p"; text: string }
     | { type: "matrix"; label: string; rows: string[] }
     | { type: "note"; text: string }
-    | { type: "interactive"; component: "qubit-transformation"; defaultGate?: "I" | "X" | "Y" | "Z" | "H" }
+    | { type: "interactive"; component: "qubit-transformation"; defaultGate?: "I" | "X" | "Y" | "Z" | "H" | "S" | "S†" | "T" | "T†" }
     | { type: "interactive"; component: "bloch-explorer" }
     | { type: "interactive"; component: "measurement-demo" }
     | { type: "interactive"; component: "entanglement-demo" }
-    | { type: "interactive"; component: "two-qubit-gate-demo" }
+    | { type: "interactive"; component: "two-qubit-gate-demo"; gateType?: "cx" | "cz" | "swap" }
+    | { type: "interactive"; component: "three-qubit-gate-demo"; gateType?: "ccx" | "cswap" }
+    | { type: "interactive"; component: "rotation-gate-demo"; axis: "x" | "y" | "z" }
     | { type: "interactive"; component: "shors-periodicity" }
     // Renders one or more circuits from lib/content/circuit-templates.ts
     // as an SVG diagram (see components/learn/CircuitDiagramView.tsx).
@@ -271,6 +273,292 @@ export const TOPICS: Topic[] = [
             {
                 type: "note",
                 text: "A circuit with no Measure gates still gives you exact probabilities in this platform — Measure only changes how the result is reported, not whether the underlying math is computed.",
+            },
+        ],
+    },
+
+    {
+        id: "gate-s",
+        title: "S (Phase)",
+        category: "gates",
+        summary: "A quarter-turn of relative phase — leaves |0⟩ and |1⟩ probabilities untouched.",
+        body: [
+            {
+                type: "p",
+                text: "S multiplies the |1⟩ amplitude by i, leaving |0⟩'s amplitude alone. Since |i| = 1, this never changes how likely you are to measure 0 or 1 — it only changes the relative phase between the two amplitudes, which is invisible in the computational basis but shows up as a rotation around the Bloch sphere's equator.",
+            },
+            {
+                type: "matrix",
+                label: "S =",
+                rows: ["[ 1  0 ]", "[ 0  i ]"],
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "S",
+            },
+            {
+                type: "note",
+                text: "S does nothing visible to |0⟩ or |1⟩ themselves — try it from |+⟩ above and watch the point sweep a quarter-turn around the equator instead of the poles.",
+            },
+        ],
+    },
+    {
+        id: "gate-sdg",
+        title: "S† (S Dagger)",
+        category: "gates",
+        summary: "The inverse of S — undoes exactly the phase rotation S applies.",
+        body: [
+            {
+                type: "p",
+                text: "S† multiplies the |1⟩ amplitude by -i instead of i — the opposite quarter-turn from S. Applying S then S† (or S† then S) returns a state to exactly where it started, which is what makes it the 'dagger' (inverse) of S.",
+            },
+            {
+                type: "matrix",
+                label: "S† =",
+                rows: ["[ 1  0 ]", "[ 0 -i ]"],
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "S†",
+            },
+            {
+                type: "note",
+                text: "Gates whose matrix is its own inverse (like H, X, Y, Z) don't need a separate dagger version in the palette — S and T do, because applying them twice doesn't get you back to where you started.",
+            },
+        ],
+    },
+    {
+        id: "gate-t",
+        title: "T",
+        category: "gates",
+        summary: "An eighth-turn of relative phase — half the rotation of S.",
+        body: [
+            {
+                type: "p",
+                text: "T multiplies the |1⟩ amplitude by e^(iπ/4) — an eighth of a full turn, exactly half of what S does. Four T gates in a row equal one S gate; eight equal a full rotation back to the start. T shows up constantly in real quantum algorithms because it's the smallest common phase rotation most hardware can apply directly.",
+            },
+            {
+                type: "math",
+                tex: "T = \\begin{pmatrix} 1 & 0 \\\\ 0 & e^{i\\pi/4} \\end{pmatrix}",
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "T",
+            },
+            {
+                type: "note",
+                text: "Try S and T back to back from |+⟩ (S lesson, then T lesson) and compare how far each one sweeps the point — T's step is visibly half of S's.",
+            },
+        ],
+    },
+    {
+        id: "gate-tdg",
+        title: "T† (T Dagger)",
+        category: "gates",
+        summary: "The inverse of T — rotates relative phase by -π/4 instead of +π/4.",
+        body: [
+            {
+                type: "p",
+                text: "T† multiplies the |1⟩ amplitude by e^(-iπ/4), the exact opposite of T's rotation. Like S†, it exists so you can undo a T gate without having to apply T seven more times to loop all the way around.",
+            },
+            {
+                type: "math",
+                tex: "T^\\dagger = \\begin{pmatrix} 1 & 0 \\\\ 0 & e^{-i\\pi/4} \\end{pmatrix}",
+            },
+            {
+                type: "interactive",
+                component: "qubit-transformation",
+                defaultGate: "T†",
+            },
+            {
+                type: "note",
+                text: "T followed by T† (in either order) is the identity — build that two-gate circuit in the builder and confirm the output matches the input exactly.",
+            },
+        ],
+    },
+    {
+        id: "gate-rx",
+        title: "RX(θ)",
+        category: "gates",
+        summary: "A continuously adjustable rotation around the Bloch sphere's X axis.",
+        body: [
+            {
+                type: "p",
+                text: "Where X is a fixed 180° flip, RX(θ) lets you dial in any rotation angle around the same X axis. At θ = 180°, RX becomes X (up to an overall phase that doesn't affect measurement) — X is really just one specific case of this more general gate.",
+            },
+            {
+                type: "math",
+                tex: "R_x(\\theta) = \\begin{pmatrix} \\cos\\frac{\\theta}{2} & -i\\sin\\frac{\\theta}{2} \\\\ -i\\sin\\frac{\\theta}{2} & \\cos\\frac{\\theta}{2} \\end{pmatrix}",
+            },
+            {
+                type: "interactive",
+                component: "rotation-gate-demo",
+                axis: "x",
+            },
+            {
+                type: "note",
+                text: "Drag θ all the way to 180° above and compare the output to what the fixed X gate lesson showed — they should land on the same point.",
+            },
+        ],
+    },
+    {
+        id: "gate-ry",
+        title: "RY(θ)",
+        category: "gates",
+        summary: "A continuously adjustable rotation around the Bloch sphere's Y axis.",
+        body: [
+            {
+                type: "p",
+                text: "RY(θ) rotates around the Y axis by any angle you choose. Unlike RX and RZ, RY's matrix is entirely real-valued — no i's anywhere — which makes it a common choice for preparing specific superposition amplitudes without introducing any relative phase.",
+            },
+            {
+                type: "math",
+                tex: "R_y(\\theta) = \\begin{pmatrix} \\cos\\frac{\\theta}{2} & -\\sin\\frac{\\theta}{2} \\\\ \\sin\\frac{\\theta}{2} & \\cos\\frac{\\theta}{2} \\end{pmatrix}",
+            },
+            {
+                type: "interactive",
+                component: "rotation-gate-demo",
+                axis: "y",
+            },
+            {
+                type: "note",
+                text: "At θ = 90°, RY turns |0⟩ into |+⟩ with purely real amplitudes — try it above and check the statevector readout has no i terms at all.",
+            },
+        ],
+    },
+    {
+        id: "gate-rz",
+        title: "RZ(θ)",
+        category: "gates",
+        summary: "A continuously adjustable rotation around the Bloch sphere's Z axis — generalizes S, S†, T and T†.",
+        body: [
+            {
+                type: "p",
+                text: "RZ(θ) is the general phase rotation that S, S†, T and T† are all specific angles of: S is RZ(90°), T is RZ(45°), and so on. Because it rotates around the same axis |0⟩ and |1⟩ sit on, applying it to a pure |0⟩ or |1⟩ shows no visible movement on the Bloch sphere — the demo below starts from |+⟩ instead so the rotation is actually visible.",
+            },
+            {
+                type: "math",
+                tex: "R_z(\\theta) = \\begin{pmatrix} e^{-i\\theta/2} & 0 \\\\ 0 & e^{i\\theta/2} \\end{pmatrix}",
+            },
+            {
+                type: "interactive",
+                component: "rotation-gate-demo",
+                axis: "z",
+            },
+            {
+                type: "note",
+                text: "Set θ to 90° and 45° above and compare the result to the S and T lessons — RZ at those angles reproduces them (up to an overall phase that measurement can't detect).",
+            },
+        ],
+    },
+    {
+        id: "gate-cz",
+        title: "CZ (Controlled-Z)",
+        category: "gates",
+        summary: "Flips the relative phase of |11⟩ only — symmetric between its two qubits.",
+        body: [
+            {
+                type: "p",
+                text: "CZ applies a Z gate to the target qubit only when the control is |1⟩ — but since Z only flips sign, and that sign flip only matters when BOTH qubits are |1⟩, CZ ends up completely symmetric: it doesn't matter which qubit you call the control. CZ never changes which basis state you'd measure — only the relative phase of |11⟩ flips, which is why it's the workhorse behind Grover's diffusion operator.",
+            },
+            {
+                type: "matrix",
+                label: "CZ =",
+                rows: [
+                    "[ 1 0 0  0 ]",
+                    "[ 0 1 0  0 ]",
+                    "[ 0 0 1  0 ]",
+                    "[ 0 0 0 -1 ]",
+                ],
+            },
+            {
+                type: "interactive",
+                component: "two-qubit-gate-demo",
+                gateType: "cz",
+            },
+            {
+                type: "note",
+                text: "This is exactly the oracle gate used in the Grover's Search lesson to mark |11⟩ — go compare the circuit diagram there once you've played with CZ here.",
+            },
+        ],
+    },
+    {
+        id: "gate-swap",
+        title: "SWAP",
+        category: "gates",
+        summary: "Exchanges the states of two qubits entirely.",
+        body: [
+            {
+                type: "p",
+                text: "SWAP exchanges whatever state q0 and q1 are holding — classical bits, superpositions, even their half of an entangled pair. It's built from three CX gates in a row in hardware that can't apply it directly, which is a classic trick worth knowing: CX(0,1), CX(1,0), CX(0,1) swaps q0 and q1 exactly.",
+            },
+            {
+                type: "matrix",
+                label: "SWAP =",
+                rows: [
+                    "[ 1 0 0 0 ]",
+                    "[ 0 0 1 0 ]",
+                    "[ 0 1 0 0 ]",
+                    "[ 0 0 0 1 ]",
+                ],
+            },
+            {
+                type: "interactive",
+                component: "two-qubit-gate-demo",
+                gateType: "swap",
+            },
+            {
+                type: "note",
+                text: "Try the three-CX trick in the builder: CX(q0→q1), CX(q1→q0), CX(q0→q1) on a circuit where q0 = |1⟩ and q1 = |0⟩ — the result should match SWAP's output here.",
+            },
+        ],
+    },
+    {
+        id: "gate-ccx",
+        title: "CCX (Toffoli)",
+        category: "gates",
+        summary: "Flips the target only when BOTH of two controls are |1⟩ — the quantum AND gate.",
+        body: [
+            {
+                type: "p",
+                text: "CCX (Controlled-Controlled-X, or the Toffoli gate) flips its target qubit only when both control qubits are |1⟩ — it's the closest thing in this gate set to a classical AND gate, and because it's reversible (applying it twice undoes it), it's exactly the kind of gate quantum computers need to implement classical logic without losing information.",
+            },
+            {
+                type: "p",
+                text: "With 3 qubits there are 8 basis states and an 8×8 matrix — too big to usefully print here, but the rule is simple: copy q0 and q1 unchanged, flip q2 exactly when q0 = q1 = 1.",
+            },
+            {
+                type: "interactive",
+                component: "three-qubit-gate-demo",
+                gateType: "ccx",
+            },
+            {
+                type: "note",
+                text: "CCX plus a handful of single-qubit gates is enough to build any classical circuit on a quantum computer — it's universal for classical (reversible) computation.",
+            },
+        ],
+    },
+    {
+        id: "gate-cswap",
+        title: "Fredkin (Controlled-SWAP)",
+        category: "gates",
+        summary: "Swaps two qubits, but only when a third control qubit is |1⟩.",
+        body: [
+            {
+                type: "p",
+                text: "The Fredkin gate (Controlled-SWAP) swaps q1 and q2 only when the control q0 is |1⟩ — otherwise all three qubits pass through unchanged. Like Toffoli, it's reversible and universal for classical computation, and it has a notable extra property: it never changes how many qubits are in state |1⟩ overall, which makes it a natural fit for reversible circuits that need to conserve a quantity.",
+            },
+            {
+                type: "interactive",
+                component: "three-qubit-gate-demo",
+                gateType: "cswap",
+            },
+            {
+                type: "note",
+                text: "Compare this to plain SWAP: SWAP always exchanges q0 and q1, no questions asked. Fredkin only swaps its two target qubits when a separate control says to — same swap, with a permission check attached.",
             },
         ],
     },

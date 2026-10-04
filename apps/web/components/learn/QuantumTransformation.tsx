@@ -5,7 +5,7 @@ import { ArrowRight, RotateCcw } from 'lucide-react'
 
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
 
-type Gate = 'I' | 'X' | 'Y' | 'Z' | 'H'
+type Gate = 'I' | 'X' | 'Y' | 'Z' | 'H' | 'S' | 'S†' | 'T' | 'T†'
 
 type Complex = [number, number]
 
@@ -46,9 +46,43 @@ const GATES: GateInfo[] = [
         description:
             'The Hadamard gate places the qubit into an equal superposition of |0⟩ and |1⟩.',
     },
+    {
+        label: 'S',
+        name: 'Phase (S)',
+        description:
+            'The S gate rotates the relative phase by π/2 — a quarter turn around the equator.',
+    },
+    {
+        label: 'S†',
+        name: 'S Dagger',
+        description:
+            'The inverse of S: rotates the relative phase by -π/2.',
+    },
+    {
+        label: 'T',
+        name: 'T Gate',
+        description:
+            'The T gate rotates the relative phase by π/4 — half of what S does.',
+    },
+    {
+        label: 'T†',
+        name: 'T Dagger',
+        description:
+            'The inverse of T: rotates the relative phase by -π/4.',
+    },
 ]
 
-const INPUT_STATE: Complex[] = [[1, 0], [0, 0]]
+// Phase gates (S, S†, T, T†) only change the RELATIVE phase between |0⟩
+// and |1⟩ — applied to a pure |0⟩ they'd look like nothing happened.
+// Starting those from |+⟩ instead makes the rotation visible as the
+// point sweeping around the Bloch sphere's equator.
+const PHASE_ONLY_GATES: Gate[] = ['S', 'S†', 'T', 'T†']
+
+const ZERO_STATE: Complex[] = [[1, 0], [0, 0]]
+const PLUS_STATE: Complex[] = [
+    [1 / Math.sqrt(2), 0],
+    [1 / Math.sqrt(2), 0],
+]
 
 function applyGate(
     gate: Gate,
@@ -95,6 +129,31 @@ function applyGate(
                     (aRe - bRe) * factor,
                     (aIm - bIm) * factor,
                 ],
+            ]
+        }
+
+        // S, S†, T, T† only touch the |1⟩ amplitude — they multiply it
+        // by a unit-magnitude phase factor e^{i*angle} and leave |0⟩'s
+        // amplitude untouched.
+        case 'S':
+            return [[aRe, aIm], [-bIm, bRe]] // ×i
+
+        case 'S†':
+            return [[aRe, aIm], [bIm, -bRe]] // ×-i
+
+        case 'T': {
+            const f = 1 / Math.sqrt(2) // cos(π/4) = sin(π/4)
+            return [
+                [aRe, aIm],
+                [(bRe - bIm) * f, (bRe + bIm) * f],
+            ]
+        }
+
+        case 'T†': {
+            const f = 1 / Math.sqrt(2)
+            return [
+                [aRe, aIm],
+                [(bRe + bIm) * f, (bIm - bRe) * f],
             ]
         }
     }
@@ -170,6 +229,22 @@ function getStateLabel(state: Complex[]) {
         return '|−⟩'
     }
 
+    if (
+        Math.abs(a[0] - 1 / Math.sqrt(2)) < 0.001 &&
+        isZero([a[1], b[0]]) &&
+        Math.abs(b[1] - 1 / Math.sqrt(2)) < 0.001
+    ) {
+        return '|i⟩'
+    }
+
+    if (
+        Math.abs(a[0] - 1 / Math.sqrt(2)) < 0.001 &&
+        isZero([a[1], b[0]]) &&
+        Math.abs(b[1] + 1 / Math.sqrt(2)) < 0.001
+    ) {
+        return '|−i⟩'
+    }
+
     return null
 }
 
@@ -205,9 +280,18 @@ export default function QuantumTransformation({
     const currentGate =
         GATES.find((item) => item.label === gate) ?? GATES[0]
 
+    const inputState = PHASE_ONLY_GATES.includes(gate)
+        ? PLUS_STATE
+        : ZERO_STATE
+    const inputLabel = PHASE_ONLY_GATES.includes(gate) ? '|+⟩' : '|0⟩'
+    const inputProbabilities = [
+        probability(inputState[0]),
+        probability(inputState[1]),
+    ]
+
     const outputState = useMemo(
-        () => applyGate(gate, INPUT_STATE),
-        [gate]
+        () => applyGate(gate, inputState),
+        [gate, inputState]
     )
 
     const outputProbabilities = useMemo(
@@ -222,7 +306,7 @@ export default function QuantumTransformation({
 
     const inputData = {
         num_qubits: 1,
-        statevector: INPUT_STATE,
+        statevector: inputState,
     }
 
     const outputData = {
@@ -324,7 +408,7 @@ export default function QuantumTransformation({
                                     State
                                 </div>
                                 <div className="mt-1 font-mono text-lg font-semibold text-zinc-950">
-                                    |0⟩
+                                    {inputLabel}
                                 </div>
                             </div>
 
@@ -333,7 +417,8 @@ export default function QuantumTransformation({
                                     Probability
                                 </div>
                                 <div className="mt-1 font-mono text-xs text-zinc-600">
-                                    100% / 0%
+                                    {(inputProbabilities[0] * 100).toFixed(0)}% /{' '}
+                                    {(inputProbabilities[1] * 100).toFixed(0)}%
                                 </div>
                             </div>
                         </div>

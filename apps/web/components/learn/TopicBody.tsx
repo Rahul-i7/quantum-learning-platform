@@ -8,6 +8,8 @@ import BlochExplorer from './BlochExplorer'
 import ProbabilityCollapseDemo from './ProbabilityCollapseDemo'
 import TwoQubitCorrelationDemo from './TwoQubitCorrelationDemo'
 import TwoQubitGateDemo from './TwoQubitGateDemo'
+import ThreeQubitGateDemo from './ThreeQubitGateDemo'
+import RotationGateDemo from './RotationGateDemo'
 import CircuitDiagramView from './CircuitDiagramView'
 import ShorsPeriodicityChart from './ShorsPeriodicityChart'
 
@@ -85,7 +87,28 @@ export default function TopicBody({
                         return <TwoQubitCorrelationDemo key={i} />
                     }
                     if (block.component === 'two-qubit-gate-demo') {
-                        return <TwoQubitGateDemo key={i} />
+                        return (
+                            <TwoQubitGateDemo
+                                key={i}
+                                gateType={block.gateType}
+                            />
+                        )
+                    }
+                    if (block.component === 'three-qubit-gate-demo') {
+                        return (
+                            <ThreeQubitGateDemo
+                                key={i}
+                                gateType={block.gateType}
+                            />
+                        )
+                    }
+                    if (block.component === 'rotation-gate-demo') {
+                        return (
+                            <RotationGateDemo
+                                key={i}
+                                axis={block.axis}
+                            />
+                        )
                     }
                     if (block.component === 'shors-periodicity') {
                         return <ShorsPeriodicityChart key={i} />
