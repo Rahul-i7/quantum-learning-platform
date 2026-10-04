@@ -21,7 +21,7 @@ MAX_QUBITS = 20
 SUPPORTED_GATES = {
     "h", "x", "y", "z", "s", "t", "sdg", "tdg",
     "rx", "ry", "rz",
-    "cx", "cy", "cz", "swap", "ccx",
+    "cx", "cy", "cz", "swap", "ccx", "cswap",
     "measure",
 }
 
@@ -95,6 +95,8 @@ def build_circuit(
             getattr(qc, gtype)(qubits[0], qubits[1])
         elif gtype == "ccx":
             qc.ccx(qubits[0], qubits[1], qubits[2])
+        elif gtype == "cswap":
+            qc.cswap(qubits[0], qubits[1], qubits[2])
 
     return qc
 

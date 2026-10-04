@@ -1,6 +1,7 @@
 import { useDrop } from 'react-dnd'
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import { X } from 'lucide-react'
+import { useState } from 'react'
 
 interface CellProps {
     qubitIndex: number
@@ -23,7 +24,7 @@ interface CellProps {
 
 //helper for better display
 function formatAngle(theta?: number) {
-    if (theta === undefined) return 'π/2'
+    if (theta === undefined) return '?'
 
     if (Math.abs(theta - Math.PI / 2) < 0.000001) return 'π/2'
     if (Math.abs(theta - Math.PI) < 0.000001) return 'π'
@@ -31,6 +32,64 @@ function formatAngle(theta?: number) {
     if (Math.abs(theta - 2 * Math.PI) < 0.000001) return '2π'
 
     return theta.toFixed(2)
+}
+
+function parseAngle(value: string): number | null {
+    const input = value
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/°$/, '')
+
+    if (!input) return null
+
+    // Direct number: radians
+    const numeric = Number(input)
+    if (!Number.isNaN(numeric)) {
+        return numeric
+    }
+
+    // π expressions
+    const normalized = input.replace(/π/g, 'pi')
+
+    if (normalized === 'pi') return Math.PI
+    if (normalized === '-pi') return -Math.PI
+
+    const match = normalized.match(/^(-?\d*\.?\d*)\/?pi?$/)
+
+    if (match) {
+        const numerator = match[1]
+
+        if (!numerator || numerator === '+') {
+            return Math.PI
+        }
+
+        if (numerator === '-') {
+            return -Math.PI
+        }
+
+        return Number(numerator) * Math.PI
+    }
+
+    // e.g. pi/2, 3pi/4, -pi/2
+    const piMatch = normalized.match(/^(-?\d*\.?\d*)pi\/(\d*\.?\d+)$/)
+
+    if (piMatch) {
+        const numerator =
+            piMatch[1] === '' || piMatch[1] === '+'
+                ? 1
+                : piMatch[1] === '-'
+                    ? -1
+                    : Number(piMatch[1])
+
+        const denominator = Number(piMatch[2])
+
+        if (denominator === 0) return null
+
+        return (numerator * Math.PI) / denominator
+    }
+
+    return null
 }
 
 export default function DropCell({
@@ -41,6 +100,35 @@ export default function DropCell({
 }: CellProps) {
     const addGate = useCircuitStore((state) => state.addGate)
     const removeGate = useCircuitStore((state) => state.removeGate)
+    const [rotationGate, setRotationGate] = useState<{
+        type: string
+        qubitIndex: number
+        stepIndex: number
+    } | null>(null)
+
+    const [angleInput, setAngleInput] = useState("π/2")
+
+    const handleRotationSubmit = () => {
+        if (!rotationGate) return
+
+        const theta = parseAngle(angleInput)
+
+        if (theta === null) {
+            return
+        }
+
+        addGate({
+            id: `${rotationGate.type}-q${rotationGate.qubitIndex}-s${rotationGate.stepIndex}-${Date.now()}`,
+            type: rotationGate.type,
+            qubits: [rotationGate.qubitIndex],
+            step: rotationGate.stepIndex,
+            params: {
+                theta,
+            },
+        })
+
+        setRotationGate(null)
+    }
 
     const gate = useCircuitStore((state) =>
         state.gates.find(
@@ -57,27 +145,44 @@ export default function DropCell({
             type: string
             gateType: string
         }) => {
-            if (item.gateType === 'cx' || item.gateType === 'cz' || item.gateType === 'swap' || item.gateType === 'ccx' || item.gateType === 'cswap') {
+            if (
+                item.gateType === 'cx' ||
+                item.gateType === 'cz' ||
+                item.gateType === 'swap' ||
+                item.gateType === 'ccx' ||
+                item.gateType === 'cswap'
+            ) {
                 setPendingGate({
                     type: item.gateType,
                     qubitIndex,
                     stepIndex,
-                    selectedQubits: [qubitIndex]
+                    selectedQubits: [qubitIndex],
                 })
-            } else {
-                addGate({
-                    id: `${item.gateType}-${pendingGate?.selectedQubits.join('-')}-s${stepIndex}-${Date.now()}`,
-                    type: item.gateType,
-                    qubits: pendingGate?.selectedQubits || [qubitIndex],
-                    step: stepIndex,
-                    ...(item.gateType === 'rx' || item.gateType === 'ry' || item.gateType === 'rz'
-                        ? {
-                            params: {
-                                theta: Math.PI / 2
-                            }
-                        } : {}),
-                })
+
+                return
             }
+
+            if (
+                item.gateType === 'rx' ||
+                item.gateType === 'ry' ||
+                item.gateType === 'rz'
+            ) {
+                setRotationGate({
+                    type: item.gateType,
+                    qubitIndex,
+                    stepIndex,
+                })
+
+                setAngleInput('π/2')
+                return
+            }
+
+            addGate({
+                id: `${item.gateType}-q${qubitIndex}-s${stepIndex}-${Date.now()}`,
+                type: item.gateType,
+                qubits: [qubitIndex],
+                step: stepIndex,
+            })
         },
 
         collect: (monitor) => ({
@@ -114,7 +219,7 @@ export default function DropCell({
     const isCXTarget =
         isCX &&
         gate?.qubits[1] === qubitIndex
-    
+
     const isCCXControl =
         gate?.type === 'ccx' &&
         (gate.qubits[0] === qubitIndex ||
@@ -195,6 +300,57 @@ export default function DropCell({
                 }
             `}
         >
+            {rotationGate && (
+                <div
+                    className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 border border-zinc-200 bg-white p-3 shadow-lg"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="mb-2">
+                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                            Rotation
+                        </div>
+
+                        <div className="mt-1 text-xs font-semibold text-zinc-900">
+                            {rotationGate.type.toUpperCase()}(θ)
+                        </div>
+                    </div>
+
+                    <input
+                        value={angleInput}
+                        onChange={(e) => setAngleInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleRotationSubmit()
+                            }
+
+                            if (e.key === 'Escape') {
+                                setRotationGate(null)
+                            }
+                        }}
+                        autoFocus
+                        className="h-8 w-full border border-zinc-200 bg-zinc-50 px-2 font-mono text-xs text-zinc-900 outline-none focus:border-blue-500"
+                        placeholder="π/2"
+                    />
+
+                    <div className="mt-2 flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setRotationGate(null)}
+                            className="flex-1 border border-zinc-200 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-500 hover:bg-zinc-50"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleRotationSubmit}
+                            className="flex-1 bg-zinc-950 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-white hover:bg-blue-600"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
             {/* Quantum wire */}
             <div className="absolute inset-x-0 top-1/2 z-0 h-px bg-zinc-300" />
 

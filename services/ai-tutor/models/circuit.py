@@ -29,7 +29,7 @@ class GateType(str, Enum):
     SWAP = "swap"
     # Three qubit
     CCX = "ccx"
-    TOFFOLI = "toffoli"
+    CSWAP = "cswap"
     # Non-unitary
     MEASURE = "measure"
     BARRIER = "barrier"

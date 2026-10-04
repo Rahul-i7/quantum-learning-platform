@@ -24,6 +24,7 @@ try:
     from ..tools.learner_profile_tool import get_learner_profile
     from ..personalization.engine import PersonalizationEngine
     from ..prompts.system_tutor import MASTER_TUTOR_SYSTEM_INSTRUCTION
+    from .circuit_builder import bloch_target_to_gates, extract_circuit_proposal, CIRCUIT_BUILDING_INSTRUCTION
     from ..prompts.debugger_prompt import DEBUGGER_PROMPT_TEMPLATE
     from ..prompts.explainer_prompt import EXPLAINER_PROMPT_TEMPLATE
     from ..prompts.optimizer_prompt import OPTIMIZER_PROMPT_TEMPLATE
@@ -42,6 +43,7 @@ except (ImportError, ValueError):
     from tools.learner_profile_tool import get_learner_profile
     from personalization.engine import PersonalizationEngine
     from prompts.system_tutor import MASTER_TUTOR_SYSTEM_INSTRUCTION
+    from core.circuit_builder import bloch_target_to_gates, extract_circuit_proposal, CIRCUIT_BUILDING_INSTRUCTION
     from prompts.debugger_prompt import DEBUGGER_PROMPT_TEMPLATE
     from prompts.explainer_prompt import EXPLAINER_PROMPT_TEMPLATE
     from prompts.optimizer_prompt import OPTIMIZER_PROMPT_TEMPLATE
@@ -176,6 +178,13 @@ class QuantumAITutor:
         reason = self.last_error or "AI model did not respond."
         return f"\n\n> **AI Tutor is offline** - showing the built-in explanation instead.  \n> Reason: {reason}"
 
+    @staticmethod
+    def _with_display_name(profile: Dict[str, Any], user_name: Optional[str]) -> Dict[str, Any]:
+        """Use the signed-in user's own name (first word) instead of whatever the stored profile says."""
+        if user_name and user_name.strip():
+            profile = {**profile, "name": user_name.strip().split()[0]}
+        return profile
+
     def is_gemini_connected(self) -> bool:
         return self.client is not None
 
@@ -184,16 +193,17 @@ class QuantumAITutor:
         message: str,
         circuit: Optional[CircuitDefinition] = None,
         history: Optional[List[ChatMessage]] = None,
-        user_id: str = "beginner_alex",
+        user_id: str = "default_learner",
         skill_override: Optional[SkillLevel] = None,
-        style_override: Optional[LearningStyle] = None
+        style_override: Optional[LearningStyle] = None,
+        user_name: Optional[str] = None
     ) -> TutorChatResponse:
         """
         Multi-turn conversational tutoring session.
         Uses Gemini with automatic tool-calling or heuristic pedagogical fallback.
         """
         # Fetch learner context
-        profile_data = get_learner_profile(user_id)
+        profile_data = self._with_display_name(get_learner_profile(user_id), user_name)
         pedagogical_context = PersonalizationEngine.get_pedagogical_context(
             profile_data, skill_override=skill_override, style_override=style_override
         )
@@ -206,12 +216,15 @@ class QuantumAITutor:
             # Pre-simulate so simulation data is ready for both Gemini and local response
             sim_dict = simulate_circuit(circuit_dict)
             sim_called = True
+            # The Qiskit simulation service returns `counts: null` (and may omit other
+            # fields) when the circuit has no measure gate, so use `or` fallbacks rather
+            # than .get(key, default), which only applies when the key is missing.
             circuit_sim_result = SimulationResult(
-                success=sim_dict.get("success", False),
-                num_qubits=sim_dict.get("num_qubits", 1),
+                success=bool(sim_dict.get("success", False)),
+                num_qubits=sim_dict.get("num_qubits") or circuit.num_qubits,
                 statevector_formatted=sim_dict.get("statevector_formatted"),
-                probabilities=sim_dict.get("probabilities", {}),
-                counts=sim_dict.get("counts", {}),
+                probabilities=sim_dict.get("probabilities") or {},
+                counts=sim_dict.get("counts") or {},
                 bloch_vectors=sim_dict.get("bloch_vectors"),
                 circuit_depth=sim_dict.get("circuit_depth"),
                 gate_count=sim_dict.get("gate_count"),
@@ -222,8 +235,11 @@ class QuantumAITutor:
             try:
                 system_instruction = (
                     f"{MASTER_TUTOR_SYSTEM_INSTRUCTION}\n\n"
+                    f"{CIRCUIT_BUILDING_INSTRUCTION}\n\n"
                     f"{pedagogical_context}\n\n"
                 )
+                if profile_data.get("name") and profile_data["name"] != "Student":
+                    system_instruction += f"The learner's name is {profile_data['name']}. Address them by this name when natural.\n\n"
                 if circuit_dict:
                     system_instruction += (
                         f"### CURRENT CIRCUIT ON CANVAS:\n"
@@ -248,17 +264,19 @@ class QuantumAITutor:
                     config=types.GenerateContentConfig(
                         system_instruction=system_instruction,
                         temperature=0.7,
-                        tools=[simulate_circuit, get_learner_profile, compare_circuits],
+                        tools=[simulate_circuit, get_learner_profile, compare_circuits, bloch_target_to_gates],
                     )
                 )
 
                 reply_text = response.text or "I inspected your circuit and quantum state."
+                reply_text, proposed_circuit = extract_circuit_proposal(reply_text)
 
                 # Generate follow-up suggestions
                 suggested_questions = self._extract_or_generate_questions(reply_text, circuit)
 
                 return TutorChatResponse(
                     response=reply_text,
+                    proposed_circuit=proposed_circuit,
                     simulation_called=sim_called,
                     simulation_result=circuit_sim_result,
                     suggested_questions=suggested_questions
@@ -276,15 +294,16 @@ class QuantumAITutor:
     def explain_circuit(
         self,
         circuit: Optional[CircuitDefinition] = None,
-        user_id: str = "beginner_alex",
+        user_id: str = "default_learner",
         query: Optional[str] = None,
         skill_override: Optional[SkillLevel] = None,
-        style_override: Optional[LearningStyle] = None
+        style_override: Optional[LearningStyle] = None,
+        user_name: Optional[str] = None
     ) -> ExplainResponse:
         """
         Explain a circuit's state evolution or a specific quantum concept.
         """
-        profile = get_learner_profile(user_id)
+        profile = self._with_display_name(get_learner_profile(user_id), user_name)
         pedagogical_context = PersonalizationEngine.get_pedagogical_context(
             profile, skill_override=skill_override, style_override=style_override
         )
@@ -335,7 +354,7 @@ class QuantumAITutor:
         self,
         circuit: CircuitDefinition,
         target_objective: str,
-        user_id: str = "beginner_alex",
+        user_id: str = "default_learner",
         reference_circuit: Optional[CircuitDefinition] = None
     ) -> DebugResponse:
         """

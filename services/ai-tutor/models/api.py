@@ -15,6 +15,7 @@ class ChatMessage(BaseModel):
 
 class TutorChatRequest(BaseModel):
     user_id: Optional[str] = "default_learner"
+    user_name: Optional[str] = Field(default=None, description="Display name to address the learner by")
     message: str = Field(..., description="Student's prompt or question")
     circuit: Optional[CircuitDefinition] = Field(
         default=None, description="Current circuit loaded on the learner canvas"
@@ -28,6 +29,9 @@ class TutorChatRequest(BaseModel):
 
 class TutorChatResponse(BaseModel):
     response: str
+    proposed_circuit: Optional[CircuitDefinition] = Field(
+        default=None, description="Circuit the tutor built on request; the frontend can apply it to the canvas"
+    )
     simulation_called: bool = False
     simulation_result: Optional[SimulationResult] = None
     suggested_questions: List[str] = Field(default_factory=list)
@@ -35,6 +39,7 @@ class TutorChatResponse(BaseModel):
 
 class ExplainRequest(BaseModel):
     user_id: Optional[str] = "default_learner"
+    user_name: Optional[str] = None
     concept_or_circuit_query: Optional[str] = None
     circuit: Optional[CircuitDefinition] = None
     skill_level: Optional[SkillLevel] = None

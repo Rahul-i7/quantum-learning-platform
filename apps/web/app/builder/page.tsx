@@ -12,7 +12,8 @@ import MeasurementHistogram from '@/components/visualizations/MeasurementHistogr
 import BlochSphereVisualizer from '@/components/visualizations/BlochSphereVisualizer'
 import { useCircuitStore } from '@/lib/store/circuit-store'
 import NavBar from '@/components/nav/NavBar'
-import AIExplanation from '@/components/circuit-builder/AIExplanation'
+import AIChat, { type ChatMsg, type ProposedCircuit } from '@/components/circuit-builder/AIChat'
+import { useAuth } from '@/lib/supabase/AuthProvider'
 import TemplateLoader from '@/components/circuit-builder/TemplateLoader'
 
 export default function BuilderPage() {
@@ -27,8 +28,12 @@ export default function BuilderPage() {
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [messages, setMessages] = useState<ChatMsg[]>([])
     const [aiExplanation, setAiExplanation] = useState<string | null>(null)
     const [aiLoading, setAiLoading] = useState(false)
+    const { user, profile } = useAuth()
+    const userName = profile?.name && profile.name !== 'Learner' ? profile.name : undefined
+    const userId = user?.id ?? 'default_learner'
 
     const MIN_QUBITS = 1
     const MAX_QUBITS = 6
@@ -42,8 +47,15 @@ export default function BuilderPage() {
         setError(null)
     }
 
-    const handleRunSimulation = async () => {
-        if (store.gates.length === 0) {
+    const toApiGates = (gates: typeof store.gates) => 
+        [...gates].sort((a, b) => a.step - b.step).map((g) => ({
+            type: g.type.toLowerCase(),
+            qubits: g.qubits,
+            ...(g.params?.theta !== undefined ? {params: [g.params.theta]} : {}),
+        }))
+
+    const runSimulation = async (numQubits: number, gates: typeof store.gates) => {
+        if (gates.length === 0) {
             setError('Please place at least one gate on the circuit canvas before running.')
             return
         }
@@ -51,24 +63,12 @@ export default function BuilderPage() {
         setLoading(true)
         setError(null)
         try {
-            const formattedGates = [...store.gates]
-                .sort((a, b) => a.step - b.step)
-                .map((g) => ({
-                    type: g.type.toLowerCase(),
-                    qubits: g.qubits,
-                    ...(g.params?.theta !== undefined
-                        ? {
-                            params: [g.params.theta],
-                        }
-                        : {}),
-                }))
-
             const res = await fetch('/api/simulate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    num_qubits: store.numQubits,
-                    gates: formattedGates,
+                    num_qubits: numQubits,
+                    gates: toApiGates(gates),
                 }),
             })
 
@@ -85,38 +85,95 @@ export default function BuilderPage() {
         }
     }
 
-    const handleAskAi = async () => {
-        if (store.gates.length === 0) {
-            setError('Place at least one gate before asking for an explanation.')
-            return
-        }
+    const handleRunSimulation = () => runSimulation(store.numQubits, store.gates)
+
+    const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2,7)}`
+
+    const sendToTutor = async (text: string) => {
+        const userMsg: ChatMsg = { id: newId(), role: 'user', content: text }
+        const history = [...messages, userMsg]
+        setMessages(history)
         setAiLoading(true)
-        setAiExplanation(null)
         setError(null)
         try {
-            const formattedGates = [...store.gates]
-                .sort((a, b) => a.step - b.step)
-                .map((g) => ({ type: g.type.toLowerCase(), qubits: g.qubits }))
-
-            const res = await fetch('/api/tutor/explain', {
+            const res = await fetch('/api/tutor/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    circuit: { num_qubits: store.numQubits, gates: formattedGates },
-                    concept_or_circuit_query: 'Explain this circuit step-by-step and what it computes',
-                    user_id: 'beginner_alex',
+                    message: text,
+                    history: messages.slice(-10).map((m) => ({role: m.role, content: m.content})),
+                    circuit: 
+                        store.gates.length > 0
+                        ? { num_qubits: store.numQubits, gates: toApiGates(store.gates)}
+                        : null,
+                    user_id: userId,
+                    user_name: userName,
                 }),
             })
-
             const data = await res.json()
-
-            if (!res.ok) throw new Error(data.detail || data.error || `AI explain failed: ${res.status}`)
-            setAiExplanation(data.explanation ?? JSON.stringify(data))
+            if (!res.ok) throw new Error(data.detail || data.error || `AI tutor chat failed: ${res.status}`)
+            setMessages([
+                ...history,
+                {
+                    id: newId(),
+                    role: 'model',
+                    content: data.response ?? JSON.stringify(data),
+                    proposedCircuit: data.proposed_circuit ?? null,
+                    suggestions: data.suggested_questions ?? []
+                },
+            ])
         } catch (err: any) {
             setError(err?.message || 'AI tutor is unavailable')
         } finally {
             setAiLoading(false)
         }
+    }
+
+    const handleAskAi = async () => {
+        if (store.gates.length === 0) {
+            setError('Place at least one gate before asking for an explanation.')
+            return
+        }
+        sendToTutor('Explain this circuit step-by-step and what it computes')
+    }
+
+    const handleApplyCircuit = (messageId: string, circuit: ProposedCircuit) => {
+        const numQubits = Math.max(MIN_QUBITS, Math.min(MAX_QUBITS, circuit.num_qubits))
+
+        const MAX_STEPS = 8
+        const nextFree: number[] = Array(numQubits).fill(0)
+        const placed: typeof store.gates = []
+        let overflow = false
+        circuit.gates.forEach((g, i) => {
+            const lo = Math.min(...g.qubits)
+            const hi = Math.max(...g.qubits)
+            
+            const span = Array.from({ length: hi - lo + 1 }, (_, k) => lo + k)
+            const step = Math.max(...span.map((q) => nextFree[q] ?? 0))
+            if (step >= MAX_STEPS) {
+                overflow = true
+                return
+            }
+            span.forEach((q) => (nextFree[q] = step + 1))
+            const type = g.type.toLowerCase()
+            placed.push({
+                id: `${type}-${g.qubits.join('-')}-s${step}-${i}-${Date.now()}`,
+                type,
+                qubits: g.qubits,
+                step,
+                ...(g.params && g.params.length > 0 ? { params: { theta: g.params[0] } } : {}),
+            })
+        })
+
+        store.loadCircuit(numQubits, placed)
+        setSimulationResult(null)
+        setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, applied: true } : m)))
+        if (overflow) {
+            setError('Part of that circuit did not fit in the 8 available steps and was left out.')
+        } else {
+            setError(null)
+        }
+        runSimulation(numQubits, placed)
     }
 
     const handleClearCircuit = () => {
@@ -286,103 +343,27 @@ export default function BuilderPage() {
                                         </div>
 
                                         <div className="mt-1 text-sm font-semibold text-zinc-900">
-                                            AI Explanation
+                                            AI Tutor
                                         </div>
                                     </div>
 
                                     <div
                                         className={`h-1.5 w-1.5 rounded-full ${aiLoading
                                             ? 'animate-pulse bg-blue-500'
-                                            : aiExplanation
+                                            : messages.length > 0
                                                 ? 'bg-emerald-500'
                                                 : 'bg-zinc-300'
                                             }`}
                                     />
                                 </div>
 
-                                <div className="flex min-h-105 max-h-105 overflow-y-auto flex-col">
-                                    {aiLoading ? (
-                                        /* Loading */
-                                        <div className="flex flex-1 flex-col p-5">
-                                            <div className="mb-6 flex items-center gap-2">
-                                                <div className="h-px w-5 bg-blue-500" />
-
-                                                <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-600">
-                                                    Analyzing circuit
-                                                </span>
-                                            </div>
-
-                                            <div className="space-y-3">
-                                                <div className="h-2 w-3/4 animate-pulse bg-zinc-100" />
-                                                <div className="h-2 w-full animate-pulse bg-zinc-100" />
-                                                <div className="h-2 w-5/6 animate-pulse bg-zinc-100" />
-                                                <div className="h-2 w-2/3 animate-pulse bg-zinc-100" />
-                                            </div>
-
-                                            <div className="mt-auto border-t border-zinc-100 pt-4">
-                                                <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
-                                                    Reading gate sequence...
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ) : aiExplanation ? (
-                                        /* Explanation */
-                                        <div className="flex flex-1 flex-col">
-                                            <div className="border-b border-zinc-100 px-5 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-emerald-600">
-                                                        Analysis complete
-                                                    </span>
-
-                                                    <span className="h-px flex-1 bg-zinc-100" />
-                                                </div>
-                                            </div>
-
-                                            <div className="flex-1 overflow-y-auto px-5 py-5">
-                                                <AIExplanation content={aiExplanation} />
-                                            </div>
-
-                                            <div className="border-t border-zinc-100 px-5 py-3">
-                                                <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
-                                                    Generated from current circuit
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        /* Empty */
-                                        <div className="flex flex-1 flex-col p-5">
-                                            <div className="flex flex-1 flex-col items-center justify-center text-center">
-                                                <div className="mb-5 flex h-10 w-10 items-center justify-center border border-zinc-200 bg-zinc-50">
-                                                    <Sparkle className="h-4 w-4 text-blue-600" />
-                                                </div>
-
-                                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                                                    No analysis yet
-                                                </div>
-
-                                                <p className="mt-3 max-w-[210px] text-sm font-medium leading-5 text-zinc-800">
-                                                    Let QMentor explain what your circuit is doing.
-                                                </p>
-
-                                                <p className="mt-2 max-w-[210px] text-xs leading-5 text-zinc-400">
-                                                    Add gates to the register, then ask the AI to analyze the
-                                                    resulting quantum operation.
-                                                </p>
-                                            </div>
-
-                                            <div className="border-t border-zinc-100 pt-4">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-400">
-                                                        AI Tutor
-                                                    </span>
-
-                                                    <span className="font-mono text-[8px] text-zinc-300">
-                                                        READY
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                <div className="flex h-105 flex-col">
+                                    <AIChat 
+                                        messages={messages}
+                                        loading={aiLoading}
+                                        onSend={sendToTutor}
+                                        onApply={handleApplyCircuit}
+                                    />
                                 </div>
                             </aside>
                         </div>
