@@ -3,6 +3,7 @@
 import { LogOut, User as UserIcon, Settings } from 'lucide-react'
 import { useAuth } from '@/lib/supabase/AuthProvider'
 import Link from 'next/link'
+import ThemeToggle from '../ThemeToggle'
 
 export default function ProfileMenu() {
     const { user, profile, role, signOut } = useAuth()
@@ -35,17 +36,20 @@ export default function ProfileMenu() {
             <div className="w-full h-px bg-zinc-200" />
             <div className='flex flex-col p-1'>
                 {items.map((item) => (
-                    <Link key={item.label} href={item.href} className="px-3 py-2 rounded-md flex text-sm cursor-pointer hover:bg-zinc-100 items-center gap-4 text-zinc-600">
+                    <Link key={item.label} href={item.href} className="px-3 py-2 rounded-md flex text-sm cursor-pointer hover:bg-zinc-200/80 items-center gap-4 text-zinc-600">
                         <item.icon className="h-4 w-4" strokeWidth={1.7} />
                         <span>{item.label}</span>
                     </Link>
                 ))}
             </div>
+            <div className="p-1">
+                <ThemeToggle expand={true} />
+            </div>
             <div className="w-full h-px bg-zinc-200" />
             <div className="p-1">
                 <button
                     onClick={() => signOut()}
-                    className="cursor-pointer flex h-9 w-full items-center gap-2 rounded-md px-3 py-2  text-sm text-zinc-600 transition-color hover:bg-zinc-100"
+                    className="cursor-pointer flex h-9 w-full items-center gap-2 rounded-md px-3 py-2  text-sm text-zinc-600 transition-color hover:bg-zinc-200/80"
                     title={user?.email ?? undefined}
                 >
                     <LogOut

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/supabase/AuthProvider";
+import Provider from "../components/Provider";
 import 'katex/dist/katex.min.css'
 
 const poppins = Poppins({
@@ -23,11 +24,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${poppins.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-gray-50 overflow-x-hidden">
         <AuthProvider>
-          <div className="flex flex-1 flex-col overflow-x-hidden">{children}</div>
+          <Provider>
+            <div className="flex flex-1 flex-col overflow-x-hidden">{children}</div>
+          </Provider>
         </AuthProvider>
       </body>
     </html>

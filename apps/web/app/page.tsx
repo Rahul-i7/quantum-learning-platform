@@ -98,18 +98,6 @@ export default function Home() {
 
             {/* HERO */}
             <section className="relative overflow-hidden border-b border-zinc-200 bg-[#0b0d10] text-white">
-                {/* <div className="pointer-events-none absolute inset-0">
-                    <div
-                        className="absolute inset-0 opacity-[0.05]"
-                        style={{
-                            backgroundImage: `
-                                linear-gradient(rgba(255,255,255,.7) 1px, transparent 1px),
-                                linear-gradient(90deg, rgba(255,255,255,.7) 1px, transparent 1px)
-                            `,
-                            backgroundSize: "48px 48px",
-                        }}
-                    />
-                </div> */}
                 <AnimatedQuantumGrid />
 
                 <div className="relative mx-auto max-w-7xl px-6">
