@@ -279,7 +279,7 @@ export const TOPICS: Topic[] = [
 
     {
         id: "gate-s",
-        title: "S (Phase)",
+        title: "S — Phase",
         category: "gates",
         summary: "A quarter-turn of relative phase — leaves |0⟩ and |1⟩ probabilities untouched.",
         body: [
@@ -305,7 +305,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-sdg",
-        title: "S† (S Dagger)",
+        title: "S† — S Dagger",
         category: "gates",
         summary: "The inverse of S — undoes exactly the phase rotation S applies.",
         body: [
@@ -331,7 +331,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-t",
-        title: "T",
+        title: "T — Gate",
         category: "gates",
         summary: "An eighth-turn of relative phase — half the rotation of S.",
         body: [
@@ -356,7 +356,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-tdg",
-        title: "T† (T Dagger)",
+        title: "T† — T Dagger",
         category: "gates",
         summary: "The inverse of T — rotates relative phase by -π/4 instead of +π/4.",
         body: [
@@ -456,7 +456,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-cz",
-        title: "CZ (Controlled-Z)",
+        title: "CZ — Controlled-Z",
         category: "gates",
         summary: "Flips the relative phase of |11⟩ only — symmetric between its two qubits.",
         body: [
@@ -487,7 +487,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-swap",
-        title: "SWAP",
+        title: "SWAP Gate",
         category: "gates",
         summary: "Exchanges the states of two qubits entirely.",
         body: [
@@ -518,7 +518,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-ccx",
-        title: "CCX (Toffoli)",
+        title: "Toffoli — Controlled-CX",
         category: "gates",
         summary: "Flips the target only when BOTH of two controls are |1⟩ — the quantum AND gate.",
         body: [
@@ -543,7 +543,7 @@ export const TOPICS: Topic[] = [
     },
     {
         id: "gate-cswap",
-        title: "Fredkin (Controlled-SWAP)",
+        title: "Fredkin — Controlled-SWAP",
         category: "gates",
         summary: "Swaps two qubits, but only when a third control qubit is |1⟩.",
         body: [
