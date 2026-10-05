@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { ArrowDown, Atom } from 'lucide-react'
 import AnimatedQuantumGrid from '../ui/AnimatedQuantumGrid'
-import { ReturnDocument } from 'mongodb'
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
