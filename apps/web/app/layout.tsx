@@ -27,10 +27,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${poppins.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50 overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-[#fafafa] dark:bg-[#0a0a0a] overflow-x-hidden">
         <AuthProvider>
           <Provider>
-            <div className="flex flex-1 flex-col overflow-x-hidden">{children}</div>
+            <div className="flex flex-1 flex-col overflow-x-clip">{children}</div>
           </Provider>
         </AuthProvider>
       </body>

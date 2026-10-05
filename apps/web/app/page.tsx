@@ -90,14 +90,14 @@ export default function Home() {
     const [activePreset, setActivePreset] = useState<Preset>("superposition");
 
     return (
-        <main className="min-h-screen bg-[#fafafa] text-zinc-950 overflow-x-hidden">
+        <main className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-zinc-950 dark:text-zinc-100 overflow-x-hidden">
             {/* Interactive Particle Cursor Trail */}
             <QuantumCursorTrail />
 
             <NavBar />
 
             {/* HERO */}
-            <section className="relative overflow-hidden border-b border-zinc-200 bg-[#0b0d10] text-white">
+            <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800 bg-[#0b0d10] text-white">
                 <AnimatedQuantumGrid />
 
                 <div className="relative mx-auto max-w-7xl px-6">
@@ -227,7 +227,7 @@ export default function Home() {
             {/* INTRO — WHY QMENTOR                                              */}
             {/* ================================================================ */}
 
-            <section className="border-b border-zinc-200 bg-white">
+            <section className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0a]">
                 <div className="mx-auto max-w-7xl px-6 py-24 lg:py-32">
                     <motion.div
                         initial="hidden"
@@ -241,12 +241,12 @@ export default function Home() {
                             variants={fadeInUp}
                             className="lg:col-span-4"
                         >
-                            <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600">
+                            <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                 / 01 — Why this exists
                             </div>
 
                             <div className="mt-8 hidden lg:block">
-                                <div className="h-px w-16 bg-zinc-200" />
+                                <div className="h-px w-16 bg-zinc-200 dark:bg-zinc-700" />
                                 <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                                     abstraction → interaction
                                 </div>
@@ -258,12 +258,12 @@ export default function Home() {
                             variants={fadeInUp}
                             className="lg:col-span-7 lg:col-start-6"
                         >
-                            <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] tracking-[-0.035em] text-zinc-950 sm:text-4xl lg:text-[2.75rem]">
+                            <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] tracking-[-0.035em] text-zinc-950 dark:text-zinc-100 sm:text-4xl lg:text-[2.75rem]">
                                 Quantum computing becomes easier to understand when you can
-                                <span className="text-zinc-400"> see what the mathematics is doing.</span>
+                                <span className="text-zinc-400 dark:text-zinc-500"> see what the mathematics is doing.</span>
                             </h2>
 
-                            <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-500">
+                            <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-500 dark:text-zinc-400">
                                 Instead of jumping between equations, documentation and
                                 simulators, experiment directly. Change a gate. Watch the
                                 state change. Run the circuit. See the result.
@@ -277,17 +277,17 @@ export default function Home() {
                         whileInView="visible"
                         viewport={{ once: true, margin: "-100px" }}
                         variants={staggerContainer}
-                        className="mt-20 grid border border-zinc-200 bg-[#f5f5f3] lg:grid-cols-12"
+                        className="mt-20 grid border border-zinc-200 dark:border-zinc-800 bg-[#f5f5f3] dark:bg-[#111111] lg:grid-cols-12"
                     >
                         {/* Circuit side */}
                         <motion.div
                             variants={fadeInUp}
-                            className="relative overflow-hidden border-b border-zinc-200 p-6 sm:p-8 lg:col-span-7 lg:border-b-0 lg:border-r"
+                            className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 lg:col-span-7 lg:border-b-0 lg:border-r"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <CircleDot className="h-4 w-4 text-blue-600" strokeWidth={1.5} />
-                                    <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                                    <CircleDot className="h-4 w-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
+                                    <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                                         Circuit state
                                     </span>
                                 </div>
@@ -297,24 +297,24 @@ export default function Home() {
                                 </span>
                             </div>
 
-                            <div className="relative mt-12 overflow-hidden border-y border-zinc-200 bg-white py-10">
+                            <div className="relative mt-12 overflow-hidden border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0c] py-10">
                                 {/* horizontal wire */}
-                                <div className="absolute left-8 right-8 top-1/2 h-px bg-zinc-300" />
+                                <div className="absolute left-8 right-8 top-1/2 h-px bg-zinc-300 dark:bg-zinc-700" />
 
                                 <div className="relative flex items-center justify-center gap-10 sm:gap-16">
                                     <div className="font-mono text-xs text-zinc-400">
                                         q₀
                                     </div>
 
-                                    <div className="flex h-12 w-12 items-center justify-center border border-zinc-300 bg-white font-mono text-sm text-zinc-900 shadow-sm">
+                                    <div className="flex h-12 w-12 items-center justify-center border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-mono text-sm text-zinc-900 dark:text-zinc-200 shadow-sm">
                                         H
                                     </div>
 
-                                    <div className="flex h-12 w-12 items-center justify-center border border-blue-200 bg-blue-50 font-mono text-sm text-blue-600">
+                                    <div className="flex h-12 w-12 items-center justify-center border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 font-mono text-sm text-blue-600 dark:text-blue-400">
                                         ×
                                     </div>
 
-                                    <div className="flex h-12 w-12 items-center justify-center border border-zinc-300 bg-white font-mono text-sm text-zinc-900 shadow-sm">
+                                    <div className="flex h-12 w-12 items-center justify-center border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-mono text-sm text-zinc-900 dark:text-zinc-200 shadow-sm">
                                         M
                                     </div>
                                 </div>
@@ -325,7 +325,7 @@ export default function Home() {
                                     H → X → Measure
                                 </span>
 
-                                <span className="text-blue-600">
+                                <span className="text-blue-600 dark:text-blue-400">
                                     ready
                                 </span>
                             </div>
@@ -336,9 +336,9 @@ export default function Home() {
                             variants={fadeInUp}
                             className="lg:col-span-5"
                         >
-                            <div className="border-b border-zinc-200 p-6 sm:p-8">
+                            <div className="border-b border-zinc-200 dark:border-zinc-800 p-6 sm:p-8">
                                 <div className="flex items-center justify-between">
-                                    <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                                    <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                                         State representation
                                     </span>
 
@@ -349,11 +349,11 @@ export default function Home() {
                                 </div>
 
                                 <div className="mt-10">
-                                    <div className="font-mono text-2xl tracking-tight text-zinc-950">
+                                    <div className="font-mono text-2xl tracking-tight text-zinc-950 dark:text-zinc-100">
                                         |ψ⟩ = α|0⟩ + β|1⟩
                                     </div>
 
-                                    <p className="mt-4 text-sm leading-6 text-zinc-500">
+                                    <p className="mt-4 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                                         The state is no longer just an equation.
                                         It becomes something you can inspect.
                                     </p>
@@ -366,25 +366,25 @@ export default function Home() {
                                         P(|0⟩)
                                     </div>
 
-                                    <div className="mt-3 font-mono text-2xl text-zinc-950">
+                                    <div className="mt-3 font-mono text-2xl text-zinc-950 dark:text-zinc-100">
                                         50.0%
                                     </div>
 
-                                    <div className="mt-4 h-1 bg-zinc-200">
+                                    <div className="mt-4 h-1 bg-zinc-200 dark:bg-zinc-800">
                                         <div className="h-full w-1/2 bg-blue-500" />
                                     </div>
                                 </div>
 
-                                <div className="border-l border-zinc-200 p-6 sm:p-8">
+                                <div className="border-l border-zinc-200 dark:border-zinc-800 p-6 sm:p-8">
                                     <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                                         P(|1⟩)
                                     </div>
 
-                                    <div className="mt-3 font-mono text-2xl text-zinc-950">
+                                    <div className="mt-3 font-mono text-2xl text-zinc-950 dark:text-zinc-100">
                                         50.0%
                                     </div>
 
-                                    <div className="mt-4 h-1 bg-zinc-200">
+                                    <div className="mt-4 h-1 bg-zinc-200 dark:bg-zinc-800">
                                         <div className="h-full w-1/2 bg-blue-500" />
                                     </div>
                                 </div>
@@ -399,7 +399,7 @@ export default function Home() {
             {/* WORKFLOW — BUILD / VISUALIZE / UNDERSTAND                        */}
             {/* ================================================================ */}
 
-            <section className="border-b border-zinc-200 bg-[#f5f5f3]">
+            <section className="border-b border-zinc-200 dark:border-zinc-800 bg-[#f5f5f3] dark:bg-[#0c0c0c]">
                 <div className="mx-auto max-w-7xl px-6 py-24 lg:py-32">
 
                     <motion.div
@@ -410,11 +410,11 @@ export default function Home() {
                         className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end"
                     >
                         <div>
-                            <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600">
+                            <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                 / 02 — Workflow
                             </div>
 
-                            <h2 className="mt-4 max-w-xl text-3xl font-medium tracking-[-0.035em] text-zinc-950 sm:text-4xl">
+                            <h2 className="mt-4 max-w-xl text-3xl font-medium tracking-[-0.035em] text-zinc-950 dark:text-zinc-100 sm:text-4xl">
                                 From idea to circuit.
                             </h2>
                         </div>
@@ -430,13 +430,13 @@ export default function Home() {
                         whileInView="visible"
                         viewport={{ once: true, margin: "-50px" }}
                         variants={staggerContainer}
-                        className="mt-14 grid border-l border-t border-zinc-300 md:grid-cols-3"
+                        className="mt-14 grid border-l border-t border-zinc-300 dark:border-zinc-800 md:grid-cols-3"
                     >
                         {FEATURES.map(({ number, icon: Icon, title, description }, index) => (
                             <motion.div
                                 key={title}
                                 variants={fadeInUp}
-                                className="group relative min-h-90 overflow-hidden border-b border-r border-zinc-300 bg-[#f5f5f3] p-8 transition-colors duration-300 hover:bg-white"
+                                className="group relative min-h-90 overflow-hidden border-b border-r border-zinc-300 dark:border-zinc-800 bg-[#f5f5f3] dark:bg-[#0c0c0c] p-8 transition-colors duration-300 hover:bg-white dark:hover:bg-[#141414]"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between">
@@ -455,17 +455,17 @@ export default function Home() {
                                 <div className="mt-10 h-24">
                                     {index === 0 && (
                                         <div className="relative h-full">
-                                            <div className="absolute left-0 right-0 top-1/2 h-px bg-zinc-300" />
+                                            <div className="absolute left-0 right-0 top-1/2 h-px bg-zinc-300 dark:bg-zinc-700" />
 
-                                            <div className="absolute left-[18%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-zinc-300 bg-white font-mono text-xs transition-transform duration-300 group-hover:translate-y-[-65%]">
+                                            <div className="absolute left-[18%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-mono text-xs dark:text-zinc-200 transition-transform duration-300 group-hover:translate-y-[-65%]">
                                                 H
                                             </div>
 
-                                            <div className="absolute left-[52%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-blue-200 bg-blue-50 font-mono text-xs text-blue-600 transition-transform duration-300 group-hover:translate-y-[-65%]">
+                                            <div className="absolute left-[52%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 font-mono text-xs text-blue-600 dark:text-blue-400 transition-transform duration-300 group-hover:translate-y-[-65%]">
                                                 X
                                             </div>
 
-                                            <div className="absolute right-[10%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-zinc-300 bg-white font-mono text-xs transition-transform duration-300 group-hover:translate-y-[-65%]">
+                                            <div className="absolute right-[10%] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-mono text-xs dark:text-zinc-200 transition-transform duration-300 group-hover:translate-y-[-65%]">
                                                 M
                                             </div>
                                         </div>
@@ -476,7 +476,7 @@ export default function Home() {
                                             {[28, 48, 72, 55, 84, 42, 66, 35].map((height, i) => (
                                                 <div
                                                     key={i}
-                                                    className="flex-1 bg-zinc-300 transition-all duration-500 group-hover:bg-blue-400"
+                                                    className="flex-1 bg-zinc-300 dark:bg-zinc-700 transition-all duration-500 group-hover:bg-blue-400 dark:group-hover:bg-blue-600"
                                                     style={{ height: `${height}%` }}
                                                 />
                                             ))}
@@ -485,11 +485,11 @@ export default function Home() {
 
                                     {index === 2 && (
                                         <div className="relative flex h-full items-center justify-center">
-                                            <div className="absolute h-20 w-20 rounded-full border border-zinc-300 transition-all duration-500 group-hover:h-24 group-hover:w-24 group-hover:border-blue-300" />
+                                            <div className="absolute h-20 w-20 rounded-full border border-zinc-300 dark:border-zinc-700 transition-all duration-500 group-hover:h-24 group-hover:w-24 group-hover:border-blue-300 dark:group-hover:border-blue-700" />
 
                                             <div className="absolute h-2 w-2 rounded-full bg-blue-500" />
 
-                                            <div className="absolute h-28 w-28 rotate-45 border border-dashed border-zinc-300 transition-transform duration-500 group-hover:rotate-90" />
+                                            <div className="absolute h-28 w-28 rotate-45 border border-dashed border-zinc-300 dark:border-zinc-700 transition-transform duration-500 group-hover:rotate-90" />
                                         </div>
                                     )}
                                 </div>
@@ -497,11 +497,11 @@ export default function Home() {
 
                                 {/* Content */}
                                 <div className="mt-10">
-                                    <h3 className="text-2xl font-medium tracking-tight text-zinc-950">
+                                    <h3 className="text-2xl font-medium tracking-tight text-zinc-950 dark:text-zinc-100">
                                         {title}
                                     </h3>
 
-                                    <p className="mt-4 max-w-sm text-sm leading-6 text-zinc-500">
+                                    <p className="mt-4 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                                         {description}
                                     </p>
                                 </div>
@@ -519,7 +519,7 @@ export default function Home() {
             {/* TECHNICAL SECTION                                                 */}
             {/* ================================================================ */}
 
-            <section className="bg-[#0b0d10] text-white">
+            <section className="bg-[#0b0d10] text-white border-b border-zinc-200 dark:border-zinc-800">
                 <div className="mx-auto max-w-7xl px-6 py-24 lg:py-28">
 
                     <motion.div
@@ -711,7 +711,7 @@ export default function Home() {
             {/* FINAL CTA                                                          */}
             {/* ================================================================ */}
 
-            <section className="bg-white">
+            <section className="bg-white dark:bg-[#0a0a0a]">
                 <div className="mx-auto max-w-7xl px-6 py-28 lg:py-36">
 
                     <motion.div
@@ -719,11 +719,11 @@ export default function Home() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.7 }}
-                        className="group relative overflow-hidden border border-zinc-200 bg-[#f5f5f3]"
+                        className="group relative overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-[#f5f5f3] dark:bg-[#111111]"
                     >
                         {/* Technical grid */}
                         <div
-                            className="pointer-events-none absolute inset-0 opacity-[0.035]"
+                            className="pointer-events-none absolute inset-0 opacity-[0.035] dark:invert"
                             style={{
                                 backgroundImage: `
                         linear-gradient(#000 1px, transparent 1px),
@@ -739,11 +739,11 @@ export default function Home() {
                         <div className="relative grid lg:grid-cols-12">
 
                             <div className="px-8 py-16 sm:px-14 lg:col-span-8 lg:py-20">
-                                <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600">
+                                <div className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                     / Start experimenting
                                 </div>
 
-                                <h2 className="mt-5 max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.045em] text-zinc-950 sm:text-5xl lg:text-6xl">
+                                <h2 className="mt-5 max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.045em] text-zinc-950 dark:text-zinc-100 sm:text-5xl lg:text-6xl">
                                     Do not just learn what a qubit is.
                                     <br />
                                     <span className="text-zinc-400">
@@ -754,7 +754,7 @@ export default function Home() {
                                 <div className="mt-9">
                                     <Link
                                         href="/builder"
-                                        className="group/btn inline-flex items-center gap-3 bg-zinc-950 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-blue-600"
+                                        className="group/btn inline-flex items-center gap-3 bg-zinc-950 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-blue-600 dark:bg-zinc-100 dark:text-zinc-950"
                                     >
                                         Launch the builder
 
@@ -766,18 +766,18 @@ export default function Home() {
                             </div>
 
                             {/* CTA visual */}
-                            <div className="relative hidden overflow-hidden border-l border-zinc-200 lg:col-span-4 lg:block">
+                            <div className="relative hidden overflow-hidden border-l border-zinc-200 dark:border-zinc-800 lg:col-span-4 lg:block">
 
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="relative h-52 w-52">
 
-                                        <div className="absolute inset-0 rounded-full border border-zinc-300" />
+                                        <div className="absolute inset-0 rounded-full border border-zinc-300 dark:border-zinc-700" />
 
-                                        <div className="absolute inset-8 rounded-full border border-zinc-300" />
+                                        <div className="absolute inset-8 rounded-full border border-zinc-300 dark:border-zinc-700" />
 
-                                        <div className="absolute left-1/2 top-1/2 h-px w-full -translate-x-1/2 bg-zinc-300" />
+                                        <div className="absolute left-1/2 top-1/2 h-px w-full -translate-x-1/2 bg-zinc-300 dark:bg-zinc-700" />
 
-                                        <div className="absolute left-1/2 top-1/2 h-full w-px -translate-y-1/2 bg-zinc-300" />
+                                        <div className="absolute left-1/2 top-1/2 h-full w-px -translate-y-1/2 bg-zinc-300 dark:bg-zinc-700" />
 
                                         <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500 shadow-[0_0_0_6px_rgba(59,130,246,0.08)]" />
 
@@ -805,13 +805,13 @@ export default function Home() {
             {/* FOOTER                                                             */}
             {/* ================================================================ */}
 
-            <footer className="border-t border-zinc-200 bg-white">
+            <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0a]">
                 <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
 
                     <div className="flex items-center gap-2">
-                        <Atom className="h-4 w-4 text-blue-600" />
+                        <Atom className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 
-                        <span className="font-medium text-sm text-zinc-800">
+                        <span className="font-medium text-sm text-zinc-800 dark:text-zinc-200">
                             QMentor
                         </span>
                     </div>

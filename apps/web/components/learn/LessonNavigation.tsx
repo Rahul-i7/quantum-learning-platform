@@ -11,11 +11,11 @@ interface LessonNavigationProps {
 
 export default function LessonNavigation({ prevTopic, nextTopic, onPrevious, onNext }: LessonNavigationProps) {
     return (
-        <div className="mt-10 flex items-center justify-between border-t border-gray-100 pt-6">
+        <div className="mt-10 flex items-center justify-between border-t border-gray-100 dark:border-zinc-800 pt-6">
             {prevTopic ? (
                 <button
                     onClick={onPrevious}
-                    className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-xs font-semibold text-gray-700 dark:text-zinc-300 transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     <span className="truncate max-w-30 sm:max-w-none">{prevTopic.title}</span>

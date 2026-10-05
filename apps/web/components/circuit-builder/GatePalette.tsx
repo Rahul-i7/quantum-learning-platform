@@ -147,15 +147,15 @@ function DraggableGate({ gate }: { gate: Gate }) {
 
     return (
         <div className={`group relative ${isDragging ? 'opacity-40' : 'opacity-100'}`}>
-            <div ref={drag as any} className="flex cursor-grab items-center gap-3 border-b border-zinc-200 px-1 py-3 transition-colors hover:bg-zinc-100/90 active:cursor-grabbing">
+            <div ref={drag as any} className="flex cursor-grab items-center gap-3 border-b border-zinc-200 px-1 py-3 transition-colors hover:bg-zinc-100/90 active:cursor-grabbing dark:border-zinc-800 dark:hover:bg-zinc-800/90">
                 {/* Gate symbol */}
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-zinc-300 bg-white font-mono text-xs font-semibold text-zinc-900 transition-all group-hover:border-blue-500 group-hover:text-blue-600">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-zinc-300 bg-white font-mono text-xs font-semibold text-zinc-900 transition-all group-hover:border-blue-500 group-hover:text-blue-600 dark:border-zinc-700 dark:bg-[#111111] dark:text-zinc-100 dark:group-hover:text-blue-300">
                     {gate.label}
                 </div>
 
                 {/* Gate information */}
                 <div className="min-w-0">
-                    <div className="text-xs font-semibold text-zinc-800">
+                    <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                         {gate.name}
                     </div>
 
@@ -188,7 +188,7 @@ export default function GatePalette() {
                             01
                         </span>
 
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Single Qubit
                         </span>
                     </div>
@@ -210,7 +210,7 @@ export default function GatePalette() {
                             02
                         </span>
 
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Rotation Gates
                         </span>
                     </div>
@@ -232,7 +232,7 @@ export default function GatePalette() {
                             03
                         </span>
 
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Multi Qubit
                         </span>
                     </div>
@@ -254,7 +254,7 @@ export default function GatePalette() {
                             04
                         </span>
 
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Advanced Gates
                         </span>
                     </div>
@@ -276,7 +276,7 @@ export default function GatePalette() {
                             05
                         </span>
 
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Measurement
                         </span>
                     </div>
@@ -293,7 +293,7 @@ export default function GatePalette() {
             </div>
 
             {/* Hint */}
-            <div className="mt-2 border-t border-zinc-200 pt-4">
+            <div className="mt-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
                 <p className="font-mono text-[9px] leading-4 text-zinc-400">
                     DRAG AN OPERATION
                     <br />

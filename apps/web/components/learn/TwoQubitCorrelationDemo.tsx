@@ -32,20 +32,20 @@ export default function TwoQubitCorrelationDemo() {
     }
 
     return (
-        <section className="my-10 max-w-3xl border border-zinc-200 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6">
+        <section className="my-10 max-w-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
                 <div>
-                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                         Interactive
                     </div>
-                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950">
+                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                         Measure an entangled pair
                     </h3>
                 </div>
 
                 <button
                     onClick={reset}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                     <RotateCcw className="h-3 w-3" />
                     Reset
@@ -53,7 +53,7 @@ export default function TwoQubitCorrelationDemo() {
             </div>
 
             <div className="px-5 py-6 sm:px-6">
-                <p className="mb-6 max-w-xl text-xs leading-6 text-zinc-500">
+                <p className="mb-6 max-w-xl text-xs leading-6 text-zinc-500 dark:text-zinc-400">
                     q0 and q1 are in the Bell state (|00⟩ + |11⟩)/√2. Each
                     measurement is random — but q0 and q1 always agree.
                 </p>
@@ -64,16 +64,16 @@ export default function TwoQubitCorrelationDemo() {
                             key={qubit}
                             className={`flex h-20 w-20 flex-col items-center justify-center border-2 font-mono transition-all duration-300 ${
                                 animating
-                                    ? 'animate-pulse border-blue-400 bg-blue-50'
+                                    ? 'animate-pulse border-blue-400 bg-blue-50 dark:bg-blue-500/10'
                                     : result !== null
-                                      ? 'border-emerald-500 bg-emerald-50'
-                                      : 'border-zinc-200 bg-zinc-50'
+                                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
+                                      : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900'
                             }`}
                         >
                             <span className="text-[9px] uppercase tracking-wider text-zinc-400">
                                 q{qubit}
                             </span>
-                            <span className="text-2xl font-bold text-zinc-950">
+                            <span className="text-2xl font-bold text-zinc-950 dark:text-zinc-100">
                                 {bitFor(qubit)}
                             </span>
                         </div>
@@ -84,7 +84,7 @@ export default function TwoQubitCorrelationDemo() {
                     <button
                         onClick={handleMeasure}
                         disabled={animating}
-                        className="flex items-center gap-2 border border-zinc-950 bg-zinc-950 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                        className="flex items-center gap-2 border border-zinc-950 bg-zinc-950 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200"
                     >
                         <Zap className="h-3 w-3" />
                         Measure Both

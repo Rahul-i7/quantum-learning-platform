@@ -48,21 +48,21 @@ export default function ThreeQubitGateDemo({
     const changed = output !== input
 
     return (
-        <section className="my-10 max-w-3xl border border-zinc-200 bg-white">
-            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6">
-                <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+        <section className="my-10 max-w-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
+                <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                     Interactive
                 </div>
-                <h3 className="text-sm font-semibold tracking-tight text-zinc-950">
+                <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                     Try every {info.label} input
                 </h3>
             </div>
 
             <div className="px-5 py-6 sm:px-6">
-                <p className="mb-1 max-w-xl text-xs leading-6 text-zinc-500">
+                <p className="mb-1 max-w-xl text-xs leading-6 text-zinc-500 dark:text-zinc-400">
                     {info.name}.
                 </p>
-                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500">
+                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500 dark:text-zinc-400">
                     {info.blurb}
                 </p>
 
@@ -73,8 +73,8 @@ export default function ThreeQubitGateDemo({
                             onClick={() => setInput(i)}
                             className={`border px-3 py-2 font-mono text-xs font-semibold transition-all ${
                                 input === i
-                                    ? 'border-zinc-950 bg-zinc-950 text-white'
-                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950'
+                                    ? 'border-zinc-950 bg-zinc-950 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950'
+                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100'
                             }`}
                         >
                             |{i}⟩
@@ -83,11 +83,11 @@ export default function ThreeQubitGateDemo({
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-6">
-                    <div className="border border-zinc-200 bg-zinc-50 px-6 py-4 text-center">
+                    <div className="border border-zinc-200 bg-zinc-50 px-6 py-4 text-center dark:border-zinc-800 dark:bg-zinc-900">
                         <div className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
                             Input (q0 q1 q2)
                         </div>
-                        <div className="mt-1 font-mono text-2xl font-bold text-zinc-950">
+                        <div className="mt-1 font-mono text-2xl font-bold text-zinc-950 dark:text-zinc-100">
                             |{input}⟩
                         </div>
                     </div>
@@ -102,14 +102,14 @@ export default function ThreeQubitGateDemo({
                     <div
                         className={`border-2 px-6 py-4 text-center transition-colors ${
                             changed
-                                ? 'border-emerald-500 bg-emerald-50'
-                                : 'border-zinc-200 bg-zinc-50'
+                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
+                                : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900'
                         }`}
                     >
                         <div className="font-mono text-[9px] uppercase tracking-wider text-zinc-400">
                             Output (q0 q1 q2)
                         </div>
-                        <div className="mt-1 font-mono text-2xl font-bold text-zinc-950">
+                        <div className="mt-1 font-mono text-2xl font-bold text-zinc-950 dark:text-zinc-100">
                             |{output}⟩
                         </div>
                     </div>

@@ -182,31 +182,31 @@ export default function BuilderPage() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="min-h-screen bg-[#fafafa] text-zinc-950">
+            <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-zinc-950 dark:text-zinc-100">
                 <NavBar />
 
                 <main className="mx-auto w-full max-w-[1600px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
                     {/* Builder Header */}
-                    <header className="mb-8 border-b border-zinc-200 pb-6">
+                    <header className="mb-8 border-b border-zinc-200 dark:border-zinc-800 pb-6">
                         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                             <div>
                                 <div className="mb-3 flex items-center gap-3">
-                                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+                                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                         QMentor / Builder
                                     </span>
 
-                                    <span className="h-px w-8 bg-zinc-300" />
+                                    <span className="h-px w-8 bg-zinc-300 dark:bg-zinc-700" />
 
                                     <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400">
                                         Quantum Workspace
                                     </span>
                                 </div>
 
-                                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
+                                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-100 sm:text-5xl">
                                     Circuit Builder
                                 </h1>
 
-                                <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
+                                <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                                     Construct, simulate, and inspect quantum circuits one gate at a
                                     time.
                                 </p>
@@ -219,18 +219,18 @@ export default function BuilderPage() {
                                         Qubits
                                     </span>
 
-                                    <div className="flex items-center border border-zinc-200 bg-white">
+                                    <div className="flex items-center border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111]">
                                         <button
                                             onClick={() =>
                                                 handleQubitChange(Math.max(MIN_QUBITS, store.numQubits - 1))
                                             }
                                             disabled={store.numQubits <= MIN_QUBITS}
-                                            className="flex h-8 w-8 items-center justify-center border-r border-zinc-200 text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
+                                            className="flex h-8 w-8 items-center justify-center border-r border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
                                         >
                                             <Minus className="h-3.5 w-3.5" />
                                         </button>
 
-                                        <span className="flex h-8 min-w-10 items-center justify-center font-mono text-xs font-semibold text-zinc-900">
+                                        <span className="flex h-8 min-w-10 items-center justify-center font-mono text-xs font-semibold text-zinc-900 dark:text-zinc-200">
                                             {String(store.numQubits).padStart(2, '0')}
                                         </span>
 
@@ -239,19 +239,19 @@ export default function BuilderPage() {
                                                 handleQubitChange(Math.min(MAX_QUBITS, store.numQubits + 1))
                                             }
                                             disabled={store.numQubits >= MAX_QUBITS}
-                                            className="flex h-8 w-8 items-center justify-center border-l border-zinc-200 text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
+                                            className="flex h-8 w-8 items-center justify-center border-l border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
                                         >
                                             <Plus className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="hidden h-8 w-px bg-zinc-200 sm:block" />
+                                <div className="hidden h-8 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
 
                                 <button
                                     onClick={handleRunSimulation}
                                     disabled={loading}
-                                    className="cursor-pointer flex h-9 items-center gap-2 bg-zinc-950 px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="cursor-pointer flex h-9 items-center gap-2 bg-zinc-950 dark:bg-zinc-100 px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white dark:text-zinc-950 transition-colors hover:bg-blue-600 dark:hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {loading ? 'Running...' : 'Run Simulation'}
                                 </button>
@@ -259,7 +259,7 @@ export default function BuilderPage() {
                                 <button
                                     onClick={handleAskAi}
                                     disabled={aiLoading}
-                                    className="cursor-pointer flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="cursor-pointer flex h-9 items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111] px-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-700 dark:text-zinc-300 transition-colors hover:border-blue-300 dark:hover:border-blue-700 hover:text-blue-600 dark:hover:text-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <Sparkle className="h-3.5 w-3.5" />
                                     {aiLoading ? 'Thinking...' : 'Ask AI'}
@@ -270,26 +270,26 @@ export default function BuilderPage() {
 
                     {/* Error */}
                     {error && (
-                        <div className="mb-6 border-l-2 border-red-500 bg-red-50 px-4 py-3">
+                        <div className="mb-6 border-l-2 border-red-500 bg-red-50 px-4 py-3 dark:bg-red-500/10">
                             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-red-500">
                                 Simulation Error
                             </div>
-                            <p className="mt-1 text-sm leading-6 text-red-700">
+                            <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-400">
                                 {error}
                             </p>
                         </div>
                     )}
 
                     {/* Circuit Workspace */}
-                    <section className="border border-zinc-200 bg-white">
+                    <section className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111]">
                         <div className="grid lg:grid-cols-[280px_minmax(0,1fr)_280px]">
                             {/* Gate Library */}
-                            <aside className="border-b border-zinc-200 lg:border-b-0 lg:border-r">
-                                <div className="border-b border-zinc-200 px-5 py-4">
+                            <aside className="border-b border-zinc-200 dark:border-zinc-800 lg:border-b-0 lg:border-r">
+                                <div className="border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
                                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                         01 / Gate Library
                                     </div>
-                                    <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                    <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-200">
                                         Operations
                                     </div>
                                 </div>
@@ -299,12 +299,12 @@ export default function BuilderPage() {
 
                             {/* Circuit */}
                             <section className="min-w-0">
-                                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                                <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
                                     <div>
                                         <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                             02 / Circuit
                                         </div>
-                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-200">
                                             Quantum Register
                                         </div>
                                     </div>
@@ -335,14 +335,14 @@ export default function BuilderPage() {
                             </section>
 
                             {/* AI */}
-                            <aside className="border-t border-zinc-200 lg:border-l lg:border-t-0">
-                                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                            <aside className="border-t border-zinc-200 dark:border-zinc-800 lg:border-l lg:border-t-0">
+                                <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
                                     <div>
                                         <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                             03 / Analysis
                                         </div>
 
-                                        <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                        <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-200">
                                             AI Tutor
                                         </div>
                                     </div>
@@ -352,7 +352,7 @@ export default function BuilderPage() {
                                             ? 'animate-pulse bg-blue-500'
                                             : messages.length > 0
                                                 ? 'bg-emerald-500'
-                                                : 'bg-zinc-300'
+                                                : 'bg-zinc-300 dark:bg-zinc-700'
                                             }`}
                                     />
                                 </div>
@@ -371,14 +371,14 @@ export default function BuilderPage() {
 
                     {/* Results */}
                     {simulationResult && (
-                        <section className="mt-8 border-t border-zinc-200 pt-8">
+                        <section className="mt-8 border-t border-zinc-200 dark:border-zinc-800 pt-8">
                             <div className="mb-5 flex items-end justify-between">
                                 <div>
                                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                         04 / Simulation
                                     </div>
 
-                                    <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
+                                    <h2 className="mt-1 text-lg font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                                         Measurement & quantum state
                                     </h2>
 
@@ -392,15 +392,15 @@ export default function BuilderPage() {
                                 </span>
                             </div>
 
-                            <div className="grid border border-zinc-200 lg:grid-cols-2">
-                                <div className="min-w-0 bg-white p-5 lg:border-r lg:border-zinc-200">
+                            <div className="grid border border-zinc-200 dark:border-zinc-800 lg:grid-cols-2">
+                                <div className="min-w-0 bg-white dark:bg-[#111111] p-5 lg:border-r lg:border-zinc-200 dark:lg:border-zinc-800">
                                     <MeasurementHistogram
                                         data={simulationResult}
                                         loading={loading}
                                     />
                                 </div>
 
-                                <div className="min-w-0 bg-white p-5">
+                                <div className="min-w-0 bg-white dark:bg-[#111111] p-5">
                                     <BlochSphereVisualizer
                                         data={simulationResult}
                                         variant="default"
@@ -414,13 +414,13 @@ export default function BuilderPage() {
 
                     {/* Qiskit Code */}
                     <section className="mt-10">
-                        <div className="mb-5 flex items-end justify-between border-b border-zinc-200 pb-3">
+                        <div className="mb-5 flex items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
                             <div>
-                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                                     Export
                                 </div>
 
-                                <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950">
+                                <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                                     Qiskit Code
                                 </h2>
                             </div>
@@ -430,7 +430,7 @@ export default function BuilderPage() {
                             </span>
                         </div>
 
-                        <div className="border border-zinc-200 bg-white">
+                        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111]">
                             <QiskitPreview />
                         </div>
                     </section>

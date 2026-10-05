@@ -37,11 +37,11 @@ export default function CircuitPreview() {
     )
 
     return (
-        <div className="overflow-x-auto bg-white">
+        <div className="overflow-x-auto bg-white dark:bg-[#111111]">
             <div className="min-w-max">
                 {/* Header */}
-                <div className="flex border-b border-zinc-200 bg-zinc-50/70">
-                    <div className="flex h-8 w-16 shrink-0 items-center justify-center border-r border-zinc-200">
+                <div className="flex border-b border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-900/70">
+                    <div className="flex h-8 w-16 shrink-0 items-center justify-center border-r border-zinc-200 dark:border-zinc-800">
                         <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-zinc-400">
                             Qubit
                         </span>
@@ -50,7 +50,7 @@ export default function CircuitPreview() {
                     {steps.map((stepIndex) => (
                         <div
                             key={stepIndex}
-                            className="flex h-8 w-14 shrink-0 items-center justify-center border-l border-zinc-100"
+                            className="flex h-8 w-14 shrink-0 items-center justify-center border-l border-zinc-100 dark:border-zinc-800"
                         >
                             <span className="font-mono text-[8px] text-zinc-400">
                                 {String(stepIndex + 1).padStart(2, '0')}
@@ -67,8 +67,8 @@ export default function CircuitPreview() {
                             className="flex"
                         >
                             {/* Qubit label */}
-                            <div className="flex h-14 w-16 shrink-0 items-center justify-center border-r border-zinc-200 bg-zinc-50/50">
-                                <span className="font-mono text-xs font-medium text-zinc-500">
+                            <div className="flex h-14 w-16 shrink-0 items-center justify-center border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+                                <span className="font-mono text-xs font-medium text-zinc-500 dark:text-zinc-400">
                                     q[{qubitIndex}]
                                 </span>
                             </div>
@@ -115,10 +115,10 @@ export default function CircuitPreview() {
                                     return (
                                         <div
                                             key={stepIndex}
-                                            className="relative flex h-14 w-14 shrink-0 items-center justify-center border-l border-zinc-100"
+                                            className="relative flex h-14 w-14 shrink-0 items-center justify-center border-l border-zinc-100 dark:border-zinc-800"
                                         >
                                             {/* Quantum wire */}
-                                            <div className="absolute inset-x-0 top-1/2 z-0 h-px bg-zinc-300" />
+                                            <div className="absolute inset-x-0 top-1/2 z-0 h-px bg-zinc-300 dark:bg-zinc-600" />
 
                                             {/* Standard gate */}
                                             {gate && !['cx', 'cz', 'swap', 'ccx', 'cswap'].includes(gate.type) && (
@@ -148,7 +148,7 @@ export default function CircuitPreview() {
                                             {/* CX target */}
                                             {isCXTarget && (
                                                 <div className="relative z-20 flex h-8 w-8 items-center justify-center">
-                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">
                                                         +
                                                     </div>
                                                 </div>
@@ -165,7 +165,7 @@ export default function CircuitPreview() {
                                             {isSwapGate && (
                                                 <div
                                                     className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">×</div>
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">×</div>
                                                 </div>
                                             )}
 
@@ -177,7 +177,7 @@ export default function CircuitPreview() {
                                             )}
                                             {isCCXTarget && (
                                                 <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">
                                                         +
                                                     </div>
                                                 </div>
@@ -191,7 +191,7 @@ export default function CircuitPreview() {
                                             )}
                                             {isCSWAPTarget && (
                                                 <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">
                                                         ×
                                                     </div>
                                                 </div>
@@ -227,7 +227,7 @@ export default function CircuitPreview() {
 
                 {/* Empty state */}
                 {gates.length === 0 && (
-                    <div className="border-t border-zinc-100 px-5 py-6 text-center">
+                    <div className="border-t border-zinc-100 px-5 py-6 text-center dark:border-zinc-800">
                         <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400">
                             No gates in circuit
                         </p>

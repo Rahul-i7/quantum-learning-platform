@@ -3,8 +3,17 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #f8fafc; /* light neutral */
-  --foreground: #0f172a; /* dark slate */
+  --background: #fafafa;
+  --foreground: #0f172a;
+
+  /* Surfaces */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f5f5f3;
+  --surface-inset: #f8fafc;
+
+  /* Borders */
+  --border-primary: #e4e4e7;    /* zinc-200 */
+  --border-secondary: #d4d4d8;  /* zinc-300 */
 
   /* Primary palette (indigo) */
   --primary-50: #eef2ff;
@@ -13,24 +22,46 @@
   --primary-700: #4338ca;
   --primary-900: #312e81;
 
-  --accent: #06b6d4; /* cyan */
+  --accent: #06b6d4;
   --muted: #6b7280;
 
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  /* Surfaces */
+  --surface-primary: #111111;
+  --surface-secondary: #171717;
+  --surface-inset: #0c0c0c;
+
+  /* Borders */
+  --border-primary: #262626;
+  --border-secondary: #333333;
+
+  /* Primary palette (indigo — slightly lifted for dark) */
+  --primary-50: rgba(79, 70, 229, 0.08);
+  --primary-100: rgba(79, 70, 229, 0.12);
+  --primary-600: #6366f1;
+  --primary-700: #818cf8;
+  --primary-900: #c7d2fe;
+
+  --accent: #22d3ee;
+  --muted: #a1a1aa;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-inset: var(--surface-inset);
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -54,5 +85,13 @@ body {
 .muted { color: var(--muted); }
 
 /* Simple layout helpers to keep tailwind classes minimal for theme application */
-.site-section-contrast { background: white; }
+.site-section-contrast { background: var(--surface-primary); }
 .heading { color: var(--primary-900); }
+
+/* Smooth theme transitions on key properties */
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}

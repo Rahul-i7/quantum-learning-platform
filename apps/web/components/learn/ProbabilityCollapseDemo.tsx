@@ -39,20 +39,20 @@ export default function ProbabilityCollapseDemo() {
     const count1 = runs.length - count0
 
     return (
-        <section className="my-10 max-w-3xl border border-zinc-200 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6">
+        <section className="my-10 max-w-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
                 <div>
-                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                         Interactive
                     </div>
-                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950">
+                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                         Collapse a superposition
                     </h3>
                 </div>
 
                 <button
                     onClick={reset}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                     <RotateCcw className="h-3 w-3" />
                     Reset
@@ -60,7 +60,7 @@ export default function ProbabilityCollapseDemo() {
             </div>
 
             <div className="px-5 py-6 sm:px-6">
-                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500">
+                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500 dark:text-zinc-400">
                     Qubit starts in |+⟩ = (|0⟩ + |1⟩)/√2 — a true 50/50
                     superposition. Each measurement is an independent coin
                     flip; the bars below show the live probability, then
@@ -72,7 +72,7 @@ export default function ProbabilityCollapseDemo() {
                         <div key={bit}>
                             <div className="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                                 <span>|{bit}⟩</span>
-                                <span className="text-zinc-900">
+                                <span className="text-zinc-900 dark:text-zinc-100">
                                     {result === null && !animating
                                         ? '50%'
                                         : animating
@@ -82,7 +82,7 @@ export default function ProbabilityCollapseDemo() {
                                             : '0%'}
                                 </span>
                             </div>
-                            <div className="h-6 w-full overflow-hidden border border-zinc-200 bg-zinc-50">
+                            <div className="h-6 w-full overflow-hidden border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
                                 <div
                                     className={`h-full transition-all duration-300 ease-out ${
                                         result === bit
@@ -100,15 +100,15 @@ export default function ProbabilityCollapseDemo() {
                     <button
                         onClick={handleMeasure}
                         disabled={animating}
-                        className="flex items-center gap-2 border border-zinc-950 bg-zinc-950 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                        className="flex items-center gap-2 border border-zinc-950 bg-zinc-950 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200"
                     >
                         <Zap className="h-3 w-3" />
                         Measure
                     </button>
 
                     {result !== null && !animating && (
-                        <span className="font-mono text-xs text-zinc-500">
-                            Collapsed to <strong className="text-zinc-950">|{result}⟩</strong>
+                        <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                            Collapsed to <strong className="text-zinc-950 dark:text-zinc-100">|{result}⟩</strong>
                         </span>
                     )}
 

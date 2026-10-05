@@ -45,13 +45,13 @@ export default function BlochExplorer() {
     )
 
     return (
-        <section className="my-10 max-w-5xl border border-zinc-200 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6">
+        <section className="my-10 max-w-5xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
                 <div>
-                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+                    <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                         Interactive
                     </div>
-                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950">
+                    <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                         Drag the angles, watch the state move
                     </h3>
                 </div>
@@ -61,14 +61,14 @@ export default function BlochExplorer() {
                         setTheta(90)
                         setPhi(0)
                     }}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                     <RotateCcw className="h-3 w-3" />
                     Reset
                 </button>
             </div>
 
-            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6">
+            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
                 <div className="flex flex-wrap gap-1.5">
                     {PRESETS.map((p) => (
                         <button
@@ -79,8 +79,8 @@ export default function BlochExplorer() {
                             }}
                             className={`min-w-10 border px-3 py-2 font-mono text-xs font-semibold transition-all ${
                                 matchedPreset?.label === p.label
-                                    ? 'border-zinc-950 bg-zinc-950 text-white'
-                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950'
+                                    ? 'border-zinc-950 bg-zinc-950 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950'
+                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100'
                             }`}
                         >
                             {p.label}
@@ -90,7 +90,7 @@ export default function BlochExplorer() {
             </div>
 
             <div className="grid md:grid-cols-[1fr_1fr]">
-                <div className="h-72 border-b border-zinc-200 md:border-b-0 md:border-r">
+                <div className="h-72 border-b border-zinc-200 md:border-b-0 md:border-r dark:border-zinc-800">
                     <BlochSphereVisualizer
                         data={data}
                         qubitIndex={0}
@@ -104,7 +104,7 @@ export default function BlochExplorer() {
                     <div>
                         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                             <span>θ (polar) — pole to pole</span>
-                            <span className="text-zinc-900">{theta}°</span>
+                            <span className="text-zinc-900 dark:text-zinc-100">{theta}°</span>
                         </div>
                         <input
                             type="range"
@@ -119,7 +119,7 @@ export default function BlochExplorer() {
                     <div>
                         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                             <span>φ (azimuth) — around the equator</span>
-                            <span className="text-zinc-900">{phi}°</span>
+                            <span className="text-zinc-900 dark:text-zinc-100">{phi}°</span>
                         </div>
                         <input
                             type="range"

@@ -25,7 +25,7 @@ export default function TopicBody({
                     return (
                         <p
                             key={i}
-                            className="max-w-3xl text-[15px] leading-8 text-zinc-600"
+                            className="max-w-3xl text-[15px] leading-8 text-zinc-600 dark:text-zinc-400"
                         >
                             {block.text}
                         </p>
@@ -127,12 +127,12 @@ export default function TopicBody({
                     return (
                         <div
                             key={i}
-                            className="flex max-w-3xl items-start gap-4 border-l-2 border-blue-500 bg-blue-50/40 px-5 py-4 text-sm leading-7 text-blue-950"
+                            className="flex max-w-3xl items-start gap-4 border-l-2 border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 px-5 py-4 text-sm leading-7 text-blue-950 dark:text-blue-200"
                         >
-                            <Lightbulb className="mt-1 h-4 w-4 shrink-0 text-blue-600" />
+                            <Lightbulb className="mt-1 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
 
                             <div>
-                                <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blue-600">
+                                <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                                     Try it
                                 </span>
 

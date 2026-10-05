@@ -93,15 +93,15 @@ export default function CircuitCanvas() {
     return (
         <div
             ref={canvasRef}
-            className="relative  bg-white">
+            className="relative  bg-white dark:bg-[#111111]">
             {pendingGate && (
-                <div className="mb-3 flex items-center justify-between border border-blue-200 bg-blue-50 px-3 py-2">
+                <div className="mb-3 flex items-center justify-between border border-blue-200 bg-blue-50 px-3 py-2 dark:border-blue-800 dark:bg-blue-500/10">
                     <div>
                         <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-blue-500">
                             Placing {pendingGate.type.toUpperCase()}
                         </span>
 
-                        <p className="mt-0.5 text-xs text-blue-700">
+                        <p className="mt-0.5 text-xs text-blue-700 dark:text-blue-400">
                             {pendingGate.type === 'ccx' || pendingGate.type === 'cswap'
                                 ? `Select ${3 - pendingGate.selectedQubits.length} more ${3 - pendingGate.selectedQubits.length === 1
                                     ? 'qubit'
@@ -114,7 +114,7 @@ export default function CircuitCanvas() {
 
                     <button
                         onClick={() => setPendingGate(null)}
-                        className="cursor-pointer font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-500 hover:text-blue-700"
+                        className="cursor-pointer font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"
                     >
                         Cancel
                     </button>
@@ -138,8 +138,8 @@ export default function CircuitCanvas() {
 
 
             {/* Circuit header */}
-            <div className="flex items-center border-b border-zinc-200 bg-zinc-50/70">
-                <div className="flex h-8 w-16 shrink-0 items-center justify-center border-r border-zinc-200">
+            <div className="flex items-center border-b border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-900/70">
+                <div className="flex h-8 w-16 shrink-0 items-center justify-center border-r border-zinc-200 dark:border-zinc-800">
                     <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-zinc-400">
                         Qubit
                     </span>
@@ -148,7 +148,7 @@ export default function CircuitCanvas() {
                 {steps.map((stepIndex) => (
                     <div
                         key={stepIndex}
-                        className="flex h-8 w-14 shrink-0 items-center justify-center border-l border-zinc-100"
+                        className="flex h-8 w-14 shrink-0 items-center justify-center border-l border-zinc-100 dark:border-zinc-800"
                     >
                         <span className="font-mono text-[8px] text-zinc-400">
                             {String(stepIndex + 1).padStart(2, '0')}
@@ -162,8 +162,8 @@ export default function CircuitCanvas() {
                 {qubits.map((qubitIndex) => (
                     <div key={qubitIndex} className="flex">
                         {/* Qubit label */}
-                        <div className="flex h-14 w-16 shrink-0 items-center justify-center border-r border-zinc-200 bg-zinc-50/50">
-                            <span className="font-mono text-xs font-medium text-zinc-500">
+                        <div className="flex h-14 w-16 shrink-0 items-center justify-center border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+                            <span className="font-mono text-xs font-medium text-zinc-500 dark:text-zinc-400">
                                 q[{qubitIndex}]
                             </span>
                         </div>
@@ -213,7 +213,7 @@ export default function CircuitCanvas() {
 
             {/* Empty state */}
             {gates.length === 0 && (
-                <div className="border-t border-zinc-100 px-5 py-6 text-center">
+                <div className="border-t border-zinc-100 px-5 py-6 text-center dark:border-zinc-800">
                     <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-400">
                         Drag a gate onto the register
                     </p>

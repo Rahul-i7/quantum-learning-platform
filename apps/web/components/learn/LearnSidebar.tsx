@@ -55,9 +55,9 @@ export default function LearnSidebar({
         <div>
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-blue-600" />
+              <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
                 Learning Path
               </span>
             </div>
@@ -69,7 +69,7 @@ export default function LearnSidebar({
           </div>
 
           {/* Progress */}
-          <div className="h-px w-full bg-zinc-200">
+          <div className="h-px w-full bg-zinc-200 dark:bg-zinc-800">
             <div
               className="h-px bg-blue-600 transition-all duration-500"
               style={{
@@ -92,7 +92,7 @@ export default function LearnSidebar({
             placeholder="Filter modules..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border-b border-zinc-200 bg-transparent py-2 pl-6 pr-2 text-xs text-zinc-800 outline-none transition-colors placeholder:text-zinc-400 focus:border-blue-500"
+            className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-transparent py-2 pl-6 pr-2 text-xs text-zinc-800 dark:text-zinc-200 outline-none transition-colors placeholder:text-zinc-400 focus:border-blue-500"
           />
         </div>
 
@@ -114,13 +114,13 @@ export default function LearnSidebar({
                     {String(categoryIndex + 1).padStart(2, '0')}
                   </span>
 
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
                     {CATEGORY_LABELS[category]}
                   </span>
                 </div>
 
                 {/* Topics */}
-                <div className="border-l border-zinc-200">
+                <div className="border-l border-zinc-200 dark:border-zinc-800">
                   {categoryTopics.map((topic) => {
                     const isSelected = activeId === topic.id
                     const isDone = !!completedTopics[topic.id]
@@ -131,8 +131,8 @@ export default function LearnSidebar({
                         onClick={() => setActiveId(topic.id)}
                         className={`group relative flex w-full items-center justify-between py-2 pl-4 pr-2 text-left transition-all ${
                           isSelected
-                            ? 'text-zinc-950'
-                            : 'text-zinc-500 hover:text-zinc-900'
+                            ? 'text-zinc-950 dark:text-zinc-100'
+                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 dark:text-zinc-400'
                         }`}
                       >
                         {/* Active indicator */}
@@ -154,7 +154,7 @@ export default function LearnSidebar({
                           <CheckCircle2
                             className={`h-3.5 w-3.5 ${
                               isSelected
-                                ? 'text-blue-600'
+                                ? 'text-blue-600 dark:text-blue-400'
                                 : 'text-emerald-500'
                             }`}
                           />
@@ -171,13 +171,13 @@ export default function LearnSidebar({
         {/* Builder */}
         <Link
           href="/builder"
-          className="group flex items-center justify-between border border-zinc-200 bg-white px-4 py-3 transition-all hover:border-zinc-300 hover:shadow-sm"
+          className="group flex items-center justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111] px-4 py-3 transition-all hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm"
         >
           <div className="flex items-center gap-2.5">
-            <Cpu className="h-4 w-4 text-blue-600" />
+            <Cpu className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 
             <div>
-              <div className="text-xs font-semibold text-zinc-900">
+              <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">
                 Circuit Builder
               </div>
 

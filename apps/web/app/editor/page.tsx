@@ -75,30 +75,30 @@ export default function EditorPage() {
         }
     }
     return (
-        <main className="min-h-screen bg-[#fafafa] text-zinc-950">
+        <main className="min-h-screen bg-[#fafafa] text-zinc-950 dark:bg-[#0a0a0a] dark:text-zinc-100">
             <NavBar />
 
             <div className="mx-auto w-full max-w-[1600px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-                <header className="mb-8 border-b border-zinc-200 pb-6">
+                <header className="mb-8 border-b border-zinc-200 pb-6 dark:border-zinc-800">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div>
                             <div className="mb-3 flex items-center gap-3">
-                                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+                                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                     QMentor / Editor
                                 </span>
 
-                                <span className="h-px w-8 bg-zinc-300" />
+                                <span className="h-px w-8 bg-zinc-300 dark:bg-zinc-600" />
 
                                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400">
                                     Code Workspace
                                 </span>
                             </div>
 
-                            <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
+                            <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl dark:text-zinc-100">
                                 Quantum Editor
                             </h1>
 
-                            <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
+                            <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                                 Write Qiskit circuits directly, then simulate and inspect
                                 their quantum state.
                             </p>
@@ -107,11 +107,11 @@ export default function EditorPage() {
                         <button
                             onClick={handleRunSimulation}
                             disabled={loading}
-                            className="inline-flex h-11 items-center justify-center bg-zinc-950 px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="inline-flex h-11 items-center justify-center bg-zinc-950 px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-950"
                         >
                             {loading ? (
                                 <>
-                                    <span className="mr-2 h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white" />
+                                    <span className="mr-2 h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white dark:border-zinc-950/30 dark:border-t-zinc-950" />
                                     Simulating
                                 </>
                             ) : (
@@ -121,15 +121,15 @@ export default function EditorPage() {
                     </div>
                 </header>
 
-                <section className="grid min-h-155 border border-zinc-200 bg-white lg:grid-cols-[minmax(0,1fr)_420px]">
-                    <div className="min-w-0 border-b border-zinc-200 lg:border-b-0 lg:border-r">
-                        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                <section className="grid min-h-155 border border-zinc-200 bg-white lg:grid-cols-[minmax(0,1fr)_420px] dark:border-zinc-800 dark:bg-[#111111]">
+                    <div className="min-w-0 border-b border-zinc-200 lg:border-b-0 lg:border-r dark:border-zinc-800">
+                        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
                             <div>
                                 <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                     01 / Source
                                 </div>
 
-                                <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                     Qiskit / Python
                                 </div>
                             </div>
@@ -143,23 +143,23 @@ export default function EditorPage() {
                     </div>
 
                     <aside className="min-w-0">
-                        <div className="border-b border-zinc-200 px-5 py-4">
+                        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
                             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                 02 / Output
                             </div>
 
-                            <div className="mt-1 text-sm font-semibold text-zinc-900">
+                            <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                 Circuit & Results
                             </div>
                         </div>
 
-                        <div className="border-b border-zinc-200 p-5">
+                        <div className="border-b border-zinc-200 p-5 dark:border-zinc-800">
                             <div className="mb-4">
                                 <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                     Circuit
                                 </div>
 
-                                <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                     Generated circuit
                                 </div>
                             </div>
@@ -169,12 +169,12 @@ export default function EditorPage() {
 
                         <div className="min-h-[560px]">
                             {error && (
-                                <div className="border-b border-zinc-200 bg-red-50 px-5 py-4">
+                                <div className="border-b border-zinc-200 bg-red-50 px-5 py-4 dark:border-zinc-800 dark:bg-red-500/10">
                                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-red-500">
                                         Simulation Error
                                     </div>
 
-                                    <p className="mt-1 text-xs leading-5 text-red-700">
+                                    <p className="mt-1 text-xs leading-5 text-red-700 dark:text-red-400">
                                         {error}
                                     </p>
                                 </div>
@@ -183,11 +183,11 @@ export default function EditorPage() {
                             {!simulationResult && !loading && !error && (
                                 <div className="flex min-h-[560px] items-center justify-center px-6">
                                     <div className="max-w-[220px] text-center">
-                                        <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center border border-zinc-200 bg-zinc-50">
+                                        <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
                                             <span className="font-mono text-xs text-zinc-400">∿</span>
                                         </div>
 
-                                        <p className="text-xs font-medium text-zinc-700">
+                                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                                             No simulation yet
                                         </p>
 
@@ -201,9 +201,9 @@ export default function EditorPage() {
                             {loading && (
                                 <div className="flex min-h-[560px] items-center justify-center px-6">
                                     <div className="text-center">
-                                        <div className="mx-auto mb-4 h-5 w-5 animate-spin rounded-full border border-zinc-200 border-t-blue-600" />
+                                        <div className="mx-auto mb-4 h-5 w-5 animate-spin rounded-full border border-zinc-200 border-t-blue-600 dark:border-zinc-800" />
 
-                                        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500">
+                                        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
                                             Simulating circuit
                                         </p>
                                     </div>
@@ -211,14 +211,14 @@ export default function EditorPage() {
                             )}
 
                             {simulationResult && !loading && (
-                                <div className="divide-y divide-zinc-200">
+                                <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
                                     <div className="p-5">
                                         <div className="mb-4">
                                             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                                                 Measurement
                                             </div>
 
-                                            <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                                 Probability distribution
                                             </div>
                                         </div>
@@ -235,7 +235,7 @@ export default function EditorPage() {
                                                 Quantum State
                                             </div>
 
-                                            <div className="mt-1 text-sm font-semibold text-zinc-900">
+                                            <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                                 Bloch sphere
                                             </div>
                                         </div>

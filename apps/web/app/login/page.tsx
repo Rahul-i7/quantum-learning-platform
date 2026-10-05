@@ -67,7 +67,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#fafafa] text-zinc-950 lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="min-h-screen bg-[#fafafa] text-zinc-950 lg:grid lg:grid-cols-[1.05fr_0.95fr] dark:bg-[#0a0a0a] dark:text-zinc-100">
 
             {/* ========================================================= */}
             {/* LEFT — QMentor identity / quantum visual                  */}
@@ -218,7 +218,7 @@ export default function LoginPage() {
 
                 {/* subtle mobile/background grid */}
                 <div
-                    className="pointer-events-none absolute inset-0 opacity-[0.45]"
+                    className="pointer-events-none absolute inset-0 opacity-[0.45] dark:invert"
                     style={{
                         backgroundImage: `
             linear-gradient(rgba(24,24,27,0.035) 1px, transparent 1px),
@@ -233,8 +233,8 @@ export default function LoginPage() {
                     {/* Mobile brand */}
                     <div className="mb-10 flex items-center justify-between lg:hidden">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center border border-blue-200 bg-blue-50">
-                                <Sparkles className="h-4 w-4 text-blue-600" />
+                            <div className="flex h-9 w-9 items-center justify-center border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-500/10">
+                                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             </div>
 
                             <span className="text-lg font-semibold tracking-tight">
@@ -251,18 +251,18 @@ export default function LoginPage() {
                     <div className="mb-8">
 
                         <div className="mb-4 flex items-center gap-3">
-                            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+                            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
                                 {mode === 'signin' ? '01 / Sign in' : '01 / Create account'}
                             </span>
 
-                            <span className="h-px w-10 bg-zinc-200" />
+                            <span className="h-px w-10 bg-zinc-200 dark:bg-zinc-700" />
                         </div>
 
-                        <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
+                        <h1 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-100">
                             {mode === 'signin'? 'Welcome back.' : 'Start learning.'}
                         </h1>
 
-                        <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
+                        <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                             {mode === 'signin'
                                 ? 'Continue your quantum learning journey.'
                                 : 'Create your QMentor account and begin exploring quantum computing.'}
@@ -272,8 +272,8 @@ export default function LoginPage() {
 
                     {/* Supabase warning */}
                     {!configured && (
-                        <div className="mb-5 flex items-start gap-3 border-l-2 border-amber-500 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                        <div className="mb-5 flex items-start gap-3 border-l-2 border-amber-500 bg-amber-50 px-4 py-3 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
+                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
 
                             <span className="leading-5">
                                 Supabase environment variables are missing.
@@ -286,7 +286,7 @@ export default function LoginPage() {
                     {/* Auth form */}
                     <form
                         onSubmit={handleSubmit}
-                        className="rounded-md border border-zinc-200 bg-white p-6 shadow-[0_18px_60px_rgba(0,0,0,0.05)] sm:p-7"
+                        className="rounded-md border border-zinc-200 bg-white p-6 shadow-[0_18px_60px_rgba(0,0,0,0.05)] sm:p-7 dark:border-zinc-800 dark:bg-[#111111]"
                     >
 
                         <div className="space-y-5">
@@ -294,7 +294,7 @@ export default function LoginPage() {
                             {/* Name */}
                             {mode === 'signup' && (
                                 <div>
-                                    <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                                    <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
                                         Full name
                                     </label>
 
@@ -312,7 +312,7 @@ export default function LoginPage() {
                       placeholder:text-zinc-400
                       outline-none transition
                       focus:border-blue-500 focus:bg-white
-                      focus:ring-1 focus:ring-blue-500
+                      focus:ring-1 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-100 dark:focus:bg-zinc-800
                     "
                                         />
                                     </div>
@@ -322,7 +322,7 @@ export default function LoginPage() {
 
                             {/* Email */}
                             <div>
-                                <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                                <label className="mb-2 block font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
                                     Email address
                                 </label>
 
@@ -341,7 +341,7 @@ export default function LoginPage() {
                     placeholder:text-zinc-400
                     outline-none transition
                     focus:border-blue-500 focus:bg-white
-                    focus:ring-1 focus:ring-blue-500
+                    focus:ring-1 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-100 dark:focus:bg-zinc-800
                   "
                                     />
                                 </div>
@@ -351,21 +351,21 @@ export default function LoginPage() {
                             {/* Password */}
                             <div>
                                 <div className="mb-2 flex items-center justify-between">
-                                    <label className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                                    <label className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
                                         Password
                                     </label>
 
                                     {mode === 'signin' && (
                                         <button
                                             type="button"
-                                            className="cursor-pointer hover:underline font-mono text-[9px] uppercase tracking-[0.12em] text-blue-600 hover:text-blue-700"
+                                            className="cursor-pointer hover:underline font-mono text-[9px] uppercase tracking-[0.12em] text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                                         >
                                             Forgot?
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 px-3 border border-zinc-200 bg-zinc-50/50 w-full relative flex justify-between items-center">
+                                <div className="transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 px-3 border border-zinc-200 bg-zinc-50/50 w-full relative flex justify-between items-center dark:focus:bg-zinc-800 dark:border-zinc-800 dark:bg-zinc-900/50">
                                     <div className="flex grow justify-center items-center gap-3">
                                         <Lock className="h-4 w-4 text-zinc-400" />
 
@@ -376,7 +376,7 @@ export default function LoginPage() {
                                             placeholder="••••••••"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="h-11 w-full text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
+                                            className="h-11 w-full text-sm text-zinc-900 placeholder:text-zinc-400 outline-none dark:text-zinc-100"
                                         />
                                     </div>
                                     <button
@@ -391,7 +391,7 @@ export default function LoginPage() {
 
                             {/* Error */}
                             {error && (
-                                <div className="flex items-start gap-2 border-l-2 border-red-500 bg-red-50 px-3 py-2.5 text-xs font-medium text-red-700">
+                                <div className="flex items-start gap-2 border-l-2 border-red-500 bg-red-50 px-3 py-2.5 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
                                     <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                                     <span>{error}</span>
                                 </div>
@@ -400,7 +400,7 @@ export default function LoginPage() {
 
                             {/* Success */}
                             {notice && (
-                                <div className="border-l-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-xs text-emerald-700">
+                                <div className="border-l-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-xs text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                                     {notice}
                                 </div>
                             )}
@@ -415,12 +415,12 @@ export default function LoginPage() {
                 gap-2 bg-zinc-950 px-4 text-sm font-medium text-white
                 transition-all hover:bg-blue-600
                 active:bg-blue-700
-                disabled:cursor-not-allowed disabled:opacity-50
+                disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-950
               "
                             >
                                 {submitting ? (
                                     <>
-                                        <span className="h-3.5 w-3.5 animate-spin rounded-full border border-white/30 border-t-white" />
+                                        <span className="h-3.5 w-3.5 animate-spin rounded-full border border-white/30 border-t-white dark:border-zinc-950/30 dark:border-t-zinc-950" />
                                         <span>Authenticating…</span>
                                     </>
                                 ) : mode === 'signin' ? (
@@ -443,13 +443,13 @@ export default function LoginPage() {
                         <div className="mt-6">
 
                             <div className="flex items-center gap-3">
-                                <div className="h-px flex-1 bg-zinc-200" />
+                                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
 
                                 <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400">
                                     or
                                 </span>
 
-                                <div className="h-px flex-1 bg-zinc-200" />
+                                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
                             </div>
 
                             <button
@@ -461,10 +461,10 @@ export default function LoginPage() {
                 border border-zinc-200 bg-white text-sm font-medium
                 text-zinc-700 transition-colors
                 hover:border-zinc-300 hover:bg-zinc-50
-                disabled:cursor-not-allowed disabled:opacity-50
+                disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-800
               "
                             >
-                                <UserRound className="h-4 w-4 text-zinc-500" />
+                                <UserRound className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
                                 <span>Continue as guest</span>
                             </button>
 
@@ -479,14 +479,14 @@ export default function LoginPage() {
 
 
                     {/* Mode toggle */}
-                    <div className="mt-7 text-center text-xs text-zinc-500">
+                    <div className="mt-7 text-center text-xs text-zinc-500 dark:text-zinc-400">
                         {mode === 'signin' ? (
                             <p>
                                 Don't have an account?{' '}
                                 <button
                                     type="button"
                                     onClick={() => toggleMode('signup')}
-                                    className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+                                    className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                                 >
                                     Create one
                                 </button>
@@ -497,7 +497,7 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => toggleMode('signin')}
-                                    className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+                                    className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                                 >
                                     Sign in
                                 </button>
@@ -509,9 +509,9 @@ export default function LoginPage() {
                     {/* Footer metadata */}
                     <div className="mt-10 flex items-center justify-center gap-4 font-mono text-[8px] uppercase tracking-[0.16em] text-zinc-400">
                         <span>QMentor</span>
-                        <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                        <span className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
                         <span>Quantum Learning</span>
-                        <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                        <span className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
                         <span>v1.0</span>
                     </div>
 

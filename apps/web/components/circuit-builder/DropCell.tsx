@@ -292,17 +292,17 @@ export default function DropCell({
             relative flex h-14 w-14 shrink-0
             items-center justify-center
             border-l border-zinc-100
-            transition-colors
-            ${isOver && canDrop ? 'bg-blue-50' : ''}
+            transition-colors dark:border-zinc-800
+            ${isOver && canDrop ? 'bg-blue-50 dark:bg-blue-500/10' : ''}
             ${isPendingTarget
-                    ? 'cursor-pointer bg-blue-50/70'
+                    ? 'cursor-pointer bg-blue-50/70 dark:bg-blue-500/10'
                     : ''
                 }
             `}
         >
             {rotationGate && (
                 <div
-                    className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 border border-zinc-200 bg-white p-3 shadow-lg"
+                    className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-800 dark:bg-[#111111]"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="mb-2">
@@ -310,7 +310,7 @@ export default function DropCell({
                             Rotation
                         </div>
 
-                        <div className="mt-1 text-xs font-semibold text-zinc-900">
+                        <div className="mt-1 text-xs font-semibold text-zinc-900 dark:text-zinc-100">
                             {rotationGate.type.toUpperCase()}(θ)
                         </div>
                     </div>
@@ -328,7 +328,7 @@ export default function DropCell({
                             }
                         }}
                         autoFocus
-                        className="h-8 w-full border border-zinc-200 bg-zinc-50 px-2 font-mono text-xs text-zinc-900 outline-none focus:border-blue-500"
+                        className="h-8 w-full border border-zinc-200 bg-zinc-50 px-2 font-mono text-xs text-zinc-900 outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
                         placeholder="π/2"
                     />
 
@@ -336,7 +336,7 @@ export default function DropCell({
                         <button
                             type="button"
                             onClick={() => setRotationGate(null)}
-                            className="flex-1 border border-zinc-200 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-500 hover:bg-zinc-50"
+                            className="flex-1 border border-zinc-200 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-zinc-500 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800"
                         >
                             Cancel
                         </button>
@@ -344,7 +344,7 @@ export default function DropCell({
                         <button
                             type="button"
                             onClick={handleRotationSubmit}
-                            className="flex-1 bg-zinc-950 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-white hover:bg-blue-600"
+                            className="flex-1 bg-zinc-950 px-2 py-1.5 font-mono text-[9px] uppercase tracking-wider text-white hover:bg-blue-600 dark:bg-zinc-100 dark:text-zinc-950"
                         >
                             Apply
                         </button>
@@ -352,12 +352,12 @@ export default function DropCell({
                 </div>
             )}
             {/* Quantum wire */}
-            <div className="absolute inset-x-0 top-1/2 z-0 h-px bg-zinc-300" />
+            <div className="absolute inset-x-0 top-1/2 z-0 h-px bg-zinc-300 dark:bg-zinc-600" />
 
 
             {/* Pending multi-qubit gate indicator */}
             {isPendingTarget && !gate && (
-                <div className="absolute z-10 h-3 w-3 rounded-full border-2 border-blue-500 bg-white" />
+                <div className="absolute z-10 h-3 w-3 rounded-full border-2 border-blue-500 bg-white dark:bg-[#111111]" />
             )}
             {isPendingSelected && (
                 <div className="absolute z-20 flex h-8 w-8 items-center justify-center">
@@ -383,7 +383,7 @@ export default function DropCell({
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800">
                         <X size={10} />
                     </button>
                 </div>
@@ -397,7 +397,7 @@ export default function DropCell({
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800">
                         <X size={10} />
                     </button>
                 </div>
@@ -407,10 +407,10 @@ export default function DropCell({
             {isCXTarget && (
                 <div
                     className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">+</div>
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">+</div>
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800">
                         <X size={10} />
                     </button>
                 </div>
@@ -424,7 +424,7 @@ export default function DropCell({
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800">
                         <X size={10} />
                     </button>
                 </div>
@@ -434,10 +434,10 @@ export default function DropCell({
             {isSwapGate && (
                 <div
                     className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">×</div>
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">×</div>
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex">
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800">
                         <X size={10} />
                     </button>
                 </div>
@@ -450,7 +450,7 @@ export default function DropCell({
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800"
                     >
                         <X size={10} />
                     </button>
@@ -458,13 +458,13 @@ export default function DropCell({
             )}
             {isCCXTarget && (
                 <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">
                         +
                     </div>
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800"
                     >
                         <X size={10} />
                     </button>
@@ -478,7 +478,7 @@ export default function DropCell({
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800"
                     >
                         <X size={10} />
                     </button>
@@ -486,13 +486,13 @@ export default function DropCell({
             )}
             {isCSWAPTarget && (
                 <div className="group relative z-20 flex h-8 w-8 items-center justify-center">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-blue-600 bg-white font-mono text-sm font-semibold text-blue-600 dark:bg-[#111111] dark:text-blue-400">
                         ×
                     </div>
 
                     <button
                         onClick={handleRemove}
-                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex"
+                        className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center border border-white bg-red-500 text-white group-hover:flex dark:border-zinc-800"
                     >
                         <X size={10} />
                     </button>
@@ -501,7 +501,7 @@ export default function DropCell({
 
             {/* Drop feedback */}
             {isOver && !gate && (
-                <div className="absolute inset-1 z-10 border border-blue-400 bg-blue-100/30" />
+                <div className="absolute inset-1 z-10 border border-blue-400 bg-blue-100/30 dark:bg-blue-500/20" />
             )}
         </div>
     )

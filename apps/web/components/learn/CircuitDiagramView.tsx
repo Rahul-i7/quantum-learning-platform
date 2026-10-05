@@ -21,9 +21,9 @@ function Diagram({ templateId }: { templateId: string }) {
     const height = template.numQubits * CELL + 20
 
     return (
-        <div className="border border-zinc-200 bg-white">
-            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5">
-                <span className="text-xs font-semibold text-zinc-900">
+        <div className="border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
+                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
                     {template.title}
                 </span>
                 <span className="hidden font-mono text-[9px] uppercase tracking-wider text-zinc-400 sm:inline">
@@ -37,6 +37,7 @@ function Diagram({ templateId }: { templateId: string }) {
                     height={height}
                     viewBox={`0 0 ${width} ${height}`}
                     className="block"
+                    overflow="visible"
                 >
                     {/* Qubit wires + labels */}
                     {Array.from({ length: template.numQubits }).map((_, q) => (
@@ -44,7 +45,7 @@ function Diagram({ templateId }: { templateId: string }) {
                             <text
                                 x={0}
                                 y={q * CELL + 15}
-                                className="fill-zinc-400 font-mono text-[10px] uppercase"
+                                className="fill-zinc-400 font-mono text-[10px] uppercase dark:fill-zinc-500"
                             >
                                 q{q}
                             </text>
@@ -53,7 +54,7 @@ function Diagram({ templateId }: { templateId: string }) {
                                 y1={q * CELL + 10}
                                 x2={width - 10}
                                 y2={q * CELL + 10}
-                                stroke="#e4e4e7"
+                                className="stroke-zinc-200 dark:stroke-zinc-800"
                                 strokeWidth={1.5}
                             />
                         </g>
@@ -84,40 +85,38 @@ function Diagram({ templateId }: { templateId: string }) {
                                         y1={y1}
                                         x2={cx}
                                         y2={y2}
-                                        stroke="#18181b"
+                                        className="stroke-zinc-900 dark:stroke-zinc-100"
                                         strokeWidth={1.5}
                                     />
-                                    <circle cx={cx} cy={y1} r={5} fill="#18181b" />
+                                    <circle cx={cx} cy={y1} r={5} className="fill-zinc-900 dark:fill-zinc-100" />
                                     {isCx ? (
                                         <>
                                             <circle
                                                 cx={cx}
                                                 cy={y2}
                                                 r={9}
-                                                fill="white"
-                                                stroke="#18181b"
+                                                className="fill-white stroke-zinc-900 dark:fill-[#111111] dark:stroke-zinc-100"
                                                 strokeWidth={1.5}
                                             />
-                                            <line x1={cx - 6} y1={y2} x2={cx + 6} y2={y2} stroke="#18181b" strokeWidth={1.5} />
-                                            <line x1={cx} y1={y2 - 6} x2={cx} y2={y2 + 6} stroke="#18181b" strokeWidth={1.5} />
+                                            <line x1={cx - 6} y1={y2} x2={cx + 6} y2={y2} className="stroke-zinc-900 dark:stroke-zinc-100" strokeWidth={1.5} />
+                                            <line x1={cx} y1={y2 - 6} x2={cx} y2={y2 + 6} className="stroke-zinc-900 dark:stroke-zinc-100" strokeWidth={1.5} />
                                         </>
                                     ) : (
                                         <>
-                                            <circle cx={cx} cy={y2} r={5} fill="#18181b" />
+                                            <circle cx={cx} cy={y2} r={5} className="fill-zinc-900 dark:fill-zinc-100" />
                                             <rect
                                                 x={cx - 12}
                                                 y={(y1 + y2) / 2 - 8}
                                                 width={24}
                                                 height={16}
-                                                fill="white"
-                                                stroke="#18181b"
+                                                className="fill-white stroke-zinc-900 dark:fill-[#111111] dark:stroke-zinc-100"
                                                 strokeWidth={1}
                                             />
                                             <text
                                                 x={cx}
                                                 y={(y1 + y2) / 2 + 4}
                                                 textAnchor="middle"
-                                                className="fill-zinc-950 font-mono text-[9px] font-bold"
+                                                className="fill-zinc-950 font-mono text-[9px] font-bold dark:fill-zinc-100"
                                             >
                                                 {gate.type.toUpperCase()}
                                             </text>
@@ -138,8 +137,11 @@ function Diagram({ templateId }: { templateId: string }) {
                                     y={y - 14}
                                     width={28}
                                     height={28}
-                                    fill={isMeasure ? '#fffbeb' : '#eff6ff'}
-                                    stroke={isMeasure ? '#f59e0b' : '#2563eb'}
+                                    className={
+                                        isMeasure
+                                            ? 'fill-amber-50 stroke-amber-500 dark:fill-amber-500/10 dark:stroke-amber-400'
+                                            : 'fill-blue-50 stroke-blue-600 dark:fill-blue-500/10 dark:stroke-blue-400'
+                                    }
                                     strokeWidth={1.5}
                                 />
                                 <text
@@ -147,7 +149,7 @@ function Diagram({ templateId }: { templateId: string }) {
                                     y={y + 4}
                                     textAnchor="middle"
                                     className={`font-mono text-[10px] font-bold ${
-                                        isMeasure ? 'fill-amber-700' : 'fill-blue-700'
+                                        isMeasure ? 'fill-amber-700 dark:fill-amber-300' : 'fill-blue-700 dark:fill-blue-300'
                                     }`}
                                 >
                                     {isMeasure ? 'M' : gate.type.toUpperCase()}
@@ -168,7 +170,7 @@ export default function CircuitDiagramView({
 }) {
     return (
         <section className="my-10 max-w-5xl">
-            <div className="mb-2 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+            <div className="mb-2 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                 Circuit Diagram
             </div>
             <div

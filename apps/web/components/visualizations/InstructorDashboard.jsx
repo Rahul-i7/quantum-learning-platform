@@ -13,18 +13,11 @@ import {
 } from 'recharts';
 import { Loader2, ArrowLeft, CheckCircle2, CircleDashed, CircleDotDashed, Wifi, WifiOff } from 'lucide-react';
 import { contentApi } from '@/lib/api-client/content';
+import { useChartColors } from './useChartColors';
 
 // Learn page ke look ke hisaab se colors (zinc + blue-600 accent).
 // Recharts ko hex values chahiye, isliye yahan local rakhe hain.
-const COLORS = {
-  accent: '#2563eb',   // blue-600
-  accent2: '#059669',  // emerald-600
-  textDim: '#71717a',  // zinc-500
-  textBright: '#18181b', // zinc-900
-  border: '#e4e4e7',   // zinc-200
-  grid: '#f4f4f5',     // zinc-100
-  panel: '#ffffff',
-};
+// (Palette now comes from useChartColors() so charts follow light/dark mode.)
 
 // Matches supabase/seed.sql's demo cohort (see db/memory_store.py::DEMO_COHORT_ID
 // on the content-progress service when Supabase isn't configured yet).
@@ -74,13 +67,14 @@ const PRESETS = [
 
 
 
-function statusMeta(status) {
+function statusMeta(status, COLORS) {
   if (status === 'completed') return { icon: CheckCircle2, color: COLORS.accent, label: 'Completed' };
   if (status === 'in_progress') return { icon: CircleDotDashed, color: COLORS.accent2, label: 'In progress' };
   return { icon: CircleDashed, color: COLORS.textDim, label: 'Not started' };
 }
 
 export default function InstructorDashboard() {
+  const COLORS = useChartColors();
   const initialPreset = PRESETS[0] ?? null;
   const [activePreset, setActivePreset] = useState(initialPreset?.label ?? '');
   const [cohort, setCohort] = useState(initialPreset?.data ?? null);
@@ -175,10 +169,10 @@ export default function InstructorDashboard() {
   return (
     <div className="w-full">
       {/* Hero / page header (Learn page style) */}
-      <section className="relative overflow-hidden border-b border-zinc-200">
+      <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="pointer-events-none absolute inset-0 opacity-40">
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 dark:invert"
             style={{
               backgroundImage: `
                 linear-gradient(to right, #e4e4e7 1px, transparent 1px),
@@ -191,19 +185,19 @@ export default function InstructorDashboard() {
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <div className="mb-6 flex items-center gap-3">
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-600">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
               Dashboard / Instructor
             </span>
-            <span className="h-px w-12 bg-zinc-300" />
+            <span className="h-px w-12 bg-zinc-300 dark:bg-zinc-600" />
           </div>
 
-          <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-6xl">
+          <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-6xl dark:text-zinc-100">
             Track your cohort
             <br />
             <span className="text-zinc-400">at a glance.</span>
           </h1>
 
-          <p className="mt-7 max-w-xl text-base leading-7 text-zinc-500">
+          <p className="mt-7 max-w-xl text-base leading-7 text-zinc-500 dark:text-zinc-400">
             Monitor completion, quiz scores, and challenge progress across
             every class section — and spot who needs attention.
           </p>
@@ -213,33 +207,33 @@ export default function InstructorDashboard() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-8 lg:flex-row lg:px-8">
         {/* Main charts area */}
         <div className="flex min-w-0 flex-1 flex-col gap-6">
-          <div className="border-b border-zinc-200 pb-6">
+          <div className="border-b border-zinc-200 pb-6 dark:border-zinc-800">
             <div className="mb-3 flex items-center gap-3">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                 Cohort
               </span>
-              <span className="h-px w-8 bg-zinc-300" />
+              <span className="h-px w-8 bg-zinc-300 dark:bg-zinc-600" />
               <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400">
                 {isEmpty ? 'No cohort loaded yet' : `${cohortStats?.count ?? 0} students`}
               </span>
             </div>
-            <h2 className="text-3xl font-semibold tracking-[-0.035em] text-zinc-950">
+            <h2 className="text-3xl font-semibold tracking-[-0.035em] text-zinc-950 dark:text-zinc-100">
               {cohort ? cohort.cohortName : 'Instructor dashboard'}
             </h2>
           </div>
 
           {isEmpty && !isLoading && (
-            <div className="border border-zinc-200 bg-white px-5 py-8 text-center">
-              <p className="text-sm text-zinc-500">
+            <div className="border border-zinc-200 bg-white px-5 py-8 text-center dark:border-zinc-800 dark:bg-[#111111]">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Choose a class section to load cohort progress
               </p>
             </div>
           )}
 
           {isLoading && (
-            <div className="flex items-center gap-2 self-start border border-zinc-200 bg-white px-4 py-3">
-              <Loader2 size={15} className="animate-spin text-blue-600" />
-              <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+            <div className="flex items-center gap-2 self-start border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-[#111111]">
+              <Loader2 size={15} className="animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Loading cohort data…
               </span>
             </div>
@@ -256,8 +250,8 @@ export default function InstructorDashboard() {
               </div>
 
               {/* Per-student completion chart */}
-              <div className="border border-zinc-200 bg-white p-5">
-                <div className="text-sm font-semibold text-zinc-950">Completion by student</div>
+              <div className="border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-[#111111]">
+                <div className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">Completion by student</div>
                 <div className="mb-3 mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                   Sorted lowest to highest — click a bar for detail
                 </div>
@@ -279,7 +273,7 @@ export default function InstructorDashboard() {
                         domain={[0, 100]}
                       />
                       <Tooltip
-                        cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }}
+                        cursor={{ fill: COLORS.cursor }}
                         contentStyle={{
                           background: COLORS.panel,
                           border: `1px solid ${COLORS.border}`,
@@ -301,7 +295,7 @@ export default function InstructorDashboard() {
                         {studentChartData.map((s) => (
                           <Cell
                             key={s.id}
-                            fill={s.id === selectedId ? '#18181b' : COLORS.accent}
+                            fill={s.id === selectedId ? COLORS.selected : COLORS.accent}
                             opacity={selectedId && s.id !== selectedId ? 0.35 : 1}
                           />
                         ))}
@@ -312,8 +306,8 @@ export default function InstructorDashboard() {
               </div>
 
               {/* Module completion chart */}
-              <div className="border border-zinc-200 bg-white p-5">
-                <div className="text-sm font-semibold text-zinc-950">Average completion by module</div>
+              <div className="border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-[#111111]">
+                <div className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">Average completion by module</div>
                 <div className="mb-3 mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                   Where the whole cohort is spending the most time
                 </div>
@@ -342,7 +336,7 @@ export default function InstructorDashboard() {
                         tickLine={false}
                       />
                       <Tooltip
-                        cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }}
+                        cursor={{ fill: COLORS.cursor }}
                         contentStyle={{
                           background: COLORS.panel,
                           border: `1px solid ${COLORS.border}`,
@@ -354,7 +348,7 @@ export default function InstructorDashboard() {
                         itemStyle={{ color: COLORS.textBright }}
                         formatter={(value) => [`${value}%`, 'avg. completion']}
                       />
-                      <Bar dataKey="avgCompletion" radius={0} fill={COLORS.accent} barSize={8} background={{ fill: '#f4f4f5' }} />
+                      <Bar dataKey="avgCompletion" radius={0} fill={COLORS.accent} barSize={8} background={{ fill: COLORS.barTrack }} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -367,7 +361,7 @@ export default function InstructorDashboard() {
         <aside className="w-full shrink-0 lg:w-80">
           <div className="flex flex-col gap-7 lg:sticky lg:top-24">
             <div>
-              <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
                 Class sections
               </div>
               <div className="flex flex-col gap-2">
@@ -375,12 +369,12 @@ export default function InstructorDashboard() {
                   onClick={loadLiveCohort}
                   className={`flex items-center gap-2 border px-3 py-3 text-left text-xs font-medium transition-all sm:py-2.5 ${
                     activePreset === 'Live — Content Service'
-                      ? 'border-blue-600 bg-white text-zinc-950'
-                      : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
+                      ? 'border-blue-600 bg-white text-zinc-950 dark:bg-[#111111] dark:text-zinc-100'
+                      : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-100'
                   }`}
                 >
                   {activePreset === 'Live — Content Service' && !liveError ? (
-                    <Wifi size={13} className="text-blue-600" />
+                    <Wifi size={13} className="text-blue-600 dark:text-blue-400" />
                   ) : (
                     <WifiOff size={13} className="text-zinc-400" />
                   )}
@@ -392,8 +386,8 @@ export default function InstructorDashboard() {
                     onClick={() => applyPreset(p)}
                     className={`border px-3 py-3 text-left text-xs font-medium transition-all sm:py-2.5 ${
                       activePreset === p.label
-                        ? 'border-blue-600 bg-white text-zinc-950'
-                        : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
+                        ? 'border-blue-600 bg-white text-zinc-950 dark:bg-[#111111] dark:text-zinc-100'
+                        : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-100'
                     }`}
                   >
                     {p.label}
@@ -401,35 +395,35 @@ export default function InstructorDashboard() {
                 ))}
               </div>
               {liveError && (
-                <p className="mt-2 text-[11px] text-zinc-500">{liveError}</p>
+                <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400">{liveError}</p>
               )}
             </div>
 
             {status === 'ready' && selectedStudent && (
-              <div className="border border-zinc-200 bg-white p-4">
+              <div className="border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#111111]">
                 <button
                   onClick={() => setSelectedId(null)}
-                  className="mb-4 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900"
+                  className="mb-4 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   <ArrowLeft size={13} />
                   Back to cohort overview
                 </button>
 
-                <div className="text-base font-semibold text-zinc-950">
+                <div className="text-base font-semibold text-zinc-950 dark:text-zinc-100">
                   {selectedStudent.name}
                 </div>
                 <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-zinc-400">
                   {selectedStudent.completionPct}% complete · active {selectedStudent.lastActive}
                 </div>
 
-                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
                   Module progress
                 </div>
                 <div className="flex flex-col gap-2.5">
                   {selectedStudent.moduleProgress.map((pct, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <div className="w-24 text-[11px] text-zinc-700">{MODULES[i]}</div>
-                      <div className="h-px flex-1 bg-zinc-200">
+                      <div className="w-24 text-[11px] text-zinc-700 dark:text-zinc-300">{MODULES[i]}</div>
+                      <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700">
                         <div className="h-px bg-blue-600 transition-all duration-500" style={{ width: `${pct}%` }} />
                       </div>
                       <div className="w-9 text-right font-mono text-[10px] text-zinc-400">
@@ -439,10 +433,10 @@ export default function InstructorDashboard() {
                   ))}
                 </div>
 
-                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
                   Quiz scores
                 </div>
-                <div className="font-mono text-xs leading-7 text-zinc-900">
+                <div className="font-mono text-xs leading-7 text-zinc-900 dark:text-zinc-100">
                   {selectedStudent.quizzes.map((q) => (
                     <div key={q.name}>
                       {q.name}: {q.score}/{q.max}
@@ -450,17 +444,17 @@ export default function InstructorDashboard() {
                   ))}
                 </div>
 
-                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                <div className="mb-2 mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
                   Coding challenges
                 </div>
                 <div className="flex flex-col gap-2">
                   {selectedStudent.challenges.map((c) => {
-                    const meta = statusMeta(c.status);
+                    const meta = statusMeta(c.status, COLORS);
                     const Icon = meta.icon;
                     return (
                       <div key={c.name} className="flex items-center gap-2">
                         <Icon size={14} style={{ color: meta.color, flexShrink: 0 }} />
-                        <span className="text-xs text-zinc-700">{c.name}</span>
+                        <span className="text-xs text-zinc-700 dark:text-zinc-300">{c.name}</span>
                       </div>
                     );
                   })}
@@ -469,16 +463,16 @@ export default function InstructorDashboard() {
             )}
 
             {status === 'ready' && !selectedStudent && cohortStats && (
-              <div className="border border-zinc-200 bg-white p-4">
-                <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+              <div className="border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#111111]">
+                <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
                   Cohort overview
                 </div>
-                <div className="font-mono text-xs leading-8 text-zinc-900">
+                <div className="font-mono text-xs leading-8 text-zinc-900 dark:text-zinc-100">
                   <div>Students: {cohortStats.count}</div>
                   <div>Avg. completion: {cohortStats.avgCompletion}%</div>
                   <div>Avg. quiz score: {cohortStats.avgQuiz}%</div>
                 </div>
-                <div className="mt-3 border-t border-zinc-100 pt-3 text-[11px] leading-5 text-zinc-500">
+                <div className="mt-3 border-t border-zinc-100 pt-3 text-[11px] leading-5 text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
                   Click any bar in the chart to see the full breakdown of the progress of the student.
                 </div>
               </div>
@@ -491,9 +485,9 @@ export default function InstructorDashboard() {
 }
 
 function StatChip({ label, value, accent, accent2 }) {
-  const color = accent ? 'text-blue-600' : accent2 ? 'text-emerald-600' : 'text-zinc-900';
+  const color = accent ? 'text-blue-600 dark:text-blue-400' : accent2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-900 dark:text-zinc-100';
   return (
-    <div className="flex-[1_1_160px] border border-zinc-200 bg-white px-4 py-3">
+    <div className="flex-[1_1_160px] border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-[#111111]">
       <div className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{label}</div>
       <div className={`mt-1 font-mono text-base font-semibold ${color}`}>{value}</div>
     </div>

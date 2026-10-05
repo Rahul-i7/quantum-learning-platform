@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import { RotateCcw, Loader2, Orbit } from 'lucide-react'
 import { useCircuitStore } from '@/lib/store/circuit-store'
+import { useIsDark } from './useChartColors'
 /* ---------- PURE MATH START (no three.js / React in here; unit-tested separately) ---------- */
 
 const GROUND_STATE = {
@@ -299,12 +300,13 @@ export default function BlochSphereVisualizer({
 
     const displayedBlochState = animated ? animState : targetBlochState
 
-    // Scene setup (runs once per variant)
+    // Scene setup (runs once per variant; rebuilt when the theme flips so the 3D labels stay readable)
+    const isDarkTheme = useIsDark()
     useEffect(() => {
         const mount = mountRef.current
         if (!mount) return
 
-        const labelColor = isHero ? '#94a3b8' : '#334155'
+        const labelColor = isHero || isDarkTheme ? '#94a3b8' : '#334155'
 
         let renderer
         try {
@@ -473,7 +475,7 @@ export default function BlochSphereVisualizer({
             if (canvas.parentNode === mount) mount.removeChild(canvas)
             threeRef.current = {}
         }
-    }, [isHero])
+    }, [isHero, isDarkTheme])
 
     // Push the current state into the scene.
     useEffect(() => {
@@ -530,16 +532,16 @@ export default function BlochSphereVisualizer({
             className={
                 isHero
                     ? 'relative flex h-full min-h-0 w-full min-w-0 flex-col'
-                    : 'flex h-full min-h-0 w-full min-w-0 flex-col bg-white'
+                    : 'flex h-full min-h-0 w-full min-w-0 flex-col bg-white dark:bg-[#111111]'
             }
         >
             {/* Header */}
             {!isHero && (
-                <div className="mb-4 flex items-start justify-between gap-4 border-b border-zinc-200 pb-4">
+                <div className="mb-4 flex items-start justify-between gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="h-1.5 w-1.5 bg-blue-600" />
-                            <h3 className="text-sm font-semibold text-zinc-950">Bloch Sphere</h3>
+                            <h3 className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">Bloch Sphere</h3>
                         </div>
 
                         <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-zinc-400">
@@ -559,16 +561,16 @@ export default function BlochSphereVisualizer({
                                 Qubit
                             </span>
 
-                            <div className="flex border border-zinc-200">
+                            <div className="flex border border-zinc-200 dark:border-zinc-800">
                                 {qubitsList.map((q) => (
                                     <button
                                         key={q}
                                         type="button"
                                         aria-pressed={activeQubit === q}
                                         onClick={() => setSelectedQubit(q)}
-                                        className={`border-r border-zinc-200 px-2.5 py-1.5 font-mono text-[10px] transition-colors last:border-r-0 ${activeQubit === q
-                                            ? 'bg-zinc-950 text-white'
-                                            : 'bg-white text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+                                        className={`border-r border-zinc-200 px-2.5 py-1.5 font-mono text-[10px] transition-colors last:border-r-0 dark:border-zinc-800 ${activeQubit === q
+                                            ? 'bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                                            : 'bg-white text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:bg-[#111111] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
                                             }`}
                                     >
                                         q[{q}]
@@ -585,13 +587,13 @@ export default function BlochSphereVisualizer({
                 className={
                     isHero
                         ? 'relative min-h-0 flex-1 overflow-hidden'
-                        : 'relative min-h-[280px] flex-1 overflow-hidden border border-zinc-200 bg-[#fafafa]'
+                        : 'relative min-h-[280px] flex-1 overflow-hidden border border-zinc-200 bg-[#fafafa] dark:border-zinc-800 dark:bg-[#0a0a0a]'
                 }
             >
                 {loading && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
-                        <Loader2 className="mb-3 h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-zinc-900/80">
+                        <Loader2 className="mb-3 h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
                             Simulating state
                         </span>
                     </div>
@@ -632,7 +634,7 @@ export default function BlochSphereVisualizer({
                 <div
                     className={
                         isHero
-                            ? 'absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-zinc-700'
+                            ? 'absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-zinc-700 dark:text-zinc-300'
                             : 'pointer-events-none absolute bottom-2 left-3 flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-zinc-400'
                     }
                 >
@@ -643,13 +645,13 @@ export default function BlochSphereVisualizer({
 
             {/* State readout */}
             {!isHero && (
-                <div className="mt-4 border-t border-zinc-200 pt-4">
+                <div className="mt-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
                     <div className="flex items-center justify-between gap-4">
                         <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
                             Bloch vector
                         </span>
 
-                        <span className="font-mono text-[11px] font-semibold text-zinc-900">
+                        <span className="font-mono text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">
                             {approximate
                                 ? 'n/a'
                                 : `(${fmt(displayedBlochState.x)}, ${fmt(displayedBlochState.y)}, ${fmt(
@@ -661,12 +663,12 @@ export default function BlochSphereVisualizer({
                     <div className="mt-4 grid grid-cols-2 gap-6">
                         <div>
                             <div className="mb-1.5 flex items-center justify-between">
-                                <span className="font-mono text-[10px] text-zinc-500">P(|0⟩)</span>
-                                <span className="font-mono text-[10px] font-semibold text-zinc-900">
+                                <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">P(|0⟩)</span>
+                                <span className="font-mono text-[10px] font-semibold text-zinc-900 dark:text-zinc-100">
                                     {(displayedBlochState.prob0 * 100).toFixed(1)}%
                                 </span>
                             </div>
-                            <div className="h-px w-full bg-zinc-200">
+                            <div className="h-px w-full bg-zinc-200 dark:bg-zinc-700">
                                 <div
                                     className="h-px bg-blue-600 transition-all duration-300"
                                     style={{
@@ -678,12 +680,12 @@ export default function BlochSphereVisualizer({
 
                         <div>
                             <div className="mb-1.5 flex items-center justify-between">
-                                <span className="font-mono text-[10px] text-zinc-500">P(|1⟩)</span>
-                                <span className="font-mono text-[10px] font-semibold text-zinc-900">
+                                <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">P(|1⟩)</span>
+                                <span className="font-mono text-[10px] font-semibold text-zinc-900 dark:text-zinc-100">
                                     {(displayedBlochState.prob1 * 100).toFixed(1)}%
                                 </span>
                             </div>
-                            <div className="h-px w-full bg-zinc-200">
+                            <div className="h-px w-full bg-zinc-200 dark:bg-zinc-700">
                                 <div
                                     className="h-px bg-emerald-600 transition-all duration-300"
                                     style={{
@@ -695,8 +697,8 @@ export default function BlochSphereVisualizer({
                     </div>
 
                     {approximate && (
-                        <div className="mt-4 border-l-2 border-amber-400 bg-amber-50 px-3 py-2">
-                            <p className="font-mono text-[12px] leading-4 text-amber-700">
+                        <div className="mt-4 border-l-2 border-amber-400 bg-amber-50 px-3 py-2 dark:bg-amber-500/10">
+                            <p className="font-mono text-[12px] leading-4 text-amber-700 dark:text-amber-400">
                                 Measured circuit: the full quantum state is not available, so only Z-basis
                                 probabilities are shown. Remove the measurement to see the Bloch vector.
                             </p>
@@ -704,8 +706,8 @@ export default function BlochSphereVisualizer({
                     )}
 
                     {!approximate && !isDefault && displayedBlochState.mag < 0.98 && (
-                        <div className="mt-4 border-l-2 border-amber-400 bg-amber-50 px-3 py-2">
-                            <p className="font-mono text-[9px] leading-4 text-amber-700">
+                        <div className="mt-4 border-l-2 border-amber-400 bg-amber-50 px-3 py-2 dark:bg-amber-500/10">
+                            <p className="font-mono text-[9px] leading-4 text-amber-700 dark:text-amber-400">
                                 Mixed or reduced state · vector magnitude:{' '}
                                 {displayedBlochState.mag.toFixed(2)}
                             </p>

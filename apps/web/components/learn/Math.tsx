@@ -31,7 +31,7 @@ export default function MathBlock({
     if (display) {
         return (
             <div
-                className="max-w-3xl overflow-x-auto py-1 text-[15px] text-zinc-800"
+                className="max-w-3xl overflow-x-auto py-1 text-[15px] text-zinc-800 dark:text-zinc-200"
                 // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: html }}
             />

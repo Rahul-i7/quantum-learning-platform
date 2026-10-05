@@ -42,18 +42,18 @@ export default function ShorsPeriodicityChart() {
     const max = Math.max(...values)
 
     return (
-        <section className="my-10 max-w-3xl border border-zinc-200 bg-white">
-            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6">
-                <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+        <section className="my-10 max-w-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#111111]">
+            <div className="border-b border-zinc-200 px-5 py-4 sm:px-6 dark:border-zinc-800">
+                <div className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                     Interactive
                 </div>
-                <h3 className="text-sm font-semibold tracking-tight text-zinc-950">
+                <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                     The periodicity Shors looks for
                 </h3>
             </div>
 
             <div className="px-5 py-6 sm:px-6">
-                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500">
+                <p className="mb-5 max-w-xl text-xs leading-6 text-zinc-500 dark:text-zinc-400">
                     This is the classical sequence a<sup>x</sup> mod N — the
                     exact pattern the quantum part finds exponentially faster
                     via the Quantum Fourier Transform. Watch the period
@@ -67,8 +67,8 @@ export default function ShorsPeriodicityChart() {
                             onClick={() => setPreset(p)}
                             className={`border px-3 py-2 font-mono text-[11px] font-semibold transition-all ${
                                 preset.label === p.label
-                                    ? 'border-zinc-950 bg-zinc-950 text-white'
-                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950'
+                                    ? 'border-zinc-950 bg-zinc-950 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950'
+                                    : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-950 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100'
                             }`}
                         >
                             {p.label}
