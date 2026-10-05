@@ -98,7 +98,7 @@ export default function Home() {
 
             {/* HERO */}
             <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800 bg-[#0b0d10] text-white">
-                <AnimatedQuantumGrid />
+                <AnimatedQuantumGrid onDark />
 
                 <div className="relative mx-auto max-w-7xl px-6">
                     <div className="grid min-h-180 grid-cols-1 lg:grid-cols-12">

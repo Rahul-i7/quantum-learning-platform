@@ -1,9 +1,13 @@
 'use client'
 
 import { useEffect, useRef } from "react";
+import { useTheme } from 'next-themes'
 
-export default function AnimatedQuantumGrid() {
+export default function AnimatedQuantumGrid({ onDark = false }: { onDark?: boolean }) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const { resolvedTheme } = useTheme()
+
+    const light = !onDark && resolvedTheme !== 'dark'
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -26,11 +30,10 @@ export default function AnimatedQuantumGrid() {
         }> = [];
 
         // Softer, lower-brightness color palette
-        const colors = [
-            "rgba(96, 165, 250, 0.6)",   // Soft blue
-            "rgba(255, 255, 255, 0.45)",  // Muted white
-            "rgba(167, 139, 250, 0.5)",   // Soft purple
-        ];
+        const colors = light
+            ? ["rgba(37, 99, 235, 0.5)", "rgba(24, 24, 27, 0.35)", "rgba(124, 58, 237, 0.4)"]
+            : ["rgba(96, 165, 250, 0.6)", "rgba(255, 255, 255, 0.45)", "rgba(167, 139, 250, 0.5)"];
+        const fade = light ? "rgba(24, 24, 27, 0)" : "rgba(255, 255, 255, 0)";
 
         const handleResize = () => {
             if (!canvas.parentElement) return;
@@ -86,7 +89,7 @@ export default function AnimatedQuantumGrid() {
                     }
 
                     const gradient = ctx.createLinearGradient(p.x - p.length, p.y, p.x, p.y);
-                    gradient.addColorStop(0, "rgba(255,255,255,0)");
+                    gradient.addColorStop(0, fade);
                     gradient.addColorStop(1, p.color);
 
                     ctx.strokeStyle = gradient;
@@ -125,10 +128,12 @@ export default function AnimatedQuantumGrid() {
             window.removeEventListener("resize", handleResize);
             cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [light]);
+
+    const line = light ? "rgba(0,0,0,.6)" : "rgba(255,255,255,.6)";
 
     return (
-        <div 
+        <div
             className="pointer-events-none absolute inset-0 overflow-hidden"
             style={{
                 // Radial fade-out towards all 4 edges
@@ -141,8 +146,8 @@ export default function AnimatedQuantumGrid() {
                 className="absolute inset-0 opacity-[0.05]"
                 style={{
                     backgroundImage: `
-                        linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)
+                        linear-gradient(${line} 1px, transparent 1px),
+                        linear-gradient(90deg, ${line} 1px, transparent 1px)
                     `,
                     backgroundSize: "48px 48px",
                 }}
